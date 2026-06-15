@@ -1,0 +1,102 @@
+[
+  {
+    "id": "auditorio-eggon-diurno-basica",
+    "nome": "Auditório Eggon João da Silva - Diurno - Sala Básica",
+    "categoria": "Salas",
+    "detalhes": "Locação em período diurno sem recursos adicionais",
+    "valor": 950,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "auditorio-eggon-diurno-recursos",
+    "nome": "Auditório Eggon João da Silva - Diurno - Sala com Recursos",
+    "categoria": "Salas",
+    "detalhes": "Locação em período diurno com recursos",
+    "valor": 1250,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "sala-comercio-varejista-diurno-basica",
+    "nome": "Sala Heinz e Ilse Kolbach / Comércio Varejista - Diurno - Sala Básica",
+    "categoria": "Salas",
+    "detalhes": "Sala básica em período diurno",
+    "valor": 480,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "projetor",
+    "nome": "Projetor",
+    "categoria": "Equipamentos",
+    "detalhes": "Equipamento audiovisual",
+    "valor": 180,
+    "unidade": "unidade",
+    "status": "ativo",
+    "aplicaRegras": false
+  },
+  {
+    "id": "microfone",
+    "nome": "Microfone",
+    "categoria": "Equipamentos",
+    "detalhes": "Microfone para evento",
+    "valor": 90,
+    "unidade": "unidade",
+    "status": "ativo",
+    "aplicaRegras": false
+  },
+  {
+    "id": "cafe-1-litro",
+    "nome": "Café 1 litro",
+    "categoria": "Consumo",
+    "detalhes": "Café servido em garrafa de 1 litro",
+    "valor": 28.0,
+    "unidade": "litro",
+    "status": "ativo",
+    "aplicaRegras": false
+  },
+  {
+    "id": "agua-500ml",
+    "nome": "Água 500ml",
+    "categoria": "Consumo",
+    "detalhes": "Água mineral 500ml",
+    "valor": 3.5,
+    "unidade": "unidade",
+    "status": "ativo",
+    "aplicaRegras": false
+  },
+  {
+    "id": "copos-descartaveis",
+    "nome": "Copos descartáveis",
+    "categoria": "Consumo",
+    "detalhes": "Copo descartável unidade",
+    "valor": 0.5,
+    "unidade": "unidade",
+    "status": "ativo",
+    "aplicaRegras": false
+  },
+  {
+    "id": "copo-de-agua",
+    "nome": "Copo de água",
+    "categoria": "Consumo",
+    "detalhes": "Copo de água servido no evento",
+    "valor": 3.0,
+    "unidade": "unidade",
+    "status": "ativo",
+    "aplicaRegras": false
+  },
+  {
+    "id": "toalha-grande",
+    "nome": "Toalha Grande",
+    "categoria": "Serviços",
+    "detalhes": "Toalha para mesa de evento",
+    "valor": 35.0,
+    "unidade": "unidade",
+    "status": "ativo",
+    "aplicaRegras": true
+  }
+]

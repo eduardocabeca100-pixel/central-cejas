@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Sistema de Gestão CEJAS | Orçamentos</title>
+
+  <style>
+    :root {
+      --dark: #0f172a;
+      --sidebar: #0b0b10;
+      --accent1: #7B61FF;
+      --accent2: #FF61D2;
+      --paper: #ffffff;
+      --muted: #64748b;
+      --border: #d7dde7;
+      --bg: #e5e7eb;
+      --green: #059669;
+      --red: #ef4444;
+      --blue: #2563eb;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body,
+    button,
+    input,
+    select,
+    textarea {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: #1e293b;
+      overflow: hidden;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      height: 100vh;
+    }
+
+    .sidebar {
+      background: var(--sidebar);
+      color: #fff;
+      padding: 24px 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 26px;
+    }
+
+    .logo-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid #9b5cff;
+      display: grid;
+      place-items: center;
+      color: #ff61d2;
+      font-weight: 900;
+      font-size: 28px;
+    }
+
+    .brand h1 {
+      font-size: 15px;
+      line-height: 1.05;
+    }
+
+    .brand p {
+      font-size: 12px;
+      color: #b3b3b3;
+      margin-top: 4px;
+    }
+
+    .user-card {
+      background: #171717;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      padding: 15px;
+      margin-bottom: 28px;
+    }
+
+    .user-card strong {
+      display: block;
+      font-size: 15px;
+    }
+
+    .user-card span {
+      color: #b3b3b3;
+      font-size: 13px;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    .nav a {
+      color: #c7c7c7;
+      text-decoration: none;
+      padding: 14px 13px;
+      border-radius: 13px;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .nav a.active {
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    }
+
+    .main {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .topbar {
+      height: 72px;
+      background: #111827;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      box-shadow: 0 4px 18px rgba(0,0,0,.18);
+      flex-shrink: 0;
+    }
+
+    .topbar h2 {
+      font-size: 22px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .session-pill {
+      background: rgba(37,99,235,.22);
+      color: #dbeafe;
+      border: 1px solid rgba(147,197,253,.25);
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 9px;
+      padding: 12px 17px;
+      color: #fff;
+      font-weight: 900;
+      cursor: pointer;
+      background: #1f2937;
+      transition: .2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+    }
+
+    .btn.blue {
+      background: var(--blue);
+    }
+
+    .workspace {
+      flex: 1;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 440px 1fr;
+      gap: 34px;
+      padding: 18px;
+    }
+
+    .editor {
+      background: #fff;
+      border-radius: 14px;
+      padding: 20px;
+      overflow-y: auto;
+      box-shadow: 0 18px 40px rgba(15,23,42,.15);
+    }
+
+    .editor-section {
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 18px;
+      margin-bottom: 22px;
+    }
+
+    .editor-section:last-child {
+      border-bottom: 0;
+    }
+
+    .editor h3 {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      color: #1e293b;
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 900;
+      color: #334155;
+      margin: 10px 0 6px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: #f8fafc;
+      color: #1f2937;
+      padding: 12px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 86px;
+      resize: vertical;
+    }
+
+    .toggle {
+      display: flex;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .toggle button {
+      flex: 1;
+      border: 0;
+      background: #fff;
+      color: #9ca3af;
+      padding: 11px 8px;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .toggle button.active {
+      background: #1f2937;
+      color: #fff;
+    }
+
+    .toggle button.green.active {
+      background: var(--green);
+    }
+
+    .cron-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .pill-btn {
+      border: 0;
+      border-radius: 999px;
+      background: #1f2937;
+      color: #fff;
+      padding: 9px 13px;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .day-card {
+      border: 2px solid #eef2f7;
+      border-radius: 18px;
+      padding: 12px;
+      background: #fff;
+      box-shadow: 0 8px 24px rgba(15,23,42,.08);
+      margin-bottom: 16px;
+    }
+
+    .day-top {
+      display: grid;
+      grid-template-columns: 1fr 100px 100px 28px;
+      gap: 9px;
+      align-items: center;
+      padding: 8px;
+      border-radius: 14px;
+      background: #f8fafc;
+      margin-bottom: 10px;
+    }
+
+    .danger {
+      border: 0;
+      background: transparent;
+      color: #ef4444;
+      font-size: 24px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .item-row input {
+      padding: 10px;
+      font-size: 13px;
+      min-width: 0;
+    }
+
+    .item-row {
+      display: grid;
+      grid-template-columns: minmax(140px, 1.2fr) 58px minmax(130px, 1fr) 86px 28px;
+      gap: 9px;
+      align-items: center;
+      border: 1px solid #e5e7eb;
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 10px;
+      margin: 8px 0;
+    }
+
+    .add-line {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 9px;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 11px;
+      margin-top: 11px;
+    }
+
+    .custom-btn {
+      border: 1px dashed #cbd5e1;
+      border-radius: 10px;
+      background: #fff;
+      color: #64748b;
+      padding: 12px;
+      font-size: 13px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .custom-btn.primary {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border-color: #bfdbfe;
+    }
+
+    .preview {
+      overflow-y: auto;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding-bottom: 40px;
+    }
+
+    .document {
+      width: 21cm;
+      min-height: 29.7cm;
+      background: var(--paper);
+      color: #1f2937;
+      padding: 32px;
+      box-shadow: 0 20px 45px rgba(15,23,42,.22);
+      transform: scale(.8);
+      transform-origin: top center;
+      display: flex;
+      flex-direction: column;
+      font-size: 13px;
+    }
+
+    .doc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding-bottom: 18px;
+      border-bottom: 2px solid #1f2937;
+      margin-bottom: 16px;
+    }
+
+    .cejas-logo strong {
+      font-size: 32px;
+      color: #6b7280;
+      letter-spacing: -2px;
+    }
+
+    .cejas-logo span {
+      display: block;
+      color: #6b7280;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .doc-company {
+      text-align: right;
+      font-size: 11px;
+      line-height: 1.45;
+      color: #4b5563;
+    }
+
+    .doc-company h1 {
+      color: #111827;
+      font-size: 14px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .doc-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-bottom: 14px;
+    }
+
+    .doc-title {
+      background: #f3f4f6;
+      border: 1px solid #d1d5db;
+      padding: 10px;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: .24em;
+      font-weight: 900;
+      margin-bottom: 16px;
+    }
+
+    .doc-fields {
+      border: 1px solid #d1d5db;
+      padding: 13px;
+      margin-bottom: 18px;
+      line-height: 1.9;
+      font-size: 14px;
+    }
+
+    .doc-fields strong {
+      display: inline-block;
+      width: 110px;
+    }
+
+    .period h3 {
+      border-left: 4px solid #94a3b8;
+      padding-left: 10px;
+      font-size: 12px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-bottom: 18px;
+    }
+
+    th,
+    td {
+      border: 1px solid #d1d5db;
+      padding: 7px;
+      text-align: left;
+    }
+
+    th {
+      background: #f3f4f6;
+      font-weight: 900;
+    }
+
+    .num {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .total-general {
+      width: 340px;
+      margin: 16px 0 34px auto;
+      border: 4px solid #1f2937;
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 900;
+      font-size: 14px;
+      text-transform: uppercase;
+      background: #ffffff;
+    }
+
+    .total-general strong {
+      font-size: 28px;
+      color: #111827;
+      white-space: nowrap;
+    }
+
+    .doc-period-title {
+      border-left: 4px solid #94a3b8;
+      padding-left: 10px;
+      font-size: 14px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      color: #1f2937;
+      font-weight: 900;
+    }
+
+    .subtotal td {
+      background: #f8fafc;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .infos-box {
+      border: 1px solid #d1d5db;
+      padding: 12px;
+      margin-bottom: 18px;
+      font-size: 12px;
+      display: none;
+    }
+
+    .conditions {
+      margin-top: auto;
+      border: 1px solid #d1d5db;
+      background: #f8fafc;
+      margin-bottom: 24px;
+    }
+
+    .conditions h4 {
+      background: #e5e7eb;
+      padding: 8px 12px;
+      font-size: 10px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .conditions div {
+      padding: 12px;
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    .warning {
+      font-weight: 900;
+      color: #111827;
+      border-top: 1px solid #e5e7eb;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 7px 0;
+      margin: 7px 0;
+      text-transform: uppercase;
+    }
+
+    .signature {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      font-size: 12px;
+    }
+
+    .signature strong {
+      display: block;
+      font-size: 14px;
+      color: #111827;
+      margin-top: 10px;
+    }
+
+    .system-mark {
+      font-size: 9px;
+      color: #94a3b8;
+      text-transform: uppercase;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      z-index: 9999;
+      background: rgba(0,0,0,.72);
+      backdrop-filter: blur(8px);
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    .modal.open {
+      display: block;
+    }
+
+    .modal-box {
+      max-width: 1100px;
+      margin: auto;
+      background: #fff;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 30px 90px rgba(0,0,0,.35);
+    }
+
+    .modal-head {
+      background: #111827;
+      color: #fff;
+      padding: 18px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-body {
+      padding: 22px;
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 20px;
+    }
+
+    .modal-card {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .modal-card h3 {
+      margin-bottom: 14px;
+    }
+
+    .catalog-table {
+      width: 100%;
+      font-size: 12px;
+      background: #fff;
+    }
+
+    .mini {
+      border: 0;
+      border-radius: 8px;
+      padding: 7px 9px;
+      color: #fff;
+      background: #2563eb;
+      font-weight: 900;
+      cursor: pointer;
+      font-size: 11px;
+      margin: 2px;
+    }
+
+    .mini.red {
+      background: #dc2626;
+    }
+
+    .mini.dark {
+      background: #111827;
+    }
+
+    @media print {
+      .sidebar,
+      .topbar,
+      .editor,
+      .modal {
+        display: none !important;
+      }
+
+      body,
+      .app,
+      .main,
+      .workspace,
+      .preview {
+        display: block;
+        height: auto;
+        overflow: visible;
+        background: #fff;
+        padding: 0;
+      }
+
+      .document {
+        transform: none;
+        width: 21cm;
+        min-height: 29.7cm;
+        box-shadow: none;
+      }
+
+      @page {
+        size: A4;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo-box">M</div>
+        <div>
+          <h1>SISTEMA DE GESTÃO CEJAS</h1>
+          <p>Painel Administrativo</p>
+        </div>
+      </div>
+
+      <div class="user-card">
+        <strong id="sidebarUser">Eduardo Cabeça</strong>
+        <span>Super Admin</span>
+      </div>
+
+      <nav class="nav">
+        <a href="dashboard.html">▦ Painel Geral</a>
+        <a href="agenda.html">▣ Agenda Dinâmica</a>
+        <a href="orcamentos.html" class="active">◉ Orçamentos</a>
+        <a href="importar-relatorio.html">▤ Importar Relatório (PDF)</a>
+        <a href="tarefas.html">☑ Tarefas Pendentes</a>
+        <a href="usuarios.html">◌ Acessos / Usuários</a>
+        <a href="configuracoes.html">⚙ Configurações</a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <h2>🏢 CEJAS - Orçamentos v.2026</h2>
+
+        <div class="top-actions">
+          <span id="sessionTimer" class="session-pill">Conectado 05:00</span>
+          <button class="btn" onclick="location.href='dashboard.html'">Voltar ao Painel</button>
+          <button class="btn" onclick="openCatalog()">⚙ Cadastro de Itens</button>
+          <button class="btn blue" onclick="window.print()">🖨 Imprimir / Gerar PDF</button>
+        </div>
+      </header>
+
+      <section class="workspace">
+        <aside class="editor">
+          <section class="editor-section">
+            <h3>👤 Emissor Comercial</h3>
+            <label>Elaborado por</label>
+            <input id="emissor" value="EDUARDO CABEÇA" readonly>
+          </section>
+
+          <section class="editor-section">
+            <h3>💼 Regras de Preço</h3>
+
+            <div class="toggle">
+              <button id="btnAssociado" class="green" onclick="setAssociado(true)">ASSOCIADO</button>
+              <button id="btnNaoAssociado" class="active" onclick="setAssociado(false)">NÃO ASSOCIADO</button>
+            </div>
+
+            <div class="toggle">
+              <button id="btnUtil" class="active" onclick="setTipoDia('DIAS ÚTEIS')">DIAS ÚTEIS</button>
+              <button id="btnSabado" onclick="setTipoDia('SÁBADO')">SÁBADO</button>
+              <button id="btnDomingo" onclick="setTipoDia('DOM/FER')">DOM/FER</button>
+            </div>
+
+            <label>Empresa Solicitante</label>
+            <input id="solicitante" placeholder="Empresa Solicitante" oninput="render()">
+
+            <label>Nome do Evento</label>
+            <input id="evento" placeholder="Nome do Evento" oninput="render()">
+          </section>
+
+          <section class="editor-section">
+            <h3>📄 Infos Adicionais</h3>
+            <textarea id="infos" placeholder="Ex: Montagem especial, observações do cliente..." oninput="render()"></textarea>
+          </section>
+
+          <section class="editor-section">
+            <div class="cron-title">
+              <h3 style="margin:0;">📅 Cronograma</h3>
+              <button class="pill-btn" onclick="addDay()">+ Novo Dia</button>
+            </div>
+
+            <div id="days"></div>
+          </section>
+        </aside>
+
+        <section class="preview">
+          <article class="document">
+            <div class="doc-header">
+              <div class="cejas-logo">
+                <strong>CEJAS</strong>
+                <span>Centro Empresarial<br>de Jaraguá do Sul</span>
+              </div>
+
+              <div class="doc-company">
+                <h1>Documento Auxiliar de Venda - Orçamento</h1>
+                <p>De: Centro Empresarial de Jaraguá do Sul - CEJAS</p>
+                <p>CNPJ: 83.784.124/0001-32 - IE: Isenta</p>
+                <p>Rua Octaviano Lombardi, 100. Czerniewicz | CEP 89255-055</p>
+                <p>Jaraguá do Sul - SC</p>
+                <p>(47) 3275-7000 – Fax (47) 3275-7001</p>
+              </div>
+            </div>
+
+            <div class="doc-meta">
+              <p><strong>Data:</strong> <span id="docData"></span></p>
+              <p><strong>Elaborado por:</strong> <span id="docEmissor">EDUARDO CABEÇA</span></p>
+            </div>
+
+            <div class="doc-title">Orçamento Locação de Salas e Equipamentos</div>
+
+            <div class="doc-fields">
+              <p><strong>Solicitante:</strong> <span id="docSolicitante">_______________________</span></p>
+              <p><strong>Evento:</strong> <span id="docEvento">_______________________</span></p>
+            </div>
+
+            <div id="docPeriods"></div>
+
+            <div id="docInfos" class="infos-box"></div>
+
+            <div class="conditions">
+              <h4>Observações e Condições</h4>
+              <div>
+                <p>• Orçamento válido por <strong>72 horas</strong>. A pré-reserva garante o espaço por este período; após o prazo, o evento é considerado cancelado.</p>
+                <p class="warning">Atenção: o horário limite para fechamento total do prédio é impreterivelmente às 22:00h.</p>
+                <p><strong>FORMAS DE PAGAMENTO:</strong></p>
+                <p>- Transferência/Depósito: Sicredi Norte (Ag 2602, c/c 04247-2, titular: CEJAS).</p>
+                <p>- Boleto Bancário via Sicredi Norte.</p>
+                <p>- PIX CNPJ: 83.784.124/0001-32</p>
+              </div>
+            </div>
+
+            <div class="signature">
+              <div>
+                <p>Permanecemos à disposição.</p>
+                <p style="margin-top:14px;">Atenciosamente,</p>
+                <strong id="docAssinatura">Eduardo Cabeça</strong>
+                <p>Cel: (47) 98835-7184</p>
+                <p>E-mail: marcel@cejas.com.br</p>
+              </div>
+
+              <div class="system-mark">Sistema Comercial CEJAS v2026</div>
+            </div>
+          </article>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <div id="catalogModal" class="modal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <div>
+          <h2>Cadastro de Itens do Orçamento</h2>
+          <p style="font-size:13px;color:#cbd5e1;margin-top:4px;">Cadastre, edite e exclua itens da tabela.</p>
+        </div>
+
+        <button class="btn" onclick="closeCatalog()">Fechar</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-card">
+          <h3 id="formTitle">Cadastrar novo item</h3>
+
+          <input type="hidden" id="itemId">
+
+          <label>Nome</label>
+          <input id="itemNome" placeholder="Ex: Copos descartáveis">
+
+          <label>Categoria</label>
+          <input id="itemCategoria" placeholder="Ex: Equipamentos e Serviços">
+
+          <label>Detalhes</label>
+          <textarea id="itemDetalhes"></textarea>
+
+          <label>Valor</label>
+          <input id="itemValor" type="number" step="0.01">
+
+          <label>Aplica regra de preço?</label>
+          <select id="itemAplicaRegras">
+            <option value="false">Não - valor fixo</option>
+            <option value="true">Sim - muda com associado/dia</option>
+          </select>
+
+          <br><br>
+          <button class="btn blue" onclick="saveCatalogItem()">Salvar item</button>
+          <button class="btn" onclick="clearCatalogForm()">Limpar</button>
+        </div>
+
+        <div class="modal-card">
+          <h3>Itens cadastrados</h3>
+          <table class="catalog-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Categoria</th>
+                <th>Valor</th>
+                <th>Regra</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="catalogRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+<script>
+const BASE_CATALOG = [
+  ["Auditório Eggon João da Silva", "Diurno - Sala Básica", { assoc:{util:960,sab:1440,dom:1460}, naoAssoc:{util:1920,sab:2875,dom:2920} }],
+  ["Auditório Eggon João da Silva", "Diurno - Sala com Recursos", { assoc:{util:2625,sab:3470,dom:4150}, naoAssoc:{util:5250,sab:6930,dom:8295} }],
+  ["Auditório Eggon João da Silva", "Noturno - Sala Básica", { assoc:{util:1260,sab:0,dom:0}, naoAssoc:{util:2520,sab:0,dom:0} }],
+  ["Auditório Eggon João da Silva", "Noturno - Sala com Recursos", { assoc:{util:2940,sab:0,dom:0}, naoAssoc:{util:4200,sab:0,dom:0} }],
+  ["Auditório Eggon João da Silva", "Integral - Sala Básica", { assoc:{util:2100,sab:4200,dom:4520}, naoAssoc:{util:4200,sab:0,dom:0} }],
+  ["Auditório Eggon João da Silva", "Integral - Sala com Recursos", { assoc:{util:4520,sab:0,dom:0}, naoAssoc:{util:0,sab:0,dom:0} }],
+
+  ["Salão Nobre Pedro Donini", "Diurno - Sala Básica", { assoc:{util:340,sab:560,dom:590}, naoAssoc:{util:670,sab:1555,dom:1175} }],
+  ["Salão Nobre Pedro Donini", "Diurno - Sala com Recursos", { assoc:{util:1370,sab:1750,dom:1790}, naoAssoc:{util:2730,sab:3505,dom:3570} }],
+  ["Salão Nobre Pedro Donini", "Noturno - Sala Básica", { assoc:{util:420,sab:0,dom:0}, naoAssoc:{util:850,sab:0,dom:0} }],
+  ["Salão Nobre Pedro Donini", "Noturno - Sala com Recursos", { assoc:{util:1470,sab:0,dom:0}, naoAssoc:{util:2940,sab:0,dom:0} }],
+  ["Salão Nobre Pedro Donini", "Integral - Sala Básica", { assoc:{util:630,sab:0,dom:0}, naoAssoc:{util:1260,sab:0,dom:0} }],
+  ["Salão Nobre Pedro Donini", "Integral - Sala com Recursos", { assoc:{util:2200,sab:0,dom:0}, naoAssoc:{util:4410,sab:0,dom:0} }],
+
+  ["Sala Heinz e Ilse Kolbach / Comércio Varejista", "Diurno - Sala Básica", { assoc:{util:220,sab:420,dom:450}, naoAssoc:{util:450,sab:840,dom:905} }],
+  ["Sala Heinz e Ilse Kolbach / Comércio Varejista", "Diurno - Sala com Recursos", { assoc:{util:550,sab:780,dom:810}, naoAssoc:{util:1100,sab:1555,dom:1615} }],
+  ["Sala Heinz e Ilse Kolbach / Comércio Varejista", "Noturno - Sala Básica", { assoc:{util:250,sab:0,dom:0}, naoAssoc:{util:500,sab:0,dom:0} }],
+  ["Sala Heinz e Ilse Kolbach / Comércio Varejista", "Noturno - Sala com Recursos", { assoc:{util:580,sab:0,dom:0}, naoAssoc:{util:1150,sab:0,dom:0} }],
+  ["Sala Heinz e Ilse Kolbach / Comércio Varejista", "Integral - Sala Básica", { assoc:{util:480,sab:0,dom:0}, naoAssoc:{util:950,sab:0,dom:0} }],
+  ["Sala Heinz e Ilse Kolbach / Comércio Varejista", "Integral - Sala com Recursos", { assoc:{util:790,sab:0,dom:0}, naoAssoc:{util:1580,sab:0,dom:0} }],
+
+  ["Sala Indústria do Vestuário", "Diurno - Sala Básica", { assoc:{util:275,sab:480,dom:515}, naoAssoc:{util:550,sab:945,dom:1030} }],
+  ["Sala Indústria do Vestuário", "Diurno - Sala com Recursos", { assoc:{util:595,sab:830,dom:870}, naoAssoc:{util:1200,sab:1670,dom:1745} }],
+  ["Sala Indústria do Vestuário", "Noturno - Sala Básica", { assoc:{util:340,sab:0,dom:0}, naoAssoc:{util:670,sab:0,dom:0} }],
+  ["Sala Indústria do Vestuário", "Noturno - Sala com Recursos", { assoc:{util:650,sab:0,dom:0}, naoAssoc:{util:1300,sab:0,dom:0} }],
+  ["Sala Indústria do Vestuário", "Integral - Sala Básica", { assoc:{util:750,sab:0,dom:0}, naoAssoc:{util:1500,sab:0,dom:0} }],
+  ["Sala Indústria do Vestuário", "Integral - Sala com Recursos", { assoc:{util:1050,sab:0,dom:0}, naoAssoc:{util:2100,sab:0,dom:0} }],
+
+  ["Sala de Reunião Superior", "Diurno - Sala Básica", { assoc:{util:220,sab:420,dom:450}, naoAssoc:{util:450,sab:840,dom:905} }],
+  ["Sala de Reunião Superior", "Diurno - Sala com Recursos", { assoc:{util:500,sab:780,dom:810}, naoAssoc:{util:1000,sab:1555,dom:1615} }],
+  ["Sala de Reunião Superior", "Noturno - Sala Básica", { assoc:{util:250,sab:0,dom:0}, naoAssoc:{util:500,sab:0,dom:0} }],
+  ["Sala de Reunião Superior", "Noturno - Sala com Recursos", { assoc:{util:525,sab:0,dom:0}, naoAssoc:{util:1050,sab:0,dom:0} }],
+  ["Sala de Reunião Superior", "Integral - Sala Básica", { assoc:{util:480,sab:0,dom:0}, naoAssoc:{util:950,sab:0,dom:0} }],
+  ["Sala de Reunião Superior", "Integral - Sala com Recursos", { assoc:{util:735,sab:0,dom:0}, naoAssoc:{util:1470,sab:0,dom:0} }],
+
+  ["Salão de Eventos (Superior)", "Diurno - Sala Básica", { assoc:{util:340,sab:560,dom:590}, naoAssoc:{util:670,sab:1115,dom:1175} }],
+  ["Salão de Eventos (Superior)", "Diurno - Sala com Recursos", { assoc:{util:650,sab:920,dom:950}, naoAssoc:{util:1300,sab:1825,dom:1890} }],
+  ["Salão de Eventos (Superior)", "Noturno - Sala Básica", { assoc:{util:420,sab:0,dom:0}, naoAssoc:{util:850,sab:0,dom:0} }],
+  ["Salão de Eventos (Superior)", "Noturno - Sala com Recursos", { assoc:{util:740,sab:0,dom:0}, naoAssoc:{util:1470,sab:0,dom:0} }],
+  ["Salão de Eventos (Superior)", "Integral - Sala Básica", { assoc:{util:920,sab:0,dom:0}, naoAssoc:{util:1830,sab:0,dom:0} }],
+  ["Salão de Eventos (Superior)", "Integral - Sala com Recursos", { assoc:{util:1155,sab:0,dom:0}, naoAssoc:{util:2310,sab:0,dom:0} }],
+
+  ["Telão de LED", "LED Nobre (4x2m) - Período", { assoc:{util:775,sab:775,dom:775}, naoAssoc:{util:1100,sab:1100,dom:1100} }],
+  ["Telão de LED", "LED Nobre (4x2m) - Diária", { assoc:{util:2200,sab:2200,dom:2200}, naoAssoc:{util:3100,sab:3100,dom:3100} }],
+  ["Telão de LED", "LED Auditório (6x3m) - Período", { assoc:{util:1325,sab:1325,dom:1325}, naoAssoc:{util:2200,sab:2200,dom:2200} }],
+  ["Telão de LED", "LED Auditório (6x3m) - Diária", { assoc:{util:3970,sab:3970,dom:3970}, naoAssoc:{util:5500,sab:5500,dom:5500} }],
+
+  ["Telão de LED - EVENTOS GRATUITOS ENTIDADES", "LED Salão Nobre - Período (Entidade)", { assoc:{util:285,sab:285,dom:285}, naoAssoc:{util:285,sab:285,dom:285} }],
+  ["Telão de LED - EVENTOS GRATUITOS ENTIDADES", "LED Salão Nobre - Integral/Diária (Entidade)", { assoc:{util:445,sab:445,dom:445}, naoAssoc:{util:445,sab:445,dom:445} }],
+  ["Telão de LED - EVENTOS GRATUITOS ENTIDADES", "LED Auditório - Período (Entidade)", { assoc:{util:330,sab:330,dom:330}, naoAssoc:{util:330,sab:330,dom:330} }],
+  ["Telão de LED - EVENTOS GRATUITOS ENTIDADES", "LED Auditório - Integral/Diária (Entidade)", { assoc:{util:550,sab:550,dom:550}, naoAssoc:{util:550,sab:550,dom:550} }],
+
+  ["Equipamentos e Copa", "Água (500ml)", { assoc:{util:5,sab:5,dom:5}, naoAssoc:{util:5,sab:5,dom:5} }],
+  ["Equipamentos e Copa", "Copo de água", { assoc:{util:3,sab:3,dom:3}, naoAssoc:{util:3,sab:3,dom:3} }],
+  ["Equipamentos e Copa", "Café (1 litro)", { assoc:{util:18,sab:18,dom:18}, naoAssoc:{util:18,sab:18,dom:18} }],
+  ["Equipamentos e Copa", "Projetor", { assoc:{util:135,sab:135,dom:135}, naoAssoc:{util:385,sab:385,dom:385} }],
+  ["Equipamentos e Copa", "Microfone", { assoc:{util:35,sab:35,dom:35}, naoAssoc:{util:100,sab:100,dom:100} }],
+  ["Equipamentos e Copa", "Caixa de som", { assoc:{util:165,sab:165,dom:165}, naoAssoc:{util:280,sab:280,dom:280} }],
+  ["Equipamentos e Copa", "Sonorização Nobre (Associado)", { assoc:{util:330,sab:330,dom:330}, naoAssoc:{util:985,sab:985,dom:985} }],
+  ["Equipamentos e Copa", "Sonorização Nobre (Entidade Gratuito)", { assoc:{util:315,sab:315,dom:315}, naoAssoc:{util:315,sab:315,dom:315} }],
+  ["Equipamentos e Copa", "Sonorização Auditório (Associado)", { assoc:{util:385,sab:385,dom:385}, naoAssoc:{util:1210,sab:1210,dom:1210} }],
+  ["Equipamentos e Copa", "Sonorização Auditório (Entidade Gratuito)", { assoc:{util:370,sab:370,dom:370}, naoAssoc:{util:370,sab:370,dom:370} }],
+  ["Equipamentos e Copa", "Tampão redondo", { assoc:{util:14,sab:14,dom:14}, naoAssoc:{util:30,sab:30,dom:30} }],
+  ["Equipamentos e Copa", "Toalha Grande", { assoc:{util:44,sab:44,dom:44}, naoAssoc:{util:120,sab:120,dom:120} }],
+  ["Equipamentos e Copa", "Toalha Pequena", { assoc:{util:22,sab:22,dom:22}, naoAssoc:{util:60,sab:60,dom:60} }],
+  ["Equipamentos e Copa", "Movimentação de cadeiras (Unid.)", { assoc:{util:4,sab:4,dom:4}, naoAssoc:{util:10,sab:10,dom:10} }],
+  ["Equipamentos e Copa", "Movimentação de móveis", { assoc:{util:30,sab:30,dom:30}, naoAssoc:{util:30,sab:30,dom:30} }],
+  ["Equipamentos e Copa", "Aquários (Por Hora)", { assoc:{util:50,sab:50,dom:50}, naoAssoc:{util:105,sab:105,dom:105} }]
+];
+
+const state = {
+  associado: false,
+  tipoDia: "DIAS ÚTEIS",
+  user: {
+    name: "Eduardo Cabeça",
+    displayName: "EDUARDO CABEÇA",
+    email: "marcel@cejas.com.br"
+  },
+  catalog: [],
+  days: [
+    { date: "", start: "", end: "", items: [] }
+  ]
+};
+
+function slug(text) {
+  return String(text)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+function escapeHTML(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function escapeAttr(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function money(value) {
+  return Number(value || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+  });
+}
+
+function todayBR() {
+  return new Date().toLocaleDateString("pt-BR");
+}
+
+function makeBaseCatalog() {
+  return BASE_CATALOG.map(([categoria, nome, precos]) => ({
+    id: slug(categoria + "-" + nome),
+    categoria,
+    nome,
+    detalhes: nome,
+    precos,
+    valor: 0,
+    status: "ativo"
+  }));
+}
+
+function priceKeyDia() {
+  if (state.tipoDia === "SÁBADO") return "sab";
+  if (state.tipoDia === "DOM/FER") return "dom";
+  return "util";
+}
+
+function priceKeyPessoa() {
+  return state.associado ? "assoc" : "naoAssoc";
+}
+
+function getCatalogPrice(item) {
+  if (!item || !item.precos) return Number(item?.valor || 0);
+  return Number(item.precos?.[priceKeyPessoa()]?.[priceKeyDia()] || 0);
+}
+
+function priceItem(item) {
+  if (item.valorManual) return Number(item.valor || 0);
+  if (item.precos) return getCatalogPrice(item);
+  return Number(item.valor || 0);
+}
+
+function formatHourBR(value) {
+  if (!value) return "";
+  const [h, m] = value.split(":");
+  return `${h}H${m}`;
+}
+
+function formatDocPeriod(day) {
+  if (!day.date) return "DATA NÃO INFORMADA";
+  const [y, m, d] = day.date.split("-");
+  const dateBR = `${d}/${m}/${y}`;
+  if (day.start || day.end) {
+    return `${dateBR} - ${formatHourBR(day.start || "--:--")} AS ${formatHourBR(day.end || "--:--")}`;
+  }
+  return dateBR;
+}
+
+function normalizeDocText(value) {
+  return String(value || "").trim().toUpperCase();
+}
+
+function setAssociado(value) {
+  state.associado = value;
+  document.getElementById("btnAssociado")?.classList.toggle("active", value);
+  document.getElementById("btnNaoAssociado")?.classList.toggle("active", !value);
+  renderEditorDays();
+  render();
+}
+
+function setTipoDia(value) {
+  state.tipoDia = value;
+  document.getElementById("btnUtil")?.classList.toggle("active", value === "DIAS ÚTEIS");
+  document.getElementById("btnSabado")?.classList.toggle("active", value === "SÁBADO");
+  document.getElementById("btnDomingo")?.classList.toggle("active", value === "DOM/FER");
+  renderEditorDays();
+  render();
+}
+
+function addDay() {
+  state.days.push({ date: "", start: "", end: "", items: [] });
+  renderEditorDays();
+  render();
+}
+
+function removeDay(index) {
+  if (state.days.length <= 1) return;
+  state.days.splice(index, 1);
+  renderEditorDays();
+  render();
+}
+
+function updateDay(index, field, value) {
+  state.days[index][field] = value;
+  render();
+}
+
+function updateItem(dayIndex, itemIndex, field, value) {
+  const item = state.days[dayIndex].items[itemIndex];
+
+  if (field === "qtd") {
+    item.qtd = Number(value || 0);
+  } else if (field === "valor") {
+    item.valor = Number(value || 0);
+    item.valorManual = true;
+  } else {
+    item[field] = value;
+  }
+
+  render();
+}
+
+function removeItem(dayIndex, itemIndex) {
+  state.days[dayIndex].items.splice(itemIndex, 1);
+  renderEditorDays();
+  render();
+}
+
+function buildOptions() {
+  const groups = {};
+
+  state.catalog.forEach(item => {
+    if (item.status === "inativo") return;
+    if (!groups[item.categoria]) groups[item.categoria] = [];
+    groups[item.categoria].push(item);
+  });
+
+  let html = `<option value="">+ ADICIONAR ITEM DA TABELA...</option>`;
+
+  Object.keys(groups).forEach(category => {
+    html += `<optgroup label="${escapeAttr(category)}">`;
+    groups[category].forEach(item => {
+      html += `<option value="${escapeAttr(item.id)}">${escapeHTML(item.nome)}</option>`;
+    });
+    html += `</optgroup>`;
+  });
+
+  return html;
+}
+
+function addSelectedItem(dayIndex) {
+  const select = document.getElementById(`selectItem-${dayIndex}`);
+  if (!select || !select.value) {
+    alert("Selecione um item da tabela.");
+    return;
+  }
+
+  addCatalogItemToDay(dayIndex, select.value);
+  select.value = "";
+}
+
+function addCatalogItemToDay(dayIndex, id) {
+  const item = state.catalog.find(i => i.id === id);
+  if (!item) return;
+
+  state.days[dayIndex].items.push({
+    origemId: item.id,
+    nome: item.categoria,
+    detalhes: item.nome,
+    qtd: 1,
+    valor: getCatalogPrice(item),
+    precos: item.precos,
+    valorManual: false
+  });
+
+  renderEditorDays();
+  render();
+}
+
+function addCustomItem(dayIndex) {
+  state.days[dayIndex].items.push({
+    origemId: null,
+    nome: "Item personalizado",
+    detalhes: "Descrever detalhes",
+    qtd: 1,
+    valor: 0,
+    valorManual: true
+  });
+
+  renderEditorDays();
+  render();
+}
+
+function renderEditorDays() {
+  const container = document.getElementById("days");
+  if (!container) return;
+
+  if (!Array.isArray(state.days) || state.days.length === 0) {
+    state.days = [{ date: "", start: "", end: "", items: [] }];
+  }
+
+  container.innerHTML = state.days.map((day, dayIndex) => {
+    const rows = (day.items || []).map((item, itemIndex) => `
+      <div class="item-row">
+        <input title="Nome / Sala" value="${escapeAttr(item.nome || "")}" oninput="updateItem(${dayIndex}, ${itemIndex}, 'nome', this.value)">
+        <input title="Quantidade" type="number" min="1" value="${item.qtd || 1}" oninput="updateItem(${dayIndex}, ${itemIndex}, 'qtd', this.value)">
+        <input title="Detalhes / Recursos" value="${escapeAttr(item.detalhes || "")}" placeholder="Detalhes / Recursos" oninput="updateItem(${dayIndex}, ${itemIndex}, 'detalhes', this.value)">
+        <input title="Valor" type="number" min="0" step="0.01" value="${item.valorManual ? item.valor : priceItem(item)}" oninput="updateItem(${dayIndex}, ${itemIndex}, 'valor', this.value)">
+        <button class="danger" onclick="removeItem(${dayIndex}, ${itemIndex})">×</button>
+      </div>
+    `).join("");
+
+    return `
+      <div class="day-card">
+        <div class="day-top">
+          <input type="date" value="${escapeAttr(day.date || "")}" onchange="updateDay(${dayIndex}, 'date', this.value)">
+          <input type="time" value="${escapeAttr(day.start || "")}" onchange="updateDay(${dayIndex}, 'start', this.value)">
+          <input type="time" value="${escapeAttr(day.end || "")}" onchange="updateDay(${dayIndex}, 'end', this.value)">
+          <button class="danger" onclick="removeDay(${dayIndex})">×</button>
+        </div>
+
+        ${rows}
+
+        <div class="add-line">
+          <select id="selectItem-${dayIndex}">
+            ${buildOptions()}
+          </select>
+
+          <button class="custom-btn primary" onclick="addSelectedItem(${dayIndex})">
+            ✅ ADICIONAR ITEM SELECIONADO AO ORÇAMENTO
+          </button>
+
+          <button class="custom-btn" onclick="addCustomItem(${dayIndex})">
+            ✎ + ITEM PERSONALIZADO / CORINGA
+          </button>
+
+          <button class="custom-btn" onclick="openCatalog()">
+            ⚙ CADASTRAR / EDITAR ITENS DO SISTEMA
+          </button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function render() {
+  const solicitante = document.getElementById("solicitante")?.value || "";
+  const evento = document.getElementById("evento")?.value || "";
+  const infos = document.getElementById("infos")?.value || "";
+
+  const docData = document.getElementById("docData");
+  const docEmissor = document.getElementById("docEmissor");
+  const docAssinatura = document.getElementById("docAssinatura");
+  const docSolicitante = document.getElementById("docSolicitante");
+  const docEvento = document.getElementById("docEvento");
+  const docInfos = document.getElementById("docInfos");
+  const docPeriods = document.getElementById("docPeriods");
+
+  if (docData) docData.textContent = todayBR();
+  if (docEmissor) docEmissor.textContent = state.user.displayName;
+  if (docAssinatura) docAssinatura.textContent = state.user.name;
+  if (docSolicitante) docSolicitante.textContent = solicitante || "_______________________";
+  if (docEvento) docEvento.textContent = evento || "_______________________";
+
+  if (docInfos) {
+    if (infos.trim()) {
+      docInfos.style.display = "block";
+      docInfos.innerHTML = `<strong>Informações adicionais:</strong><br>${escapeHTML(infos).replace(/\n/g, "<br>")}`;
+    } else {
+      docInfos.style.display = "none";
+    }
+  }
+
+  let totalGeral = 0;
+
+  const periodsHTML = state.days.map(day => {
+    const rows = (day.items || []).map((item, index) => {
+      const unit = priceItem(item);
+      const total = unit * Number(item.qtd || 0);
+      totalGeral += total;
+
+      return `
+        <tr>
+          <td style="text-align:center;">${String(index + 1).padStart(2, "0")}</td>
+          <td><strong>${escapeHTML(normalizeDocText(item.nome))}</strong></td>
+          <td style="text-align:center;">${item.qtd}</td>
+          <td>${escapeHTML(normalizeDocText(item.detalhes || ""))}</td>
+          <td class="num">${money(unit)}</td>
+          <td class="num"><strong>${money(total)}</strong></td>
+        </tr>
+      `;
+    }).join("");
+
+    const subtotal = (day.items || []).reduce((acc, item) => {
+      return acc + priceItem(item) * Number(item.qtd || 0);
+    }, 0);
+
+    return `
+      <div class="period">
+        <div class="doc-period-title">${formatDocPeriod(day)}</div>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width:42px;text-align:center;">Nº</th>
+              <th>Item / Sala</th>
+              <th style="width:52px;text-align:center;">Qtd.</th>
+              <th>Detalhes / Recursos</th>
+              <th class="num">Valor unitário</th>
+              <th class="num">Valor final</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            ${rows || `<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:14px;">Nenhum item adicionado neste período.</td></tr>`}
+
+            <tr class="subtotal">
+              <td colspan="5" class="num">Subtotal do Período:</td>
+              <td class="num">${money(subtotal)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    `;
+  }).join("");
+
+  if (docPeriods) {
+    docPeriods.innerHTML = `
+      ${periodsHTML}
+      <div class="total-general">
+        <span>Total Geral:</span>
+        <strong>${money(totalGeral)}</strong>
+      </div>
+    `;
+  }
+}
+
+function openCatalog() {
+  document.getElementById("catalogModal")?.classList.add("open");
+  renderCatalog();
+}
+
+function closeCatalog() {
+  document.getElementById("catalogModal")?.classList.remove("open");
+}
+
+function clearCatalogForm() {
+  const fields = ["itemId", "itemNome", "itemCategoria", "itemDetalhes", "itemValor"];
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+
+  const regras = document.getElementById("itemAplicaRegras");
+  if (regras) regras.value = "false";
+
+  const title = document.getElementById("formTitle");
+  if (title) title.textContent = "Cadastrar novo item";
+}
+
+function saveCatalogItem() {
+  const id = document.getElementById("itemId")?.value || "";
+
+  const nome = document.getElementById("itemNome")?.value || "";
+  const categoria = document.getElementById("itemCategoria")?.value || "Outros";
+  const detalhes = document.getElementById("itemDetalhes")?.value || nome;
+  const valor = Number(document.getElementById("itemValor")?.value || 0);
+  const aplicaRegras = document.getElementById("itemAplicaRegras")?.value === "true";
+
+  if (!nome.trim()) {
+    alert("Informe o nome do item.");
+    return;
+  }
+
+  const item = {
+    id: id || slug(categoria + "-" + nome),
+    nome,
+    categoria,
+    detalhes,
+    valor,
+    precos: null,
+    valorManual: true,
+    aplicaRegras,
+    status: "ativo"
+  };
+
+  if (id) {
+    const index = state.catalog.findIndex(i => i.id === id);
+    if (index >= 0) state.catalog[index] = item;
+  } else {
+    state.catalog.push(item);
+  }
+
+  clearCatalogForm();
+  renderCatalog();
+  renderEditorDays();
+}
+
+function editCatalogItem(id) {
+  const item = state.catalog.find(i => i.id === id);
+  if (!item) return;
+
+  document.getElementById("itemId").value = item.id;
+  document.getElementById("itemNome").value = item.nome;
+  document.getElementById("itemCategoria").value = item.categoria;
+  document.getElementById("itemDetalhes").value = item.detalhes || item.nome;
+  document.getElementById("itemValor").value = getCatalogPrice(item) || item.valor || 0;
+  document.getElementById("itemAplicaRegras").value = item.aplicaRegras ? "true" : "false";
+  document.getElementById("formTitle").textContent = "Editar item";
+}
+
+function deleteCatalogItem(id) {
+  if (!confirm("Excluir este item do catálogo?")) return;
+  state.catalog = state.catalog.filter(i => i.id !== id);
+  renderCatalog();
+  renderEditorDays();
+}
+
+function useCatalogItem(id) {
+  addCatalogItemToDay(0, id);
+  closeCatalog();
+}
+
+function renderCatalog() {
+  const rows = document.getElementById("catalogRows");
+  if (!rows) return;
+
+  rows.innerHTML = state.catalog.map(item => `
+    <tr>
+      <td><strong>${escapeHTML(item.nome)}</strong><br><small>${escapeHTML(item.detalhes || "")}</small></td>
+      <td>${escapeHTML(item.categoria)}</td>
+      <td>${money(getCatalogPrice(item) || item.valor || 0)}</td>
+      <td>${item.precos ? "Tabela real" : "Manual"}</td>
+      <td>
+        <button class="mini" onclick="useCatalogItem('${escapeAttr(item.id)}')">Usar</button>
+        <button class="mini dark" onclick="editCatalogItem('${escapeAttr(item.id)}')">Editar</button>
+        <button class="mini red" onclick="deleteCatalogItem('${escapeAttr(item.id)}')">Excluir</button>
+      </td>
+    </tr>
+  `).join("");
+}
+
+async function loadUser() {
+  try {
+    const response = await fetch("/api/me", { cache: "no-store" });
+    const data = await response.json();
+
+    if (data.ok && data.user) {
+      state.user.name = data.user.name || "Eduardo Cabeça";
+      state.user.displayName = data.user.displayName || String(state.user.name).toUpperCase();
+      state.user.email = data.user.email || "marcel@cejas.com.br";
+    }
+  } catch {}
+
+  const sidebarUser = document.getElementById("sidebarUser");
+  const emissor = document.getElementById("emissor");
+
+  if (sidebarUser) sidebarUser.textContent = state.user.name;
+  if (emissor) emissor.value = state.user.displayName;
+
+  render();
+}
+
+let sessionRemainingMs = 5 * 60 * 1000;
+let lastTouchAt = 0;
+
+function formatSession(ms) {
+  const total = Math.max(0, Math.ceil(ms / 1000));
+  const m = String(Math.floor(total / 60)).padStart(2, "0");
+  const s = String(total % 60).padStart(2, "0");
+  return `${m}:${s}`;
+}
+
+function updateSessionTimer() {
+  const el = document.getElementById("sessionTimer");
+  if (el) el.textContent = `Conectado ${formatSession(sessionRemainingMs)}`;
+  if (sessionRemainingMs <= 0) window.location.href = "/login.html";
+}
+
+async function touchSession(force = false) {
+  const now = Date.now();
+  if (!force && now - lastTouchAt < 10000) return;
+
+  lastTouchAt = now;
+
+  try {
+    const response = await fetch("/api/touch", { method: "POST", cache: "no-store" });
+    const data = await response.json();
+    if (data.ok) sessionRemainingMs = data.remainingMs || 5 * 60 * 1000;
+  } catch {}
+}
+
+["click", "keydown", "mousemove", "scroll", "touchstart"].forEach(eventName => {
+  window.addEventListener(eventName, () => touchSession(false), { passive: true });
+});
+
+setInterval(() => {
+  sessionRemainingMs -= 1000;
+  updateSessionTimer();
+}, 1000);
+
+state.catalog = makeBaseCatalog();
+
+document.addEventListener("DOMContentLoaded", () => {
+  renderEditorDays();
+  render();
+  renderCatalog();
+  loadUser();
+  touchSession(true);
+});
+</script>
+
+
+<script>
+(function () {
+  const PAGE_PERMS = {
+    "dashboard.html": "painel",
+    "agenda.html": "agenda",
+    "orcamentos.html": "orcamentos",
+    "importar-relatorio.html": "relatorios",
+    "tarefas.html": "tarefas",
+    "servidor.html": "servidor",
+    "financeiro.html": "financeiro",
+    "usuarios.html": "usuarios",
+    "configuracoes.html": "configuracoes"
+  };
+
+  async function aplicarPermissoesMenu() {
+    try {
+      const response = await fetch("/api/me", { cache: "no-store" });
+      const data = await response.json();
+
+      if (!data.ok || !data.user) return;
+
+      const permissoes = data.user.permissoes || [];
+      const admin = permissoes.includes("*");
+
+      document.querySelectorAll("a[href$='.html']").forEach(link => {
+        const href = link.getAttribute("href");
+        const page = href.split("/").pop();
+        const perm = PAGE_PERMS[page];
+
+        if (!perm) return;
+
+        if (!admin && !permissoes.includes(perm)) {
+          link.style.display = "none";
+        }
+      });
+    } catch {}
+  }
+
+  aplicarPermissoesMenu();
+})();
+</script>
+
+</body>
+</html>

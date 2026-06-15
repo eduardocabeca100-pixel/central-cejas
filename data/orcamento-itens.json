@@ -1,0 +1,428 @@
+[
+  {
+    "id": "auditorio-eggon-diurno-basica",
+    "nome": "Auditório Eggon João da Silva - Diurno - Sala Básica",
+    "categoria": "Auditório Eggon João da Silva",
+    "detalhes": "Diurno - Sala Básica",
+    "valor": 950,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "auditorio-eggon-diurno-recursos",
+    "nome": "Auditório Eggon João da Silva - Diurno - Sala com Recursos",
+    "categoria": "Auditório Eggon João da Silva",
+    "detalhes": "Diurno - Sala com Recursos",
+    "valor": 1250,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "auditorio-eggon-noturno-basica",
+    "nome": "Auditório Eggon João da Silva - Noturno - Sala Básica",
+    "categoria": "Auditório Eggon João da Silva",
+    "detalhes": "Noturno - Sala Básica",
+    "valor": 1150,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "auditorio-eggon-noturno-recursos",
+    "nome": "Auditório Eggon João da Silva - Noturno - Sala com Recursos",
+    "categoria": "Auditório Eggon João da Silva",
+    "detalhes": "Noturno - Sala com Recursos",
+    "valor": 1450,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "auditorio-eggon-integral-basica",
+    "nome": "Auditório Eggon João da Silva - Integral - Sala Básica",
+    "categoria": "Auditório Eggon João da Silva",
+    "detalhes": "Integral - Sala Básica",
+    "valor": 1650,
+    "unidade": "diária",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "auditorio-eggon-integral-recursos",
+    "nome": "Auditório Eggon João da Silva - Integral - Sala com Recursos",
+    "categoria": "Auditório Eggon João da Silva",
+    "detalhes": "Integral - Sala com Recursos",
+    "valor": 1950,
+    "unidade": "diária",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+
+  {
+    "id": "salao-nobre-diurno-basica",
+    "nome": "Salão Nobre Pedro Donini - Diurno - Sala Básica",
+    "categoria": "Salão Nobre Pedro Donini",
+    "detalhes": "Diurno - Sala Básica",
+    "valor": 850,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "salao-nobre-diurno-recursos",
+    "nome": "Salão Nobre Pedro Donini - Diurno - Sala com Recursos",
+    "categoria": "Salão Nobre Pedro Donini",
+    "detalhes": "Diurno - Sala com Recursos",
+    "valor": 1100,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "salao-nobre-noturno-basica",
+    "nome": "Salão Nobre Pedro Donini - Noturno - Sala Básica",
+    "categoria": "Salão Nobre Pedro Donini",
+    "detalhes": "Noturno - Sala Básica",
+    "valor": 1050,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "salao-nobre-noturno-recursos",
+    "nome": "Salão Nobre Pedro Donini - Noturno - Sala com Recursos",
+    "categoria": "Salão Nobre Pedro Donini",
+    "detalhes": "Noturno - Sala com Recursos",
+    "valor": 1350,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "salao-nobre-integral-basica",
+    "nome": "Salão Nobre Pedro Donini - Integral - Sala Básica",
+    "categoria": "Salão Nobre Pedro Donini",
+    "detalhes": "Integral - Sala Básica",
+    "valor": 1500,
+    "unidade": "diária",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "salao-nobre-integral-recursos",
+    "nome": "Salão Nobre Pedro Donini - Integral - Sala com Recursos",
+    "categoria": "Salão Nobre Pedro Donini",
+    "detalhes": "Integral - Sala com Recursos",
+    "valor": 1800,
+    "unidade": "diária",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+
+  {
+    "id": "sala-heinz-diurno-basica",
+    "nome": "Sala Heinz e Ilse Kolbach / Comércio Varejista - Diurno - Sala Básica",
+    "categoria": "Sala Heinz e Ilse Kolbach / Comércio Varejista",
+    "detalhes": "Diurno - Sala Básica",
+    "valor": 480,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "sala-heinz-diurno-recursos",
+    "nome": "Sala Heinz e Ilse Kolbach / Comércio Varejista - Diurno - Sala com Recursos",
+    "categoria": "Sala Heinz e Ilse Kolbach / Comércio Varejista",
+    "detalhes": "Diurno - Sala com Recursos",
+    "valor": 620,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "sala-heinz-noturno-basica",
+    "nome": "Sala Heinz e Ilse Kolbach / Comércio Varejista - Noturno - Sala Básica",
+    "categoria": "Sala Heinz e Ilse Kolbach / Comércio Varejista",
+    "detalhes": "Noturno - Sala Básica",
+    "valor": 590,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "sala-heinz-noturno-recursos",
+    "nome": "Sala Heinz e Ilse Kolbach / Comércio Varejista - Noturno - Sala com Recursos",
+    "categoria": "Sala Heinz e Ilse Kolbach / Comércio Varejista",
+    "detalhes": "Noturno - Sala com Recursos",
+    "valor": 740,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "sala-heinz-integral-basica",
+    "nome": "Sala Heinz e Ilse Kolbach / Comércio Varejista - Integral - Sala Básica",
+    "categoria": "Sala Heinz e Ilse Kolbach / Comércio Varejista",
+    "detalhes": "Integral - Sala Básica",
+    "valor": 850,
+    "unidade": "diária",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "sala-heinz-integral-recursos",
+    "nome": "Sala Heinz e Ilse Kolbach / Comércio Varejista - Integral - Sala com Recursos",
+    "categoria": "Sala Heinz e Ilse Kolbach / Comércio Varejista",
+    "detalhes": "Integral - Sala com Recursos",
+    "valor": 980,
+    "unidade": "diária",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+
+  {
+    "id": "sala-vestuario-diurno-basica",
+    "nome": "Sala Indústria do Vestuário - Diurno - Sala Básica",
+    "categoria": "Sala Indústria do Vestuário",
+    "detalhes": "Diurno - Sala Básica",
+    "valor": 420,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "sala-vestuario-diurno-recursos",
+    "nome": "Sala Indústria do Vestuário - Diurno - Sala com Recursos",
+    "categoria": "Sala Indústria do Vestuário",
+    "detalhes": "Diurno - Sala com Recursos",
+    "valor": 560,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "sala-vestuario-noturno-basica",
+    "nome": "Sala Indústria do Vestuário - Noturno - Sala Básica",
+    "categoria": "Sala Indústria do Vestuário",
+    "detalhes": "Noturno - Sala Básica",
+    "valor": 540,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "sala-vestuario-noturno-recursos",
+    "nome": "Sala Indústria do Vestuário - Noturno - Sala com Recursos",
+    "categoria": "Sala Indústria do Vestuário",
+    "detalhes": "Noturno - Sala com Recursos",
+    "valor": 680,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "sala-vestuario-integral-basica",
+    "nome": "Sala Indústria do Vestuário - Integral - Sala Básica",
+    "categoria": "Sala Indústria do Vestuário",
+    "detalhes": "Integral - Sala Básica",
+    "valor": 780,
+    "unidade": "diária",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "sala-vestuario-integral-recursos",
+    "nome": "Sala Indústria do Vestuário - Integral - Sala com Recursos",
+    "categoria": "Sala Indústria do Vestuário",
+    "detalhes": "Integral - Sala com Recursos",
+    "valor": 920,
+    "unidade": "diária",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+
+  {
+    "id": "salao-eventos-superior-diurno-basica",
+    "nome": "Salão de Eventos (Superior) - Diurno - Sala Básica",
+    "categoria": "Salão de Eventos (Superior)",
+    "detalhes": "Diurno - Sala Básica",
+    "valor": 1400,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "salao-eventos-superior-diurno-recursos",
+    "nome": "Salão de Eventos (Superior) - Diurno - Sala com Recursos",
+    "categoria": "Salão de Eventos (Superior)",
+    "detalhes": "Diurno - Sala com Recursos",
+    "valor": 1750,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "salao-eventos-superior-noturno-basica",
+    "nome": "Salão de Eventos (Superior) - Noturno - Sala Básica",
+    "categoria": "Salão de Eventos (Superior)",
+    "detalhes": "Noturno - Sala Básica",
+    "valor": 1650,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "salao-eventos-superior-noturno-recursos",
+    "nome": "Salão de Eventos (Superior) - Noturno - Sala com Recursos",
+    "categoria": "Salão de Eventos (Superior)",
+    "detalhes": "Noturno - Sala com Recursos",
+    "valor": 2100,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "salao-eventos-superior-integral-basica",
+    "nome": "Salão de Eventos (Superior) - Integral - Sala Básica",
+    "categoria": "Salão de Eventos (Superior)",
+    "detalhes": "Integral - Sala Básica",
+    "valor": 2400,
+    "unidade": "diária",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "salao-eventos-superior-integral-recursos",
+    "nome": "Salão de Eventos (Superior) - Integral - Sala com Recursos",
+    "categoria": "Salão de Eventos (Superior)",
+    "detalhes": "Integral - Sala com Recursos",
+    "valor": 2850,
+    "unidade": "diária",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+
+  {
+    "id": "led-salao-nobre-periodo-entidade",
+    "nome": "LED Salão Nobre - Período (Entidade)",
+    "categoria": "Telão de LED - EVENTOS GRATUITOS ENTIDADES",
+    "detalhes": "LED Salão Nobre - Período (Entidade)",
+    "valor": 0,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": false
+  },
+  {
+    "id": "led-salao-nobre-integral-entidade",
+    "nome": "LED Salão Nobre - Integral/Diária (Entidade)",
+    "categoria": "Telão de LED - EVENTOS GRATUITOS ENTIDADES",
+    "detalhes": "LED Salão Nobre - Integral/Diária (Entidade)",
+    "valor": 0,
+    "unidade": "diária",
+    "status": "ativo",
+    "aplicaRegras": false
+  },
+  {
+    "id": "led-auditorio-periodo-entidade",
+    "nome": "LED Auditório - Período (Entidade)",
+    "categoria": "Telão de LED - EVENTOS GRATUITOS ENTIDADES",
+    "detalhes": "LED Auditório - Período (Entidade)",
+    "valor": 0,
+    "unidade": "período",
+    "status": "ativo",
+    "aplicaRegras": false
+  },
+  {
+    "id": "led-auditorio-integral-entidade",
+    "nome": "LED Auditório - Integral/Diária (Entidade)",
+    "categoria": "Telão de LED - EVENTOS GRATUITOS ENTIDADES",
+    "detalhes": "LED Auditório - Integral/Diária (Entidade)",
+    "valor": 0,
+    "unidade": "diária",
+    "status": "ativo",
+    "aplicaRegras": false
+  },
+
+  {
+    "id": "agua-500ml",
+    "nome": "Água (500ml)",
+    "categoria": "Equipamentos e Serviços",
+    "detalhes": "Água 500ml",
+    "valor": 3.5,
+    "unidade": "unidade",
+    "status": "ativo",
+    "aplicaRegras": false
+  },
+  {
+    "id": "cafe-1-litro",
+    "nome": "Café (1 litro)",
+    "categoria": "Equipamentos e Serviços",
+    "detalhes": "Café 1 litro",
+    "valor": 28,
+    "unidade": "litro",
+    "status": "ativo",
+    "aplicaRegras": false
+  },
+  {
+    "id": "projetor",
+    "nome": "Projetor",
+    "categoria": "Equipamentos e Serviços",
+    "detalhes": "Projetor",
+    "valor": 180,
+    "unidade": "unidade",
+    "status": "ativo",
+    "aplicaRegras": false
+  },
+  {
+    "id": "microfone",
+    "nome": "Microfone",
+    "categoria": "Equipamentos e Serviços",
+    "detalhes": "Microfone",
+    "valor": 90,
+    "unidade": "unidade",
+    "status": "ativo",
+    "aplicaRegras": false
+  },
+  {
+    "id": "tampao-redondo",
+    "nome": "Tampão redondo",
+    "categoria": "Equipamentos e Serviços",
+    "detalhes": "Tampão redondo",
+    "valor": 45,
+    "unidade": "unidade",
+    "status": "ativo",
+    "aplicaRegras": false
+  },
+  {
+    "id": "toalha-grande",
+    "nome": "Toalha Grande",
+    "categoria": "Equipamentos e Serviços",
+    "detalhes": "Toalha Grande",
+    "valor": 35,
+    "unidade": "unidade",
+    "status": "ativo",
+    "aplicaRegras": true
+  },
+  {
+    "id": "movimentacao-cadeiras",
+    "nome": "Movimentação de cadeiras (Unid.)",
+    "categoria": "Equipamentos e Serviços",
+    "detalhes": "Movimentação de cadeiras por unidade",
+    "valor": 2,
+    "unidade": "unidade",
+    "status": "ativo",
+    "aplicaRegras": false
+  },
+  {
+    "id": "movimentacao-moveis",
+    "nome": "Movimentação de móveis",
+    "categoria": "Equipamentos e Serviços",
+    "detalhes": "Movimentação de móveis",
+    "valor": 120,
+    "unidade": "serviço",
+    "status": "ativo",
+    "aplicaRegras": false
+  }
+]

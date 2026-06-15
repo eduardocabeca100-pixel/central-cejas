@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Sistema de Gestão CEJAS | Usuários</title>
+
+  <style>
+    :root {
+      --bg: #050505;
+      --sidebar: #0b0b10;
+      --panel: #111114;
+      --card: #17171c;
+      --border: rgba(255,255,255,.09);
+      --text: #fff;
+      --muted: #b3b3b3;
+      --purple: #7B61FF;
+      --pink: #FF61D2;
+      --green: #22c55e;
+      --red: #ef4444;
+      --gradient: linear-gradient(135deg, #7B61FF, #FF61D2);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body, button, input, select {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 270px 1fr;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      padding: 24px 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 26px;
+    }
+
+    .logo {
+      width: 45px;
+      height: 45px;
+      border-radius: 12px;
+      border: 1px solid #9b5cff;
+      display: grid;
+      place-items: center;
+      color: #ff61d2;
+      font-weight: 900;
+      font-size: 28px;
+    }
+
+    .brand h1 { font-size: 16px; line-height: 1.05; }
+    .brand p { color: var(--muted); font-size: 12px; margin-top: 5px; }
+
+    .user-card {
+      background: #171717;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 26px;
+    }
+
+    .user-card strong { display: block; font-size: 15px; }
+    .user-card span { color: var(--muted); font-size: 13px; }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .nav a {
+      color: #c7c7c7;
+      text-decoration: none;
+      padding: 13px 14px;
+      border-radius: 13px;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .nav a.active {
+      color: #fff;
+      background: var(--gradient);
+    }
+
+    .main {
+      height: 100vh;
+      overflow-y: auto;
+      padding: 32px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      color: #aaa;
+      letter-spacing: .45em;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 34px;
+      line-height: 1;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin-top: 9px;
+      max-width: 760px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 13px 17px;
+      color: #fff;
+      font-weight: 900;
+      cursor: pointer;
+      background: #1f2937;
+      transition: .2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+    }
+
+    .btn.gradient {
+      background: var(--gradient);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 430px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 20px;
+    }
+
+    .panel h3 {
+      font-size: 22px;
+      margin-bottom: 14px;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .field label {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-weight: 900;
+      margin-bottom: 7px;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.12);
+      background: #0f1014;
+      color: #fff;
+      border-radius: 12px;
+      padding: 12px;
+      outline: none;
+      font-weight: 700;
+    }
+
+    .permissions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      background: #0f1014;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px;
+      max-height: 280px;
+      overflow: auto;
+    }
+
+    .perm {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #17171c;
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 12px;
+      padding: 10px;
+      color: #ddd;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .perm input {
+      width: auto;
+      accent-color: #a855f7;
+    }
+
+    .table-wrap {
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      padding: 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+    }
+
+    .badge {
+      display: inline-flex;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      background: rgba(123,97,255,.16);
+      color: #d8c4ff;
+      margin: 2px;
+    }
+
+    .badge.admin {
+      background: rgba(34,197,94,.14);
+      color: #86efac;
+    }
+
+    .badge.inativo {
+      background: rgba(239,68,68,.14);
+      color: #fecaca;
+    }
+
+    .mini {
+      border: 1px solid rgba(255,255,255,.12);
+      background: #181820;
+      color: #fff;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      margin: 2px;
+    }
+
+    .mini.red {
+      background: rgba(239,68,68,.14);
+      color: #fecaca;
+    }
+
+    .notice {
+      background: rgba(123,97,255,.12);
+      border: 1px solid rgba(123,97,255,.25);
+      border-radius: 16px;
+      padding: 14px;
+      color: #ddd;
+      font-size: 13px;
+      line-height: 1.45;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 1200px) {
+      body { overflow: auto; }
+      .app { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .main { height: auto; }
+      .layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">M</div>
+        <div>
+          <h1>SISTEMA DE GESTÃO CEJAS</h1>
+          <p>Painel Administrativo</p>
+        </div>
+      </div>
+
+      <div class="user-card">
+        <strong>Eduardo</strong>
+        <span>Super Admin</span>
+      </div>
+
+      <nav class="nav">
+        <a href="dashboard.html">▦ Painel Geral</a>
+        <a href="agenda.html">▣ Agenda Dinâmica</a>
+        <a href="orcamentos.html">◉ Orçamentos</a>
+        <a href="importar-relatorio.html">▤ Importar Relatório (PDF)</a>
+        <a href="tarefas.html">☑ Tarefas Pendentes</a>
+        <a href="servidor.html">▣ Servidor</a>
+        <a class="active" href="usuarios.html">◌ Acessos / Usuários</a>
+        <a href="configuracoes.html">⚙ Configurações</a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Controle de acesso</div>
+          <h2>Acessos / Usuários</h2>
+          <p class="subtitle">
+            Crie usuários institucionais e escolha mais de uma permissão para cada pessoa.
+          </p>
+        </div>
+
+        <a class="btn gradient" href="dashboard.html">Voltar ao painel</a>
+      </header>
+
+      <section class="layout">
+        <aside class="panel">
+          <h3 id="formTitle">Novo usuário</h3>
+
+          <form id="userForm" class="form-grid">
+            <input type="hidden" id="userId">
+
+            <div class="field">
+              <label>Nome</label>
+              <input id="nome" required placeholder="Nome completo">
+            </div>
+
+            <div class="field">
+              <label>E-mail institucional</label>
+              <input id="email" required type="email" placeholder="nome@cejas.com.br">
+            </div>
+
+            <div class="field">
+              <label>Cargo / Função</label>
+              <input id="cargo" placeholder="Financeiro, Administração, Recepção...">
+            </div>
+
+            <div class="field">
+              <label>Tipo</label>
+              <select id="tipo" onchange="togglePermissions()">
+                <option value="usuario">Usuário com permissões</option>
+                <option value="administrador">Administrador geral</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Status</label>
+              <select id="status">
+                <option value="ativo">Ativo</option>
+                <option value="inativo">Inativo</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Senha inicial / nova senha</label>
+              <input id="senha" type="password" placeholder="Mínimo 6 caracteres">
+            </div>
+
+            <div class="field" id="permissionsBox">
+              <label>Permissões</label>
+              <div class="permissions" id="permissionsList"></div>
+            </div>
+
+            <button class="btn gradient" type="submit">Salvar usuário</button>
+            <button class="btn" type="button" onclick="clearForm()">Limpar</button>
+          </form>
+
+          <div class="notice">
+            <strong>Regra:</strong> só é permitido cadastrar usuários com e-mail institucional
+            <strong>@cejas.com.br</strong>. O administrador tem acesso total.
+          </div>
+        </aside>
+
+        <section class="panel">
+          <h3>Usuários cadastrados</h3>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Usuário</th>
+                  <th>E-mail</th>
+                  <th>Cargo</th>
+                  <th>Permissões</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="usersTable"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    let permissoesDisponiveis = [];
+    let usuarios = [];
+
+    function selectedPermissions() {
+      return [...document.querySelectorAll(".perm-check:checked")].map(input => input.value);
+    }
+
+    function togglePermissions() {
+      const tipo = document.getElementById("tipo").value;
+      document.getElementById("permissionsBox").style.display = tipo === "administrador" ? "none" : "block";
+    }
+
+    function renderPermissions() {
+      const box = document.getElementById("permissionsList");
+
+      box.innerHTML = permissoesDisponiveis.map(perm => `
+        <label class="perm">
+          <input class="perm-check" type="checkbox" value="${perm.id}">
+          ${perm.nome}
+        </label>
+      `).join("");
+    }
+
+    function renderUsers() {
+      const table = document.getElementById("usersTable");
+
+      table.innerHTML = usuarios.map(user => {
+        const admin = (user.permissoes || []).includes("*");
+
+        const perms = admin
+          ? `<span class="badge admin">Acesso total</span>`
+          : (user.permissoes || []).map(id => {
+              const perm = permissoesDisponiveis.find(item => item.id === id);
+              return `<span class="badge">${perm ? perm.nome : id}</span>`;
+            }).join("");
+
+        return `
+          <tr>
+            <td><strong>${user.nome}</strong></td>
+            <td>${user.email}</td>
+            <td>${user.cargo || ""}</td>
+            <td>${perms || "<span style='color:#777;'>Sem permissões</span>"}</td>
+            <td><span class="badge ${user.status === "inativo" ? "inativo" : ""}">${user.status}</span></td>
+            <td>
+              <button class="mini" onclick="editUser('${user.id}')">Editar</button>
+              <button class="mini red" onclick="deleteUser('${user.id}')">Excluir</button>
+            </td>
+          </tr>
+        `;
+      }).join("") || `<tr><td colspan="6">Nenhum usuário cadastrado.</td></tr>`;
+    }
+
+    function clearForm() {
+      document.getElementById("formTitle").textContent = "Novo usuário";
+      document.getElementById("userId").value = "";
+      document.getElementById("nome").value = "";
+      document.getElementById("email").value = "";
+      document.getElementById("cargo").value = "";
+      document.getElementById("tipo").value = "usuario";
+      document.getElementById("status").value = "ativo";
+      document.getElementById("senha").value = "";
+
+      document.querySelectorAll(".perm-check").forEach(input => {
+        input.checked = false;
+      });
+
+      togglePermissions();
+    }
+
+    function editUser(id) {
+      const user = usuarios.find(item => item.id === id);
+      if (!user) return;
+
+      document.getElementById("formTitle").textContent = "Editar usuário";
+      document.getElementById("userId").value = user.id;
+      document.getElementById("nome").value = user.nome;
+      document.getElementById("email").value = user.email;
+      document.getElementById("cargo").value = user.cargo || "";
+      document.getElementById("tipo").value = (user.permissoes || []).includes("*") ? "administrador" : "usuario";
+      document.getElementById("status").value = user.status || "ativo";
+      document.getElementById("senha").value = "";
+
+      document.querySelectorAll(".perm-check").forEach(input => {
+        input.checked = (user.permissoes || []).includes(input.value);
+      });
+
+      togglePermissions();
+    }
+
+    async function deleteUser(id) {
+      if (!confirm("Deseja excluir este usuário?")) return;
+
+      const response = await fetch(`/api/usuarios/${id}`, {
+        method: "DELETE"
+      });
+
+      const data = await response.json();
+
+      if (!data.ok) {
+        alert(data.message || "Erro ao excluir.");
+        return;
+      }
+
+      await loadUsers();
+    }
+
+    async function loadPermissions() {
+      const response = await fetch("/api/permissoes", { cache: "no-store" });
+      const data = await response.json();
+
+      permissoesDisponiveis = data.permissoes || [];
+      renderPermissions();
+    }
+
+    async function loadUsers() {
+      const response = await fetch("/api/usuarios", { cache: "no-store" });
+      const data = await response.json();
+
+      if (!data.ok) {
+        alert(data.message || "Erro ao carregar usuários.");
+        return;
+      }
+
+      usuarios = data.usuarios || [];
+      renderUsers();
+    }
+
+    document.getElementById("userForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const id = document.getElementById("userId").value;
+      const tipo = document.getElementById("tipo").value;
+
+      const payload = {
+        nome: document.getElementById("nome").value,
+        email: document.getElementById("email").value,
+        cargo: document.getElementById("cargo").value,
+        tipo,
+        status: document.getElementById("status").value,
+        senha: document.getElementById("senha").value,
+        permissoes: tipo === "administrador" ? ["*"] : selectedPermissions()
+      };
+
+      const response = await fetch(id ? `/api/usuarios/${id}` : "/api/usuarios", {
+        method: id ? "PUT" : "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (!data.ok) {
+        alert(data.message || "Erro ao salvar.");
+        return;
+      }
+
+      clearForm();
+      await loadUsers();
+    });
+
+    async function init() {
+      await loadPermissions();
+      await loadUsers();
+      togglePermissions();
+    }
+
+    init();
+  </script>
+
+<script>
+(function () {
+  const PAGE_PERMS = {
+    "dashboard.html": "painel",
+    "agenda.html": "agenda",
+    "orcamentos.html": "orcamentos",
+    "importar-relatorio.html": "relatorios",
+    "tarefas.html": "tarefas",
+    "servidor.html": "servidor",
+    "financeiro.html": "financeiro",
+    "usuarios.html": "usuarios",
+    "configuracoes.html": "configuracoes"
+  };
+
+  async function aplicarPermissoesMenu() {
+    try {
+      const response = await fetch("/api/me", { cache: "no-store" });
+      const data = await response.json();
+
+      if (!data.ok || !data.user) return;
+
+      const permissoes = data.user.permissoes || [];
+      const admin = permissoes.includes("*");
+
+      document.querySelectorAll("a[href$='.html']").forEach(link => {
+        const href = link.getAttribute("href");
+        const page = href.split("/").pop();
+        const perm = PAGE_PERMS[page];
+
+        if (!perm) return;
+
+        if (!admin && !permissoes.includes(perm)) {
+          link.style.display = "none";
+        }
+      });
+    } catch {}
+  }
+
+  aplicarPermissoesMenu();
+})();
+</script>
+
+</body>
+</html>

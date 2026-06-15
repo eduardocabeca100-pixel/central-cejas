@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de Gestão CEJAS | Dashboard</title>
+
+  <style>
+    :root {
+      --bg: #050505;
+      --panel: #1A1A1A;
+      --panel-2: #111114;
+      --border: rgba(255,255,255,0.08);
+      --text: #FFFFFF;
+      --muted: #B3B3B3;
+      --purple: #7B61FF;
+      --pink: #FF61D2;
+      --green: #48D86D;
+      --red: #FF5F68;
+      --orange: #FFA62B;
+      --blue: #4DA3FF;
+      --gradient: linear-gradient(135deg, #7B61FF, #FF61D2);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font-family: inherit;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: #101013;
+      border-right: 1px solid var(--border);
+      padding: 24px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand img {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+    }
+
+    .brand h1 {
+      font-size: 17px;
+      line-height: 1;
+    }
+
+    .brand p {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .user-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--gradient);
+      font-weight: 900;
+    }
+
+    .user-card strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .user-card span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .nav-title {
+      margin: 14px 10px 6px;
+      color: #777782;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .nav a {
+      color: var(--muted);
+      text-decoration: none;
+      padding: 13px 14px;
+      border-radius: 12px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 700;
+      transition: 0.22s ease;
+    }
+
+    .nav a:hover {
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      transform: translateX(4px);
+    }
+
+    .nav a.active {
+      background: var(--gradient);
+      color: #fff;
+      box-shadow: 0 12px 30px rgba(123, 97, 255, 0.25);
+    }
+
+    .help {
+      margin-top: auto;
+      background: rgba(123, 97, 255, 0.1);
+      border: 1px solid rgba(123, 97, 255, 0.28);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .help strong {
+      color: #d8ccff;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .help p {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .main {
+      height: 100vh;
+      overflow: auto;
+      padding: 26px 30px;
+      background:
+        radial-gradient(circle at 70% 0%, rgba(123,97,255,0.14), transparent 28%),
+        #050505;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 22px;
+      margin-bottom: 24px;
+    }
+
+    .page-title small {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      font-weight: 800;
+    }
+
+    .page-title h2 {
+      font-size: 30px;
+      margin-top: 4px;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .search {
+      width: 340px;
+      height: 44px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #0d0d10;
+      color: #fff;
+      padding: 0 18px;
+      outline: none;
+    }
+
+    .button {
+      height: 44px;
+      border: 0;
+      border-radius: 13px;
+      padding: 0 18px;
+      color: #fff;
+      background: var(--gradient);
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.22s ease;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+    }
+
+    .button.dark {
+      background: #151519;
+      border: 1px solid var(--border);
+    }
+
+    .grid-kpi {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+      transition: 0.22s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(123,97,255,0.45);
+    }
+
+    .kpi-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .kpi-value {
+      font-size: 25px;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .kpi-change {
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .kpi-change.red {
+      color: var(--red);
+    }
+
+    .modules {
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      margin-bottom: 14px;
+    }
+
+    .module-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+
+    .module-card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      min-height: 150px;
+      transition: 0.22s ease;
+    }
+
+    .module-card:hover {
+      transform: translateY(-4px);
+      background: #17171d;
+    }
+
+    .module-icon {
+      font-size: 28px;
+      margin-bottom: 14px;
+    }
+
+    .module-card h3 {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .module-card p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      margin-bottom: 18px;
+    }
+
+    .module-card a {
+      color: #cdbfff;
+      text-decoration: none;
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr 0.9fr;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .chart {
+      height: 260px;
+      border-radius: 16px;
+      background:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 54px 54px;
+      display: flex;
+      align-items: end;
+      gap: 18px;
+      padding: 24px;
+    }
+
+    .bar {
+      width: 34px;
+      border-radius: 10px 10px 0 0;
+      background: linear-gradient(180deg, #48D86D, #267A3B);
+    }
+
+    .bar.red {
+      background: linear-gradient(180deg, #FF5F68, #8E2028);
+    }
+
+    .line-placeholder {
+      height: 260px;
+      border-radius: 16px;
+      background:
+        linear-gradient(135deg, rgba(123,97,255,0.4), transparent 34%),
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: auto, 50px 50px, 50px 50px;
+      display: grid;
+      place-items: center;
+      color: #d8ccff;
+      font-weight: 900;
+    }
+
+    .calendar-mini {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-top: 16px;
+    }
+
+    .calendar-mini span {
+      height: 38px;
+      display: grid;
+      place-items: center;
+      background: #111114;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .calendar-mini .today {
+      color: #fff;
+      background: var(--gradient);
+    }
+
+    .recent {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .activity {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .activity strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .activity span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 1200px) {
+      body {
+        overflow: auto;
+      }
+
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+
+      .main {
+        height: auto;
+      }
+
+      .grid-kpi,
+      .module-grid,
+      .analytics-grid,
+      .recent {
+        grid-template-columns: 1fr;
+      }
+
+      .search {
+        width: 100%;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="assets/logo.svg" alt="Logo Sistema de Gestão CEJAS">
+        <div>
+          <h1>SISTEMA DE GESTÃO CEJAS</h1>
+          <p>Painel Administrativo</p>
+        </div>
+      </div>
+
+      <div class="user-card">
+        <div class="avatar">E</div>
+        <div>
+          <strong>Eduardo</strong>
+          <span>Super Admin</span>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a class="active" href="dashboard.html">▦ Painel Geral</a>
+        <a href="agenda.html">▣ Agenda Dinâmica</a>
+        <a href="orcamentos.html">◉ Orçamentos</a>
+        <a href="importar-relatorio.html">▤ Importar Relatório (PDF)</a>
+        <a href="tarefas.html">☑ Tarefas Pendentes</a>
+
+        <div class="nav-title">Administração</div>
+        <a href="usuarios.html">◌ Acessos / Usuários</a>
+        <a href="configuracoes.html">⚙ Configurações</a>
+      </nav>
+
+      <div class="help">
+        <strong>Precisa de ajuda?</strong>
+        <p>Sistema interno da CEJAS. Dados protegidos e acesso controlado.</p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="page-title">
+          <small>Sistema de Gestão CEJAS</small>
+          <h2>Dashboard de Resultados</h2>
+        </div>
+
+        <div class="actions">
+          <input class="search" type="search" placeholder="Buscar em todo o sistema...">
+          <button class="button">Salvar alterações</button>
+          <button class="button dark" onclick="location.href='login.html'">Sair</button>
+        </div>
+      </header>
+
+      <section class="grid-kpi">
+        <div class="card">
+          <p class="kpi-label">Faturamento Previsto</p>
+          <p class="kpi-value">R$ 245.800,00</p>
+          <p class="kpi-change">+12,4% vs. mês anterior</p>
+        </div>
+
+        <div class="card">
+          <p class="kpi-label">Receita Confirmada</p>
+          <p class="kpi-value">R$ 182.430,75</p>
+          <p class="kpi-change">+8,7% vs. mês anterior</p>
+        </div>
+
+        <div class="card">
+          <p class="kpi-label">Descontos Aplicados</p>
+          <p class="kpi-value">R$ 12.745,20</p>
+          <p class="kpi-change red">-3,1% vs. mês anterior</p>
+        </div>
+
+        <div class="card">
+          <p class="kpi-label">Eventos Pendentes</p>
+          <p class="kpi-value">27</p>
+          <p class="kpi-change">5 hoje • 22 próximos</p>
+        </div>
+      </section>
+
+      <section class="card modules">
+        <h3 class="section-title">Módulos e Ferramentas</h3>
+
+        <div class="module-grid">
+          <article class="module-card">
+            <div class="module-icon">📅</div>
+            <h3>Agenda Dinâmica</h3>
+            <p>Reuniões, compromissos e eventos do escritório.</p>
+            <a href="agenda.html">Abrir agenda →</a>
+          </article>
+
+          <article class="module-card">
+            <div class="module-icon">💰</div>
+            <h3>Orçamentos</h3>
+            <p>Crie, acompanhe e gerencie propostas comerciais.</p>
+            <a href="orcamentos.html">Ver orçamentos →</a>
+          </article>
+
+          <article class="module-card">
+            <div class="module-icon">📄</div>
+            <h3>Importar Relatório</h3>
+            <p>Importe relatórios financeiros em PDF.</p>
+            <a href="importar-relatorio.html">Importar agora →</a>
+          </article>
+
+          <article class="module-card">
+            <div class="module-icon">☑</div>
+            <h3>Tarefas</h3>
+            <p>Acompanhe tarefas prioritárias do dia.</p>
+            <a href="tarefas.html">Ver tarefas →</a>
+          </article>
+
+          <article class="module-card">
+            <div class="module-icon">⚙</div>
+            <h3>Configurações</h3>
+            <p>Personalize o sistema conforme a necessidade.</p>
+            <a href="configuracoes.html">Abrir configurações →</a>
+          </article>
+        </div>
+      </section>
+
+      <section class="analytics-grid">
+        <div class="card">
+          <h3 class="section-title">Receitas vs. Despesas</h3>
+          <div class="chart">
+            <div class="bar" style="height: 55%;"></div>
+            <div class="bar red" style="height: 42%;"></div>
+            <div class="bar" style="height: 72%;"></div>
+            <div class="bar red" style="height: 48%;"></div>
+            <div class="bar" style="height: 88%;"></div>
+            <div class="bar red" style="height: 63%;"></div>
+            <div class="bar" style="height: 78%;"></div>
+            <div class="bar red" style="height: 50%;"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="section-title">Fluxo de Caixa</h3>
+          <p class="kpi-label">Saldo atual</p>
+          <p class="kpi-value" style="color: var(--green);">R$ 68.945,30</p>
+          <div class="line-placeholder">Gráfico de fluxo de caixa</div>
+        </div>
+
+        <div class="card">
+          <h3 class="section-title">Agenda do Mês</h3>
+          <p style="color: var(--muted);">Junho de 2026</p>
+          <div class="calendar-mini">
+            <span>31</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span>
+            <span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span>
+            <span>14</span><span class="today">15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span>
+            <span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span>
+            <span>28</span><span>29</span><span>30</span><span>1</span><span>2</span><span>3</span><span>4</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3 class="section-title">Atividades Recentes</h3>
+
+        <div class="recent">
+          <div class="activity">
+            <strong>Reunião com Cliente</strong>
+            <span>Hoje, 09:00 • Agenda</span>
+          </div>
+
+          <div class="activity">
+            <strong>Orçamento aprovado</strong>
+            <span>Hoje, 08:15 • Orçamentos</span>
+          </div>
+
+          <div class="activity">
+            <strong>Relatório importado</strong>
+            <span>Ontem, 16:42 • PDF</span>
+          </div>
+
+          <div class="activity">
+            <strong>Tarefa concluída</strong>
+            <span>Ontem, 14:30 • Tarefas</span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

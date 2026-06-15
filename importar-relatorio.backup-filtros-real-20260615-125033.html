@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Sistema de Gestão CEJAS | Importar Relatório</title>
+
+  <style>
+    :root {
+      --bg: #050505;
+      --sidebar: #0b0b10;
+      --panel: #111114;
+      --card: #17171c;
+      --border: rgba(255,255,255,.09);
+      --text: #fff;
+      --muted: #b3b3b3;
+      --purple: #7B61FF;
+      --pink: #FF61D2;
+      --green: #22c55e;
+      --red: #ef4444;
+      --waiting: #a855f7;
+      --blue: #2563eb;
+      --gradient: linear-gradient(135deg, #7B61FF, #FF61D2);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body,
+    button,
+    input {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 270px 1fr;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      padding: 24px 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 26px;
+    }
+
+    .logo {
+      width: 45px;
+      height: 45px;
+      border-radius: 12px;
+      border: 1px solid #9b5cff;
+      display: grid;
+      place-items: center;
+      color: #ff61d2;
+      font-weight: 900;
+      font-size: 28px;
+    }
+
+    .brand h1 {
+      font-size: 16px;
+      line-height: 1.05;
+    }
+
+    .brand p {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .user-card {
+      background: #171717;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 26px;
+    }
+
+    .user-card strong {
+      display: block;
+      font-size: 15px;
+    }
+
+    .user-card span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .nav a {
+      color: #c7c7c7;
+      text-decoration: none;
+      padding: 13px 14px;
+      border-radius: 13px;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .nav a.active {
+      color: #fff;
+      background: var(--gradient);
+    }
+
+    .main {
+      height: 100vh;
+      overflow-y: auto;
+      padding: 34px;
+    }
+
+    .eyebrow {
+      color: #aaa;
+      letter-spacing: .45em;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .header h2 {
+      font-size: 34px;
+      line-height: 1;
+    }
+
+    .header p {
+      color: var(--muted);
+      margin-top: 9px;
+      max-width: 700px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 13px 18px;
+      color: #fff;
+      font-weight: 900;
+      cursor: pointer;
+      background: #1f2937;
+      transition: .2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+    }
+
+    .btn.gradient {
+      background: var(--gradient);
+    }
+
+    .upload-card {
+      background: rgba(255,255,255,.08);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 26px;
+      margin-bottom: 22px;
+    }
+
+    .dropzone {
+      border: 2px dashed rgba(123,97,255,.75);
+      border-radius: 20px;
+      min-height: 250px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 30px;
+      background: rgba(123,97,255,.07);
+    }
+
+    .dropzone h3 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .dropzone p {
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    
+    .file-upload-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin: 8px 0 18px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .file-upload-input {
+      display: none;
+    }
+
+    .file-upload-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: linear-gradient(135deg, #7B61FF, #FF61D2);
+      color: #fff;
+      border-radius: 999px;
+      padding: 13px 18px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(123,97,255,.25);
+      transition: .2s;
+    }
+
+    .file-upload-label:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+    }
+
+    .file-name {
+      color: #d6d6d6;
+      font-size: 14px;
+      font-weight: 700;
+      max-width: 360px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .dropzone input {
+      margin: 0 auto 18px;
+      color: #ddd;
+    }
+
+    
+    .filters-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 18px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      align-items: end;
+    }
+
+    .filters-card label {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-weight: 900;
+      display: block;
+      margin-bottom: 7px;
+    }
+
+    .filters-card input,
+    .filters-card select {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.12);
+      background: #0f1014;
+      color: #fff;
+      border-radius: 12px;
+      padding: 12px;
+      outline: none;
+    }
+
+    .filters-card button {
+      height: 43px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .metric-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      min-height: 118px;
+    }
+
+    .metric-card span {
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+
+    .metric-card strong {
+      display: block;
+      font-size: 25px;
+      margin-top: 12px;
+    }
+
+    .metric-card.confirmed strong {
+      color: var(--green);
+    }
+
+    .metric-card.waiting strong {
+      color: var(--waiting);
+    }
+
+    .metric-card.canceled strong {
+      color: var(--red);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: 18px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+    }
+
+    .panel h3 {
+      margin-bottom: 14px;
+      font-size: 20px;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .status-column {
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      min-height: 280px;
+    }
+
+    .status-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-weight: 900;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 99px;
+      display: inline-block;
+      margin-right: 7px;
+    }
+
+    .dot.green {
+      background: var(--green);
+    }
+
+    .dot.purple {
+      background: var(--waiting);
+    }
+
+    .dot.red {
+      background: var(--red);
+    }
+
+    .event-card {
+      background: #0f1014;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .event-card strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+
+    .event-card small {
+      color: var(--muted);
+      display: block;
+      line-height: 1.5;
+    }
+
+    .event-card .value {
+      margin-top: 8px;
+      font-weight: 900;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      color: #ddd;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+    }
+
+    td {
+      color: #cfcfcf;
+    }
+
+    .status {
+      display: inline-flex;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .status.confirmado {
+      background: rgba(34,197,94,.14);
+      color: var(--green);
+    }
+
+    .status.em_espera {
+      background: rgba(168,85,247,.14);
+      color: var(--waiting);
+    }
+
+    .status.cancelado {
+      background: rgba(239,68,68,.14);
+      color: var(--red);
+    }
+
+    .status-box {
+      color: var(--muted);
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 1300px) {
+      body {
+        overflow: auto;
+      }
+
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      
+    .filters-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 18px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      align-items: end;
+    }
+
+    .filters-card label {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-weight: 900;
+      display: block;
+      margin-bottom: 7px;
+    }
+
+    .filters-card input,
+    .filters-card select {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.12);
+      background: #0f1014;
+      color: #fff;
+      border-radius: 12px;
+      padding: 12px;
+      outline: none;
+    }
+
+    .filters-card button {
+      height: 43px;
+    }
+
+    .cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .layout,
+      .status-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">M</div>
+        <div>
+          <h1>SISTEMA DE GESTÃO CEJAS</h1>
+          <p>Painel Administrativo</p>
+        </div>
+      </div>
+
+      <div class="user-card">
+        <strong>Eduardo</strong>
+        <span>Super Admin</span>
+      </div>
+
+      <nav class="nav">
+        <a href="dashboard.html">▦ Painel Geral</a>
+        <a href="agenda.html">▣ Agenda Dinâmica</a>
+        <a href="orcamentos.html">◉ Orçamentos</a>
+        <a class="active" href="importar-relatorio.html">▤ Importar Relatório (PDF)</a>
+        <a href="tarefas.html">☑ Tarefas Pendentes</a>
+        <a href="usuarios.html">◌ Acessos / Usuários</a>
+        <a href="configuracoes.html">⚙ Configurações</a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <div class="header">
+        <div>
+          <div class="eyebrow">Importação inteligente</div>
+          <h2>Importar Relatório PDF</h2>
+          <p>
+            Envie o relatório semanal do Supera. O sistema vai separar confirmados,
+            em espera e cancelados, calcular valores e alimentar o Dashboard.
+          </p>
+        </div>
+
+        <button class="btn" onclick="location.href='dashboard.html'">Voltar ao painel</button>
+      </div>
+
+      <section class="upload-card">
+        <form id="uploadForm" class="dropzone">
+          <div>
+            <h3>Arraste seu PDF do Supera aqui</h3>
+            <p>Ou selecione o arquivo exportado do sistema para análise.</p>
+
+            <div class="file-upload-box">
+              <input id="relatorioInput" class="file-upload-input" name="relatorio" type="file" accept="application/pdf" required>
+              <label class="file-upload-label" for="relatorioInput">📎 Selecionar PDF do Supera</label>
+              <span id="fileName" class="file-name">Nenhum arquivo selecionado</span>
+            </div>
+
+            <br>
+
+            <button class="btn gradient" type="submit">Importar e processar relatório</button>
+
+            <div id="importStatus" class="status-box">Aguardando arquivo</div>
+          </div>
+        </form>
+      </section>
+
+      <section class="filters-card">
+        <div>
+          <label>Data inicial</label>
+          <input id="filterStart" type="date">
+        </div>
+
+        <div>
+          <label>Data final</label>
+          <input id="filterEnd" type="date">
+        </div>
+
+        <div>
+          <label>Status</label>
+          <select id="filterStatus">
+            <option value="todos">Todos</option>
+            <option value="confirmado">Confirmados</option>
+            <option value="em_espera">Em espera</option>
+            <option value="cancelado">Cancelados</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Buscar</label>
+          <input id="filterSearch" type="search" placeholder="Empresa, sala ou evento">
+        </div>
+
+        <button class="btn gradient" type="button" onclick="aplicarFiltrosRelatorio()">Aplicar filtros</button>
+      </section>
+
+      <section class="cards">
+        <div class="metric-card">
+          <span>Faturamento previsto</span>
+          <strong id="faturamentoPrevisto">R$ 0,00</strong>
+        </div>
+
+        <div class="metric-card confirmed">
+          <span>Receita confirmada</span>
+          <strong id="receitaConfirmada">R$ 0,00</strong>
+        </div>
+
+        <div class="metric-card">
+          <span>Descontos</span>
+          <strong id="descontosAplicados">R$ 0,00</strong>
+        </div>
+
+        <div class="metric-card confirmed">
+          <span>Confirmados</span>
+          <strong id="eventosConfirmados">0</strong>
+        </div>
+
+        <div class="metric-card waiting">
+          <span>Em espera</span>
+          <strong id="eventosPendentes">0</strong>
+        </div>
+
+        <div class="metric-card canceled">
+          <span>Cancelados</span>
+          <strong id="eventosCancelados">0</strong>
+        </div>
+      </section>
+
+      <section class="layout">
+        <div class="panel">
+          <h3>Eventos por status</h3>
+
+          <div class="status-grid">
+            <div class="status-column">
+              <div class="status-title">
+                <span><span class="dot green"></span>Confirmados</span>
+                <span id="countConfirmados">0</span>
+              </div>
+              <div id="listaConfirmados"></div>
+            </div>
+
+            <div class="status-column">
+              <div class="status-title">
+                <span><span class="dot purple"></span>Em espera</span>
+                <span id="countPendentes">0</span>
+              </div>
+              <div id="listaPendentes"></div>
+            </div>
+
+            <div class="status-column">
+              <div class="status-title">
+                <span><span class="dot red"></span>Cancelados</span>
+                <span id="countCancelados">0</span>
+              </div>
+              <div id="listaCancelados"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Salas e produtos detectados</h3>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                <th>Nome</th>
+                <th>Qtd.</th>
+              </tr>
+            </thead>
+            <tbody id="salasProdutos"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" style="margin-top:18px;">
+        <h3>Todos os eventos detectados</h3>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Hora</th>
+              <th>Empresa</th>
+              <th>Evento</th>
+              <th>Sala</th>
+              <th>Status</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody id="eventosTable"></tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const money = (value) => Number(value || 0).toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
+
+    function statusLabel(status) {
+      if (status === "confirmado") return "Confirmado";
+      if (status === "cancelado") return "Cancelado";
+      return "Em espera";
+    }
+
+    function eventCard(evento) {
+      return `
+        <div class="event-card">
+          <strong>${evento.evento || "Evento sem descrição"}</strong>
+          <small>${evento.data || ""} ${evento.horaInicial || ""} ${evento.horaFinal ? "às " + evento.horaFinal : ""}</small>
+          <small>${evento.empresa || "Empresa não detectada"}</small>
+          <small>${evento.sala || "Sala não detectada"}</small>
+          <div class="value">${money(evento.valor)}</div>
+        </div>
+      `;
+    }
+
+    function renderReport(report) {
+      const resumo = report.resumo || {};
+
+      document.getElementById("faturamentoPrevisto").textContent = money(resumo.faturamentoPrevisto);
+      document.getElementById("receitaConfirmada").textContent = money(resumo.receitaConfirmada);
+      document.getElementById("descontosAplicados").textContent = money(resumo.descontosAplicados);
+      document.getElementById("eventosConfirmados").textContent = resumo.eventosConfirmados || 0;
+      document.getElementById("eventosPendentes").textContent = resumo.eventosPendentes || 0;
+      document.getElementById("eventosCancelados").textContent = resumo.eventosCancelados || 0;
+
+      const confirmados = (report.eventos || []).filter(e => e.status === "confirmado");
+      const pendentes = (report.eventos || []).filter(e => e.status === "em_espera");
+      const cancelados = (report.eventos || []).filter(e => e.status === "cancelado");
+
+      document.getElementById("countConfirmados").textContent = confirmados.length;
+      document.getElementById("countPendentes").textContent = pendentes.length;
+      document.getElementById("countCancelados").textContent = cancelados.length;
+
+      document.getElementById("listaConfirmados").innerHTML = confirmados.slice(0, 12).map(eventCard).join("") || "<p style='color:#777;'>Nenhum confirmado.</p>";
+      document.getElementById("listaPendentes").innerHTML = pendentes.slice(0, 12).map(eventCard).join("") || "<p style='color:#777;'>Nenhum evento em espera.</p>";
+      document.getElementById("listaCancelados").innerHTML = cancelados.slice(0, 12).map(eventCard).join("") || "<p style='color:#777;'>Nenhum cancelado.</p>";
+
+      const salas = (report.salas || []).map(item => `
+        <tr>
+          <td>Sala</td>
+          <td>${item.nome}</td>
+          <td>${item.quantidade}</td>
+        </tr>
+      `);
+
+      const produtos = (report.produtos || []).map(item => `
+        <tr>
+          <td>Produto</td>
+          <td>${item.nome}</td>
+          <td>${item.quantidade}</td>
+        </tr>
+      `);
+
+      document.getElementById("salasProdutos").innerHTML =
+        [...salas, ...produtos].join("") ||
+        "<tr><td colspan='3'>Nenhum dado detectado.</td></tr>";
+
+      document.getElementById("eventosTable").innerHTML = (report.eventos || []).map(evento => `
+        <tr>
+          <td>${evento.data || ""}</td>
+          <td>${evento.horaInicial || ""} ${evento.horaFinal ? "às " + evento.horaFinal : ""}</td>
+          <td>${evento.empresa || ""}</td>
+          <td>${evento.evento || ""}</td>
+          <td>${evento.sala || ""}</td>
+          <td><span class="status ${evento.status}">${statusLabel(evento.status)}</span></td>
+          <td>${money(evento.valor)}</td>
+        </tr>
+      `).join("") || "<tr><td colspan='7'>Nenhum evento importado ainda.</td></tr>";
+    }
+
+    async function loadCurrentReport() {
+      const response = await fetch("/api/relatorio-atual", { cache: "no-store" });
+      const data = await response.json();
+
+      if (data.ok) {
+        renderReport(data.report);
+      }
+    }
+
+    const relatorioInput = document.getElementById("relatorioInput");
+    const fileName = document.getElementById("fileName");
+
+    relatorioInput.addEventListener("change", () => {
+      fileName.textContent = relatorioInput.files.length
+        ? relatorioInput.files[0].name
+        : "Nenhum arquivo selecionado";
+    });
+
+    document.getElementById("uploadForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const input = document.getElementById("relatorioInput");
+      const status = document.getElementById("importStatus");
+      const button = event.target.querySelector("button[type='submit']");
+
+      if (!input.files.length) {
+        alert("Selecione um PDF.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("relatorio", input.files[0]);
+
+      status.textContent = "Enviando PDF para o sistema...";
+      button.disabled = true;
+      button.textContent = "Processando...";
+
+      const timeout = setTimeout(() => {
+        status.textContent = "Ainda processando. Se demorar muito, o PDF pode estar escaneado como imagem.";
+      }, 12000);
+
+      try {
+        const response = await fetch("/api/importar-relatorio", {
+          method: "POST",
+          body: formData
+        });
+
+        clearTimeout(timeout);
+
+        const rawText = await response.text();
+        let data = null;
+
+        try {
+          data = JSON.parse(rawText);
+        } catch (jsonError) {
+          console.error("Resposta não JSON:", rawText);
+          status.textContent = "Erro no servidor. Resposta inesperada. Veja o Terminal.";
+          alert("Erro no servidor. Veja o Terminal do VS Code para o erro completo.");
+          return;
+        }
+
+        if (!response.ok || !data.ok) {
+          console.error("Erro da importação:", data);
+          status.textContent = data.message || "Erro ao importar.";
+          alert(data.message || "Erro ao importar relatório.");
+          return;
+        }
+
+        status.textContent = "Relatório importado com sucesso.";
+        renderReport(data.report);
+      } catch (error) {
+        clearTimeout(timeout);
+        status.textContent = "Erro: o servidor não respondeu. Veja o Terminal.";
+        alert("O servidor não respondeu. Veja se apareceu erro no Terminal.");
+      } finally {
+        button.disabled = false;
+        button.textContent = "Importar e processar relatório";
+      }
+    });
+
+    loadCurrentReport();
+  </script>
+
+<script>
+(function () {
+  let relatorioCompleto = null;
+
+  function toISODateBR(dataBR) {
+    if (!dataBR || !dataBR.includes("/")) return "";
+    const [d, m, y] = dataBR.split("/");
+    return `${y}-${m}-${d}`;
+  }
+
+  function resumoFiltrado(eventos) {
+    return eventos.reduce((acc, e) => {
+      acc.totalEventos++;
+
+      if (e.status === "confirmado") {
+        acc.eventosConfirmados++;
+        acc.receitaConfirmada += Number(e.valor || 0);
+        acc.faturamentoPrevisto += Number(e.valor || 0);
+      }
+
+      if (e.status === "em_espera") {
+        acc.eventosPendentes++;
+        acc.faturamentoPrevisto += Number(e.valor || 0);
+      }
+
+      if (e.status === "cancelado") {
+        acc.eventosCancelados++;
+      }
+
+      acc.descontosAplicados += Number(e.desconto || 0);
+
+      return acc;
+    }, {
+      faturamentoPrevisto: 0,
+      receitaConfirmada: 0,
+      descontosAplicados: 0,
+      eventosConfirmados: 0,
+      eventosPendentes: 0,
+      eventosCancelados: 0,
+      totalEventos: 0
+    });
+  }
+
+  function filtrarEventos(eventos) {
+    const start = document.getElementById("filterStart")?.value || "";
+    const end = document.getElementById("filterEnd")?.value || "";
+    const status = document.getElementById("filterStatus")?.value || "todos";
+    const search = String(document.getElementById("filterSearch")?.value || "").toLowerCase();
+
+    return (eventos || []).filter((e) => {
+      const iso = toISODateBR(e.data);
+
+      if (start && iso < start) return false;
+      if (end && iso > end) return false;
+      if (status !== "todos" && e.status !== status) return false;
+
+      if (search) {
+        const haystack = [
+          e.empresa,
+          e.evento,
+          e.sala,
+          e.data,
+          e.horaInicial,
+          e.horaFinal
+        ].join(" ").toLowerCase();
+
+        if (!haystack.includes(search)) return false;
+      }
+
+      return true;
+    });
+  }
+
+  function recalcularSalasProdutos(eventos) {
+    const salas = {};
+    const produtos = {};
+
+    eventos.forEach((e) => {
+      if (e.sala) {
+        salas[e.sala] = salas[e.sala] || { nome: e.sala, quantidade: 0 };
+        salas[e.sala].quantidade++;
+      }
+
+      (e.produtos || []).forEach((p) => {
+        produtos[p] = produtos[p] || { nome: p, quantidade: 0 };
+        produtos[p].quantidade++;
+      });
+    });
+
+    return {
+      salas: Object.values(salas),
+      produtos: Object.values(produtos)
+    };
+  }
+
+  function renderRelatorioFiltrado() {
+    if (!relatorioCompleto) return;
+
+    const eventos = filtrarEventos(relatorioCompleto.eventos || []);
+    const resumo = resumoFiltrado(eventos);
+    const agrupados = recalcularSalasProdutos(eventos);
+
+    document.getElementById("faturamentoPrevisto").textContent = money(resumo.faturamentoPrevisto);
+    document.getElementById("receitaConfirmada").textContent = money(resumo.receitaConfirmada);
+    document.getElementById("descontosAplicados").textContent = money(resumo.descontosAplicados);
+    document.getElementById("eventosConfirmados").textContent = resumo.eventosConfirmados;
+    document.getElementById("eventosPendentes").textContent = resumo.eventosPendentes;
+    document.getElementById("eventosCancelados").textContent = resumo.eventosCancelados;
+
+    const confirmados = eventos.filter(e => e.status === "confirmado");
+    const pendentes = eventos.filter(e => e.status === "em_espera");
+    const cancelados = eventos.filter(e => e.status === "cancelado");
+
+    document.getElementById("countConfirmados").textContent = confirmados.length;
+    document.getElementById("countPendentes").textContent = pendentes.length;
+    document.getElementById("countCancelados").textContent = cancelados.length;
+
+    document.getElementById("listaConfirmados").innerHTML = confirmados.slice(0, 80).map(eventCard).join("") || "<p style='color:#777;'>Nenhum confirmado.</p>";
+    document.getElementById("listaPendentes").innerHTML = pendentes.slice(0, 80).map(eventCard).join("") || "<p style='color:#777;'>Nenhum evento em espera.</p>";
+    document.getElementById("listaCancelados").innerHTML = cancelados.slice(0, 80).map(eventCard).join("") || "<p style='color:#777;'>Nenhum cancelado.</p>";
+
+    const salas = agrupados.salas.map(item => `
+      <tr>
+        <td>Sala</td>
+        <td>${item.nome}</td>
+        <td>${item.quantidade}</td>
+      </tr>
+    `);
+
+    const produtos = agrupados.produtos.map(item => `
+      <tr>
+        <td>Produto</td>
+        <td>${item.nome}</td>
+        <td>${item.quantidade}</td>
+      </tr>
+    `);
+
+    document.getElementById("salasProdutos").innerHTML =
+      [...salas, ...produtos].join("") ||
+      "<tr><td colspan='3'>Nenhum dado detectado.</td></tr>";
+
+    document.getElementById("eventosTable").innerHTML = eventos.map(evento => `
+      <tr>
+        <td>${evento.data || ""}</td>
+        <td>${evento.horaInicial || ""} ${evento.horaFinal ? "às " + evento.horaFinal : ""}</td>
+        <td>${evento.empresa || ""}</td>
+        <td>${evento.evento || ""}</td>
+        <td>${evento.sala || ""}</td>
+        <td><span class="status ${evento.status}">${statusLabel(evento.status)}</span></td>
+        <td>${money(evento.valor)}</td>
+      </tr>
+    `).join("") || "<tr><td colspan='7'>Nenhum evento encontrado com esses filtros.</td></tr>";
+  }
+
+  window.aplicarFiltrosRelatorio = renderRelatorioFiltrado;
+
+  const renderAntigo = window.renderReport || renderReport;
+
+  window.renderReport = function (report) {
+    relatorioCompleto = report;
+    renderAntigo(report);
+    renderRelatorioFiltrado();
+  };
+
+  ["filterStart", "filterEnd", "filterStatus", "filterSearch"].forEach((id) => {
+    document.addEventListener("input", (event) => {
+      if (event.target && event.target.id === id) {
+        renderRelatorioFiltrado();
+      }
+    });
+  });
+
+  fetch("/api/relatorio-atual", { cache: "no-store" })
+    .then(r => r.json())
+    .then(data => {
+      if (data.ok) {
+        window.renderReport(data.report);
+      }
+    })
+    .catch(() => {});
+})();
+</script>
+
+</body>
+</html>

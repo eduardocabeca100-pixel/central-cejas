@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Sistema de Gestão CEJAS | Tarefas</title>
+  <style>
+    body{margin:0;background:#050505;color:#fff;font-family:Inter,"Segoe UI",Arial,sans-serif}.app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}.sidebar{background:#101013;border-right:1px solid rgba(255,255,255,.08);padding:24px 18px}.brand{display:flex;gap:12px;align-items:center;margin-bottom:24px}.brand img{width:46px}.brand h1{font-size:17px}.brand p{color:#B3B3B3;font-size:12px}.user{background:#1A1A1A;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:14px;margin-bottom:22px}.user span{color:#B3B3B3;font-size:12px}nav a{display:block;color:#B3B3B3;text-decoration:none;padding:13px 14px;border-radius:12px;margin-bottom:8px;font-weight:700}nav a:hover,nav a.active{background:linear-gradient(135deg,#7B61FF,#FF61D2);color:#fff}.main{padding:30px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}.top small{color:#B3B3B3;letter-spacing:4px;text-transform:uppercase;font-weight:800}.top h2{font-size:30px;margin:4px 0}.btn{border:0;border-radius:12px;padding:13px 18px;color:#fff;font-weight:800;background:linear-gradient(135deg,#7B61FF,#FF61D2);cursor:pointer}.form{display:grid;grid-template-columns:1fr 170px 170px 130px;gap:12px;margin-bottom:20px}.form input,.form select{background:#111114;border:1px solid rgba(255,255,255,.08);border-radius:12px;color:#fff;padding:13px}.board{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.col{background:#1A1A1A;border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:18px}.task{background:#111114;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:15px;margin-top:12px}.task p{color:#B3B3B3;font-size:13px}.tag{display:inline-block;margin-top:10px;padding:6px 9px;border-radius:999px;background:rgba(123,97,255,.16);color:#cdbfff;font-size:12px;font-weight:800}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><img src="assets/logo.svg"><div><h1>SISTEMA DE GESTÃO CEJAS</h1><p>Painel Administrativo</p></div></div>
+    <div class="user"><strong>Eduardo</strong><br><span>Super Admin</span></div>
+    <nav><a href="dashboard.html">▦ Painel Geral</a><a href="agenda.html">▣ Agenda Dinâmica</a><a href="orcamentos.html">◉ Orçamentos</a><a href="importar-relatorio.html">▤ Importar Relatório (PDF)</a><a class="active" href="tarefas.html">☑ Tarefas Pendentes</a>
+        <a href="servidor.html">▣ Servidor</a><a href="usuarios.html">◌ Acessos / Usuários</a><a href="configuracoes.html">⚙ Configurações</a></nav>
+  </aside>
+  <main class="main">
+    <header class="top"><div><small>Organização Diária</small><h2>Tarefas Pendentes</h2></div><button class="btn">Salvar agora</button></header>
+    <div class="form">
+      <input placeholder="Nova tarefa">
+      <select><option>Geral</option><option>Financeiro</option><option>Agenda</option></select>
+      <select><option>Média</option><option>Alta</option><option>Baixa</option></select>
+      <button class="btn">Criar</button>
+    </div>
+    <section class="board">
+      <div class="col"><h3>Pendente</h3><div class="task"><strong>Enviar proposta comercial</strong><p>Responsável: Eduardo</p><span class="tag">Alta</span></div></div>
+      <div class="col"><h3>Em andamento</h3><div class="task"><strong>Conferir relatório PDF</strong><p>Módulo financeiro</p><span class="tag">Média</span></div></div>
+      <div class="col"><h3>Concluída</h3><div class="task"><strong>Atualizar agenda semanal</strong><p>Finalizado hoje</p><span class="tag">Concluída</span></div></div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function () {
+  const PAGE_PERMS = {
+    "dashboard.html": "painel",
+    "agenda.html": "agenda",
+    "orcamentos.html": "orcamentos",
+    "importar-relatorio.html": "relatorios",
+    "tarefas.html": "tarefas",
+    "servidor.html": "servidor",
+    "financeiro.html": "financeiro",
+    "usuarios.html": "usuarios",
+    "configuracoes.html": "configuracoes"
+  };
+
+  async function aplicarPermissoesMenu() {
+    try {
+      const response = await fetch("/api/me", { cache: "no-store" });
+      const data = await response.json();
+
+      if (!data.ok || !data.user) return;
+
+      const permissoes = data.user.permissoes || [];
+      const admin = permissoes.includes("*");
+
+      document.querySelectorAll("a[href$='.html']").forEach(link => {
+        const href = link.getAttribute("href");
+        const page = href.split("/").pop();
+        const perm = PAGE_PERMS[page];
+
+        if (!perm) return;
+
+        if (!admin && !permissoes.includes(perm)) {
+          link.style.display = "none";
+        }
+      });
+    } catch {}
+  }
+
+  aplicarPermissoesMenu();
+})();
+</script>
+
+</body>
+</html>

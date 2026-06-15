@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Sistema de Gestão CEJAS | Acessos / Usuários</title>
+  <style>
+    body{margin:0;background:#050505;color:#fff;font-family:Inter,"Segoe UI",Arial,sans-serif}.app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}.sidebar{background:#101013;border-right:1px solid rgba(255,255,255,.08);padding:24px 18px}.brand{display:flex;gap:12px;align-items:center;margin-bottom:24px}.brand img{width:46px}.brand h1{font-size:17px}.brand p{color:#B3B3B3;font-size:12px}.user{background:#1A1A1A;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:14px;margin-bottom:22px}.user span{color:#B3B3B3;font-size:12px}nav a{display:block;color:#B3B3B3;text-decoration:none;padding:13px 14px;border-radius:12px;margin-bottom:8px;font-weight:700}nav a:hover,nav a.active{background:linear-gradient(135deg,#7B61FF,#FF61D2);color:#fff}.main{padding:30px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}.top small{color:#B3B3B3;letter-spacing:4px;text-transform:uppercase;font-weight:800}.top h2{font-size:30px;margin:4px 0}.btn{border:0;border-radius:12px;padding:13px 18px;color:#fff;font-weight:800;background:linear-gradient(135deg,#7B61FF,#FF61D2);cursor:pointer}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}.card{background:#1A1A1A;border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:20px}.card p{color:#B3B3B3}.value{font-size:28px;font-weight:900}.layout{display:grid;grid-template-columns:380px 1fr;gap:20px}label{display:block;color:#B3B3B3;font-size:13px;font-weight:800;margin:13px 0 8px}input,select{width:100%;background:#111114;border:1px solid rgba(255,255,255,.08);border-radius:12px;color:#fff;padding:13px}.table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:16px;border-bottom:1px solid rgba(255,255,255,.08)}th{color:#B3B3B3;font-size:12px;text-transform:uppercase}.status{padding:7px 10px;border-radius:999px;background:rgba(72,216,109,.14);color:#48D86D;font-weight:800;font-size:12px}.blocked{background:rgba(255,95,104,.14);color:#FF5F68}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><img src="assets/logo.svg"><div><h1>SISTEMA DE GESTÃO CEJAS</h1><p>Painel Administrativo</p></div></div>
+    <div class="user"><strong>Eduardo</strong><br><span>Super Admin</span></div>
+    <nav><a href="dashboard.html">▦ Painel Geral</a><a href="agenda.html">▣ Agenda Dinâmica</a><a href="orcamentos.html">◉ Orçamentos</a><a href="importar-relatorio.html">▤ Importar Relatório (PDF)</a><a href="tarefas.html">☑ Tarefas Pendentes</a><a class="active" href="usuarios.html">◌ Acessos / Usuários</a><a href="configuracoes.html">⚙ Configurações</a></nav>
+  </aside>
+  <main class="main">
+    <header class="top"><div><small>Administração</small><h2>Acessos / Usuários</h2></div><button class="btn">Novo usuário</button></header>
+    <section class="grid">
+      <div class="card"><p>Total de usuários</p><div class="value">1</div></div>
+      <div class="card"><p>Usuários ativos</p><div class="value">1</div></div>
+      <div class="card"><p>Usuários bloqueados</p><div class="value">0</div></div>
+      <div class="card"><p>Perfis administrativos</p><div class="value">1</div></div>
+    </section>
+
+    <section class="layout">
+      <div class="card">
+        <h3>Cadastrar usuário</h3>
+        <label>Nome completo</label><input placeholder="Nome do usuário">
+        <label>Email</label><input type="email" placeholder="email@dominio.com">
+        <label>Senha provisória</label><input type="password" placeholder="Senha inicial">
+        <label>Cargo</label><input placeholder="Ex: Diretor, Financeiro, Produção">
+        <label>Permissão</label><select><option>Super Admin</option><option>Admin</option><option>Financeiro</option><option>Agenda</option><option>Visualização</option></select>
+        <label>Status</label><select><option>Ativo</option><option>Bloqueado</option></select>
+        <br><br><button class="btn">Salvar usuário</button>
+      </div>
+
+      <div class="card">
+        <h3>Usuários cadastrados</h3>
+        <table class="table">
+          <tr><th>Nome</th><th>Email</th><th>Cargo</th><th>Permissão</th><th>Status</th><th>Último acesso</th><th>Ações</th></tr>
+          <tr><td>Eduardo</td><td>eduardo@sistema.cejas.com.br</td><td>Super Admin</td><td>Super Admin</td><td><span class="status">Ativo</span></td><td>Hoje</td><td>Editar</td></tr>
+          <tr><td>Usuário Exemplo</td><td>exemplo@email.com</td><td>Financeiro</td><td>Financeiro</td><td><span class="status blocked">Bloqueado</span></td><td>Nunca</td><td>Editar</td></tr>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>
