@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login | Sistema CEJAS</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -15,9 +13,9 @@
       font-family: Arial, sans-serif;
       color: #fff;
       background:
-        radial-gradient(circle at 20% 15%, rgba(255,255,255,.25), transparent 28%),
-        radial-gradient(circle at 80% 80%, rgba(0,0,0,.35), transparent 34%),
-        linear-gradient(135deg, #7b7c80, #3f4044);
+        radial-gradient(circle at 25% 15%, rgba(255,255,255,.22), transparent 28%),
+        radial-gradient(circle at 75% 85%, rgba(0,0,0,.38), transparent 35%),
+        linear-gradient(135deg, #77787b, #424348);
       display: grid;
       place-items: center;
       padding: 24px;
@@ -28,19 +26,19 @@
       min-height: 640px;
       display: grid;
       grid-template-columns: 1fr 430px;
-      overflow: hidden;
       border-radius: 36px;
-      border: 1px solid rgba(255,255,255,.22);
+      overflow: hidden;
       background: rgba(255,255,255,.08);
-      box-shadow: 0 45px 140px rgba(0,0,0,.38);
+      border: 1px solid rgba(255,255,255,.20);
+      box-shadow: 0 45px 130px rgba(0,0,0,.38);
     }
 
     .brand {
       position: relative;
       display: grid;
       place-items: center;
+      background: rgba(255,255,255,.09);
       padding: 48px;
-      background: rgba(255,255,255,.10);
       overflow: hidden;
     }
 
@@ -52,37 +50,37 @@
       border-radius: 50%;
       top: -180px;
       right: -180px;
-      background: rgba(255,255,255,.13);
+      background: rgba(255,255,255,.12);
     }
 
-    .brand-inner {
+    .logo-area {
       position: relative;
       z-index: 2;
+      width: min(82%, 460px);
       display: grid;
-      justify-items: center;
-      gap: 38px;
-      width: min(82%, 470px);
+      gap: 36px;
       text-align: center;
+      justify-items: center;
     }
 
-    .brand-inner img {
+    .logo-area img {
       width: 100%;
-      max-height: 390px;
+      max-height: 380px;
       object-fit: contain;
       display: block;
     }
 
     .kicker {
-      font-size: 13px;
       letter-spacing: .55em;
+      font-size: 13px;
       font-weight: 900;
-      color: rgba(255,255,255,.86);
+      color: rgba(255,255,255,.84);
     }
 
     .panel {
-      background: rgba(18,18,22,.86);
+      background: rgba(19,19,23,.82);
       border-left: 1px solid rgba(255,255,255,.14);
-      padding: 46px;
+      padding: 44px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -90,7 +88,7 @@
 
     h1 {
       margin: 0 0 8px;
-      font-size: 40px;
+      font-size: 38px;
       letter-spacing: -0.05em;
     }
 
@@ -103,17 +101,22 @@
     .msg {
       display: none;
       margin-bottom: 16px;
-      padding: 14px;
+      padding: 13px;
       border-radius: 16px;
       font-weight: 800;
       font-size: 14px;
-      line-height: 1.35;
     }
 
     .msg.err {
       display: block;
       background: rgba(239,68,68,.18);
-      border: 1px solid rgba(239,68,68,.38);
+      border: 1px solid rgba(239,68,68,.34);
+    }
+
+    .msg.ok {
+      display: block;
+      background: rgba(34,197,94,.18);
+      border: 1px solid rgba(34,197,94,.34);
     }
 
     .field {
@@ -127,7 +130,7 @@
       text-transform: uppercase;
       letter-spacing: .16em;
       font-weight: 900;
-      color: rgba(255,255,255,.64);
+      color: rgba(255,255,255,.62);
     }
 
     input {
@@ -142,7 +145,7 @@
     }
 
     input:focus {
-      border-color: rgba(255,255,255,.68);
+      border-color: rgba(255,255,255,.65);
       box-shadow: 0 0 0 4px rgba(255,255,255,.10);
     }
 
@@ -163,7 +166,7 @@
       height: 42px;
       border: 0;
       border-radius: 14px;
-      background: rgba(255,255,255,.12);
+      background: rgba(255,255,255,.10);
       color: white;
       cursor: pointer;
       font-size: 18px;
@@ -171,8 +174,8 @@
 
     .row {
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
       gap: 12px;
       margin: 8px 0 22px;
     }
@@ -183,7 +186,7 @@
       gap: 9px;
       text-transform: none;
       letter-spacing: 0;
-      color: rgba(255,255,255,.74);
+      color: rgba(255,255,255,.72);
       font-size: 14px;
     }
 
@@ -195,8 +198,8 @@
 
     a {
       color: white;
-      font-weight: 900;
       text-decoration: none;
+      font-weight: 900;
       font-size: 14px;
     }
 
@@ -204,13 +207,18 @@
       width: 100%;
       border: 0;
       border-radius: 18px;
-      padding: 17px;
+      padding: 16px;
       background: white;
       color: #292a2d;
-      font-size: 16px;
       font-weight: 1000;
+      font-size: 16px;
       cursor: pointer;
       box-shadow: 0 18px 50px rgba(0,0,0,.25);
+    }
+
+    .btn:disabled {
+      opacity: .6;
+      cursor: not-allowed;
     }
 
     .notice {
@@ -225,29 +233,17 @@
     }
 
     @media (max-width: 880px) {
-      .login {
-        grid-template-columns: 1fr;
-      }
-
-      .brand {
-        min-height: 300px;
-      }
-
-      .panel {
-        border-left: 0;
-        border-top: 1px solid rgba(255,255,255,.14);
-      }
-
-      .brand-inner {
-        width: min(78%, 320px);
-      }
+      .login { grid-template-columns: 1fr; }
+      .brand { min-height: 300px; }
+      .panel { border-left: 0; border-top: 1px solid rgba(255,255,255,.14); }
+      .logo-area { width: min(78%, 310px); }
     }
   </style>
 </head>
 <body>
   <main class="login">
     <section class="brand">
-      <div class="brand-inner">
+      <div class="logo-area">
         <img src="/assets/cejas-login-logo.png" alt="CEJAS" onerror="this.src='/assets/logo.svg'">
         <div class="kicker">SISTEMA INTERNO</div>
       </div>
@@ -259,54 +255,129 @@
 
       <div id="mensagem" class="msg"></div>
 
-      <form action="/entrar" method="POST" autocomplete="on">
+      <form id="formLogin" autocomplete="on">
         <div class="field">
           <label>E-mail institucional</label>
-          <input name="email" id="email" type="email" placeholder="nome@cejas.com.br" autocomplete="username" required>
+          <input id="email" type="email" placeholder="nome@cejas.com.br" autocomplete="username" required>
         </div>
 
         <div class="field">
           <label>Senha</label>
           <div class="pass">
-            <input name="senha" id="senha" type="password" placeholder="Digite sua senha" autocomplete="current-password" required>
+            <input id="senha" type="password" placeholder="Digite sua senha" autocomplete="current-password" required>
             <button class="eye" type="button" id="toggleSenha">👁</button>
           </div>
         </div>
 
         <div class="row">
           <label class="remember">
-            <input name="lembrar" type="checkbox">
+            <input id="lembrar" type="checkbox">
             Manter-me conectado
           </label>
 
-          <a href="#" onclick="alert('Redefinição de senha será reativada depois que o login principal estiver 100%.'); return false;">Esqueci minha senha</a>
+          <a href="#" onclick="alert('Vamos reativar a redefinição depois que o login estiver 100%.'); return false;">Esqueci minha senha</a>
         </div>
 
-        <button class="btn" type="submit">Entrar no sistema</button>
+        <button class="btn" id="btnEntrar" type="submit">Entrar no sistema</button>
       </form>
 
       <div class="notice">
-        Acesso restrito ao login institucional do CEJAS.
+        No primeiro acesso, o usuário será obrigado a alterar a senha por segurança.
       </div>
     </section>
   </main>
 
-  <script>
-    const senha = document.getElementById("senha");
-    const toggle = document.getElementById("toggleSenha");
-    const msg = document.getElementById("mensagem");
+  
 
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("formLogin");
+  const email = document.getElementById("email");
+  const senha = document.getElementById("senha");
+  const lembrar = document.getElementById("lembrar");
+  const btn = document.getElementById("btnEntrar");
+  const msg = document.getElementById("mensagem");
+  const toggle = document.getElementById("toggleSenha");
+
+  function mostrar(texto, tipo = "err") {
+    if (!msg) return;
+    msg.textContent = texto || "";
+    msg.className = texto ? "msg " + tipo : "msg";
+  }
+
+  mostrar("");
+
+  if (toggle && senha) {
     toggle.addEventListener("click", () => {
       senha.type = senha.type === "password" ? "text" : "password";
     });
+  }
 
-    const params = new URLSearchParams(window.location.search);
-    const erro = params.get("erro");
+  if (!form) return;
 
-    if (erro) {
-      msg.textContent = erro;
-      msg.className = "msg err";
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    mostrar("");
+
+    const payload = {
+      email: email.value.trim().toLowerCase(),
+      senha: senha.value,
+      lembrar: lembrar.checked
+    };
+
+    if (!payload.email.endsWith("@cejas.com.br")) {
+      mostrar("Use apenas e-mail institucional @cejas.com.br.");
+      return;
     }
-  </script>
+
+    if (!payload.senha) {
+      mostrar("Digite sua senha.");
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Entrando...";
+
+    try {
+      const resposta = await fetch("/api/auth/login-cejas", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const textoResposta = await resposta.text();
+
+      let dados;
+      try {
+        dados = JSON.parse(textoResposta);
+      } catch {
+        throw new Error("O servidor respondeu uma página em vez de JSON. Reinicie o servidor e tente novamente.");
+      }
+
+      if (!resposta.ok || !dados.ok) {
+        throw new Error(dados.message || "Não foi possível entrar.");
+      }
+
+      mostrar("Login confirmado. Abrindo painel...", "ok");
+
+      setTimeout(() => {
+        window.location.href = "/dashboard.html?login=ok&ts=" + Date.now();
+      }, 400);
+    } catch (error) {
+      mostrar(error.message || "Erro ao entrar.");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Entrar no sistema";
+    }
+  });
+});
+</script>
+
 </body>
 </html>
