@@ -959,33 +959,70 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 <script src="/js/chat-cejas-widget.js?v=1"></script>
 
-
-
-
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  // Remove qualquer card extra do Painel do Dia no dashboard.
-  document.querySelectorAll('[data-card-painel-dia="true"]').forEach((el) => el.remove());
+  function garantirPainelDiaNoMenu() {
+    if (document.querySelector('a[href="/painel-dia.html"], a[href="painel-dia.html"]')) return;
 
-  // Mantém Painel do Dia somente como aba/link no menu lateral.
-  const jaExiste = document.querySelector('aside a[href="/painel-dia.html"], nav a[href="/painel-dia.html"]');
-
-  if (!jaExiste) {
     const link = document.createElement("a");
     link.href = "/painel-dia.html";
     link.textContent = "▣ Painel do Dia";
 
-    const agenda = Array.from(document.querySelectorAll("aside a, nav a")).find((a) =>
+    const agenda = Array.from(document.querySelectorAll("a")).find((a) =>
       String(a.textContent || "").toLowerCase().includes("agenda")
     );
 
-    if (agenda) {
+    if (agenda && agenda.parentElement) {
       agenda.insertAdjacentElement("afterend", link);
+      return;
     }
+
+    const nav = document.querySelector("nav") || document.querySelector("aside");
+    if (nav) nav.appendChild(link);
   }
+
+  function garantirPainelDiaCard() {
+    if (document.querySelector('[data-card-painel-dia="true"]')) return;
+
+    const card = document.createElement("a");
+    card.href = "/painel-dia.html";
+    card.dataset.cardPainelDia = "true";
+    card.style.display = "block";
+    card.style.textDecoration = "none";
+    card.style.color = "inherit";
+    card.style.border = "1px solid rgba(255,255,255,.10)";
+    card.style.borderRadius = "18px";
+    card.style.padding = "18px";
+    card.style.background = "rgba(255,255,255,.055)";
+    card.innerHTML = `
+      <div style="font-size:24px;margin-bottom:16px;">▣</div>
+      <strong style="display:block;font-size:17px;margin-bottom:8px;">Painel do Dia</strong>
+      <span style="color:rgba(255,255,255,.65);font-size:14px;">Visão operacional diária de eventos, salas e logística.</span>
+      <div style="margin-top:16px;font-weight:900;color:#e9d5ff;">Abrir painel →</div>
+    `;
+
+    const titulos = Array.from(document.querySelectorAll("h1,h2,h3,strong,div"))
+      .filter((el) => String(el.textContent || "").toLowerCase().includes("módulos e ferramentas"));
+
+    const titulo = titulos[0];
+
+    if (titulo) {
+      const bloco = titulo.closest("section, article, div");
+      const grid = bloco?.querySelector("div");
+      if (grid) {
+        grid.appendChild(card);
+        return;
+      }
+    }
+
+    const main = document.querySelector("main");
+    if (main) main.appendChild(card);
+  }
+
+  garantirPainelDiaNoMenu();
+  garantirPainelDiaCard();
 });
 </script>
 
-<script src="/js/cejas-menu-fixo.js?v=3"></script>
 </body>
 </html>

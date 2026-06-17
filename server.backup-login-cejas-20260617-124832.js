@@ -1,6 +1,4 @@
 const express = require("express");
-const { registrarLoginPublicoCejas } = require("./lib/login-publico-cejas");
-const { registrarLoginCejas } = require("./lib/login-cejas");
 const { registrarMenuPermissoesCejas } = require("./lib/menu-permissoes-cejas");
 const { registrarChatCejasApi } = require("./lib/chat-cejas-api");
 const { registrarConfiguracoesCejas } = require("./lib/configuracoes-cejas");
@@ -52,45 +50,6 @@ async function parsePdfBuffer(buffer) {
 require("dotenv").config();
 
 const app = express();
-
-
-function cejasLoginPublico(req) {
-  const caminho = String(req.path || req.url || "");
-  return (
-    caminho === "/login.html" ||
-    caminho === "/api/login-admin-fix-cejas" ||
-    caminho === "/api/public/login-cejas" ||
-    caminho === "/api/auth/login-cejas" ||
-    caminho === "/api/auth/solicitar-redefinicao" ||
-    caminho === "/api/auth/redefinir-senha" ||
-    caminho.startsWith("/assets/") ||
-    caminho.startsWith("/js/") ||
-    caminho.startsWith("/css/") ||
-    caminho === "/favicon.ico"
-  );
-}
-
-
-
-
-function cejasRotaPublica(req) {
-  const p = req.path || req.url || "";
-
-  return (
-    p === "/" ||
-    p === "/login.html" ||
-    p === "/favicon.ico" ||
-    p.startsWith("/api/auth/") ||
-    p.startsWith("/assets/") ||
-    p.startsWith("/js/") ||
-    p.startsWith("/css/") ||
-    p.startsWith("/public/")
-  );
-}
-
-
-app.use("/assets", express.static(require("path").join(__dirname, "assets")));
-
 
 
 
@@ -400,15 +359,7 @@ function isAuthenticated(req, res, next) {
 
   if (!req.session || !req.session.user) {
     if (req.path.startsWith("/api/")) {
-      if (typeof cejasRotaPublica === "function" && cejasRotaPublica(req)) {
-      return next();
-    }
-
-    if (typeof cejasLoginPublico === "function" && cejasLoginPublico(req)) {
-      return next();
-    }
-
-    return res.status(401).json({ ok: false, message: "Sessão expirada." });
+      return res.status(401).json({ ok: false, message: "Sessão expirada." });
     }
 
     return res.redirect("/login.html");
@@ -417,15 +368,7 @@ function isAuthenticated(req, res, next) {
   if (remainingSessionMs(req) <= 0) {
     return req.session.destroy(() => {
       if (req.path.startsWith("/api/")) {
-        if (typeof cejasRotaPublica === "function" && cejasRotaPublica(req)) {
-      return next();
-    }
-
-    if (typeof cejasLoginPublico === "function" && cejasLoginPublico(req)) {
-      return next();
-    }
-
-    return res.status(401).json({ ok: false, message: "Sessão expirada." });
+        return res.status(401).json({ ok: false, message: "Sessão expirada." });
       }
 
       return res.redirect("/login.html");
@@ -438,11 +381,6 @@ function isAuthenticated(req, res, next) {
 app.use(express.urlencoded({ extended: true, limit: "60mb" }));
 app.use("/js", express.static(path.join(__dirname, "public/js")));
 app.use(express.json({ limit: "60mb" }));
-
-// Login público precisa vir antes das proteções
-registrarLoginPublicoCejas(app);
-registrarMenuPermissoesCejas(app);
-
 
 app.use(
   session({
@@ -2130,14 +2068,7 @@ registrarChatCejasApi(app);
 
 
 
-
-
-
-registrarLoginCejas(app);
-
-
-
-
+registrarMenuPermissoesCejas(app);
 app.listen(PORT, () => {
   console.log(`✅ Sistema de Gestão CEJAS rodando em http://localhost:${PORT}`);
 });

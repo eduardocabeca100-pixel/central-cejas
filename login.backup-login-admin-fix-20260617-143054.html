@@ -413,94 +413,149 @@
     </div>
   </div>
 
-  
+  <script>
+    const mensagem = document.getElementById("mensagem");
+    const form = document.getElementById("formLogin");
+    const btnEntrar = document.getElementById("btnEntrar");
 
+    function msg(texto, tipo = "err") {
+      mensagem.textContent = texto;
+      mensagem.className = "msg " + tipo;
+    }
 
+    function limparMsg() {
+      mensagem.textContent = "";
+      mensagem.className = "msg";
+    }
 
-\n
+    document.querySelectorAll("[data-eye]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const input = document.getElementById(btn.dataset.eye);
+        input.type = input.type === "password" ? "text" : "password";
+      });
+    });
 
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      limparMsg();
 
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const senha = document.getElementById("senha").value;
+      const lembrar = document.getElementById("lembrar").checked;
 
+      if (!email.endsWith("@cejas.com.br")) {
+        msg("Use apenas e-mail institucional @cejas.com.br.");
+        return;
+      }
+
+      btnEntrar.disabled = true;
+      btnEntrar.textContent = "Entrando...";
+
+      try {
+        const r = await fetch("/api/public/login-cejas", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, senha, lembrar })
+        });
+
+        const j = await r.json();
+
+        if (!j.ok) throw new Error(j.message || "Erro ao entrar.");
+
+        if (j.trocarSenha) {
+          document.getElementById("modalPrimeiro").classList.add("active");
+          return;
+        }
+
+        window.location.href = "/dashboard.html";
+      } catch (error) {
+        msg(error.message);
+      } finally {
+        btnEntrar.disabled = false;
+        btnEntrar.textContent = "Entrar no sistema";
+      }
+    });
+
+    document.getElementById("salvarPrimeiraSenha").addEventListener("click", async () => {
+      const novaSenha = document.getElementById("novaSenhaPrimeiro").value;
+
+      try {
+        const r = await fetch("/api/auth/primeiro-acesso", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ novaSenha })
+        });
+
+        const j = await r.json();
+
+        if (!j.ok) throw new Error(j.message || "Erro ao salvar senha.");
+
+        window.location.href = "/dashboard.html";
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
+    document.getElementById("abrirReset").addEventListener("click", (event) => {
+      event.preventDefault();
+      document.getElementById("modalReset").classList.add("active");
+    });
+
+    document.getElementById("fecharReset").addEventListener("click", () => {
+      document.getElementById("modalReset").classList.remove("active");
+    });
+
+    document.getElementById("solicitarCodigo").addEventListener("click", async () => {
+      const email = document.getElementById("resetEmail").value.trim().toLowerCase();
+
+      try {
+        const r = await fetch("/api/auth/solicitar-redefinicao", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email })
+        });
+
+        const j = await r.json();
+        alert(j.message || "Código solicitado.");
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
+    document.getElementById("confirmarReset").addEventListener("click", async () => {
+      const email = document.getElementById("resetEmail").value.trim().toLowerCase();
+      const codigo = document.getElementById("resetCodigo").value.trim();
+      const novaSenha = document.getElementById("resetNovaSenha").value;
+
+      try {
+        const r = await fetch("/api/auth/redefinir-senha", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, codigo, novaSenha })
+        });
+
+        const j = await r.json();
+
+        if (!j.ok) throw new Error(j.message || "Erro ao redefinir senha.");
+
+        alert(j.message);
+        document.getElementById("modalReset").classList.remove("active");
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+  </script>
+<script src="/js/login-cejas-polimento.js?v=1"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("formLogin");
-  const email = document.getElementById("email");
-  const senha = document.getElementById("senha");
-  const lembrar = document.getElementById("lembrar");
-  const btn = document.getElementById("btnEntrar");
   const msg = document.getElementById("mensagem");
-  const toggle = document.getElementById("toggleSenha");
-
-  function mostrar(texto, tipo = "err") {
-    if (!msg) return;
-    msg.textContent = texto || "";
-    msg.className = texto ? "msg " + tipo : "msg";
+  if (msg && /sess[aã]o expirada/i.test(msg.textContent || "")) {
+    msg.textContent = "";
+    msg.className = "msg";
   }
-
-  mostrar("");
-
-  if (toggle && senha) {
-    toggle.addEventListener("click", () => {
-      senha.type = senha.type === "password" ? "text" : "password";
-    });
-  }
-
-  if (!form) return;
-
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    mostrar("");
-
-    const payload = {
-      email: email.value.trim().toLowerCase(),
-      senha: senha.value,
-      lembrar: lembrar.checked
-    };
-
-    if (!payload.email.endsWith("@cejas.com.br")) {
-      mostrar("Use apenas e-mail institucional @cejas.com.br.");
-      return;
-    }
-
-    if (!payload.senha) {
-      mostrar("Digite sua senha.");
-      return;
-    }
-
-    btn.disabled = true;
-    btn.textContent = "Entrando...";
-
-    try {
-      const resposta = await fetch("/api/auth/login-cejas", {
-        method: "POST",
-        credentials: "same-origin",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const dados = await resposta.json();
-
-      if (!resposta.ok || !dados.ok) {
-        throw new Error(dados.message || "Não foi possível entrar.");
-      }
-
-      mostrar("Login confirmado. Abrindo painel...", "ok");
-
-      setTimeout(() => {
-        window.location.replace("/dashboard.html");
-      }, 300);
-    } catch (error) {
-      mostrar(error.message || "Erro ao entrar.");
-    } finally {
-      btn.disabled = false;
-      btn.textContent = "Entrar no sistema";
-    }
-  });
 });
 </script>
-
+\n<script src="/js/login-final-fix.js?v=1"></script>
 </body>
 </html>

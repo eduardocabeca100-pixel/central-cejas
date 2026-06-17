@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel do Dia | Sistema CEJAS</title>
+  <style>
+    :root {
+      --bg: #05060b;
+      --side: #090a10;
+      --card: #15151a;
+      --card2: #22232a;
+      --line: rgba(255,255,255,.10);
+      --text: #fff;
+      --muted: rgba(255,255,255,.62);
+      --primary: #9b5cff;
+      --secondary: #ec4fc6;
+      --green: #22c55e;
+      --purple: #a855f7;
+      --red: #ef4444;
+      --blue: #2563eb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(155,92,255,.20), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(236,79,198,.13), transparent 35%),
+        var(--bg);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 270px 1fr;
+      min-height: 100vh;
+    }
+
+    aside {
+      background: var(--side);
+      border-right: 1px solid var(--line);
+      padding: 24px 16px;
+    }
+
+    .logo {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 26px;
+    }
+
+    .logo-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+    }
+
+    .logo strong { display: block; font-size: 15px; }
+    .logo span { color: var(--muted); font-size: 12px; }
+
+    .user {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 26px;
+    }
+
+    .user strong { display: block; }
+    .user span { color: var(--muted); font-size: 13px; }
+
+    nav a {
+      display: block;
+      color: rgba(255,255,255,.78);
+      text-decoration: none;
+      padding: 12px 14px;
+      border-radius: 14px;
+      margin-bottom: 7px;
+      font-weight: 800;
+    }
+
+    nav a.active,
+    nav a:hover {
+      color: white;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+    }
+
+    main {
+      padding: 32px;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .kicker {
+      letter-spacing: .35em;
+      color: rgba(255,255,255,.5);
+      font-size: 12px;
+      font-weight: 900;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(38px, 5vw, 64px);
+      line-height: .95;
+      letter-spacing: -0.06em;
+    }
+
+    .top p {
+      color: var(--muted);
+      line-height: 1.5;
+      max-width: 760px;
+      font-size: 16px;
+    }
+
+    button, .btn {
+      border: 0;
+      border-radius: 14px;
+      padding: 13px 16px;
+      color: white;
+      font-weight: 900;
+      cursor: pointer;
+      text-decoration: none;
+      background: rgba(255,255,255,.1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+    }
+
+    input, select {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.12);
+      background: #101016;
+      color: white;
+      border-radius: 14px;
+      padding: 13px;
+      font: inherit;
+      outline: none;
+    }
+
+    .filters {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(255,255,255,.055);
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: rgba(255,255,255,.55);
+      font-weight: 900;
+    }
+
+    .quick {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .quick button {
+      padding: 9px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: rgba(255,255,255,.08);
+    }
+
+    .quick button.active {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+    }
+
+    .grid4 {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 18px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      background: rgba(255,255,255,.065);
+      padding: 20px;
+      box-shadow: 0 22px 60px rgba(0,0,0,.25);
+    }
+
+    .metric .label {
+      color: rgba(255,255,255,.55);
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .metric .value {
+      font-size: 34px;
+      font-weight: 1000;
+      margin-top: 10px;
+    }
+
+    .metric .hint {
+      color: var(--muted);
+      margin-top: 6px;
+      font-size: 13px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+    }
+
+    .section-head small {
+      color: var(--muted);
+    }
+
+    .event {
+      border: 1px solid rgba(255,255,255,.09);
+      border-left: 5px solid var(--green);
+      border-radius: 18px;
+      padding: 14px;
+      margin-bottom: 12px;
+      background: rgba(255,255,255,.055);
+    }
+
+    .event.espera { border-left-color: var(--purple); }
+    .event.cancelado { border-left-color: var(--red); }
+
+    .event-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .event strong {
+      display: block;
+      font-size: 16px;
+    }
+
+    .tag {
+      flex: 0 0 auto;
+      border-radius: 999px;
+      padding: 6px 9px;
+      font-size: 11px;
+      font-weight: 900;
+      background: rgba(34,197,94,.18);
+      color: #bbf7d0;
+    }
+
+    .tag.espera {
+      background: rgba(168,85,247,.18);
+      color: #e9d5ff;
+    }
+
+    .tag.cancelado {
+      background: rgba(239,68,68,.18);
+      color: #fecaca;
+    }
+
+    .event small {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .room {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.09);
+      background: rgba(255,255,255,.055);
+      margin-bottom: 10px;
+      text-align: left;
+    }
+
+    .room:hover,
+    .room.active {
+      background: linear-gradient(135deg, rgba(155,92,255,.25), rgba(236,79,198,.15));
+      border-color: rgba(236,79,198,.35);
+    }
+
+    .room span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .empty {
+      color: var(--muted);
+      border: 1px dashed rgba(255,255,255,.15);
+      border-radius: 18px;
+      padding: 26px;
+      text-align: center;
+    }
+
+    .sala-eventos {
+      margin-top: 14px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding-top: 14px;
+    }
+
+    .mini-event {
+      padding: 11px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.055);
+      border: 1px solid rgba(255,255,255,.08);
+      margin-bottom: 8px;
+    }
+
+    .mini-event strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .mini-event span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 1100px) {
+      .filters-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      aside { display: none; }
+      main { padding: 18px; }
+      .top { flex-direction: column; }
+      .grid4, .grid2, .filters-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside>
+      <div class="logo">
+        <div class="logo-box">M</div>
+        <div>
+          <strong>Sistema de Gestão CEJAS</strong>
+          <span>Painel Administrativo</span>
+        </div>
+      </div>
+
+      <div class="user">
+        <strong>Eduardo</strong>
+        <span>Superadmin</span>
+      </div>
+
+      <nav>
+        <a href="/dashboard.html">▦ Painel Geral</a>
+        <a href="/agenda.html">◫ Agenda Dinâmica</a>
+        <a href="/painel-dia.html" class="active">▣ Painel do Dia</a>
+        <a href="/chat.html">💬 Chat Interno</a>
+        <a href="/orcamentos.html">◉ Orçamentos</a>
+        <a href="/importar-relatorio.html">▤ Importar Relatório</a>
+        <a href="/tarefas.html">☑ Tarefas Pendentes</a>
+        <a href="/servidor.html">▣ Servidor</a>
+        <a href="/usuarios.html">◦ Acessos / Usuários</a>
+        <a href="/contratos.html">Contratos</a>
+        <a href="/configuracoes.html">⚙ Configurações</a>
+      </nav>
+    </aside>
+
+    <main>
+      <section class="top">
+        <div>
+          <div class="kicker">LOGÍSTICA OPERACIONAL</div>
+          <h1>Painel do Dia</h1>
+          <p>
+            Visão rápida dos eventos por dia, período, status, origem e sala.
+            Clique em uma sala para ver somente os eventos daquela sala.
+          </p>
+        </div>
+
+        <div>
+          <a class="btn" href="/agenda.html">Abrir Agenda</a>
+          <button class="primary" onclick="carregarPainel()">Atualizar</button>
+        </div>
+      </section>
+
+      <section class="filters">
+        <div class="filters-grid">
+          <div class="field">
+            <label>Data inicial</label>
+            <input type="date" id="dataInicio">
+          </div>
+
+          <div class="field">
+            <label>Data final</label>
+            <input type="date" id="dataFim">
+          </div>
+
+          <div class="field">
+            <label>Status</label>
+            <select id="filtroStatus">
+              <option value="todos">Todos</option>
+              <option value="confirmado">Confirmados</option>
+              <option value="em espera">Em espera</option>
+              <option value="cancelado">Cancelados</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Origem</label>
+            <select id="filtroOrigem">
+              <option value="todos">Todas</option>
+              <option value="supera">Supera</option>
+              <option value="manual">Manual</option>
+            </select>
+          </div>
+
+          <button class="primary" onclick="carregarPainel()">Filtrar</button>
+        </div>
+
+        <div class="quick">
+          <button id="qHoje" onclick="setPeriodo('hoje')">Hoje</button>
+          <button id="qAmanha" onclick="setPeriodo('amanha')">Amanhã</button>
+          <button id="q7" onclick="setPeriodo('7dias')">Próximos 7 dias</button>
+          <button id="qMes" onclick="setPeriodo('mes')">Este mês</button>
+        </div>
+      </section>
+
+      <section class="grid4">
+        <div class="card metric">
+          <div class="label">Eventos</div>
+          <div class="value" id="mEventos">0</div>
+          <div class="hint">Total filtrado</div>
+        </div>
+
+        <div class="card metric">
+          <div class="label">Confirmados</div>
+          <div class="value" id="mConfirmados">0</div>
+          <div class="hint">Eventos liberados</div>
+        </div>
+
+        <div class="card metric">
+          <div class="label">Em espera</div>
+          <div class="value" id="mEspera">0</div>
+          <div class="hint">Atenção comercial</div>
+        </div>
+
+        <div class="card metric">
+          <div class="label">Cancelados</div>
+          <div class="value" id="mCancelados">0</div>
+          <div class="hint">Não considerar operação</div>
+        </div>
+      </section>
+
+      <section class="grid2">
+        <div class="card">
+          <div class="section-head">
+            <div>
+              <h2>Agenda operacional</h2>
+              <small id="subAgenda">Todos os eventos filtrados</small>
+            </div>
+          </div>
+
+          <div id="listaEventos" class="empty">Carregando eventos...</div>
+        </div>
+
+        <div class="card">
+          <div class="section-head">
+            <div>
+              <h2>Salas e recursos</h2>
+              <small>Clique em uma sala para ver os eventos</small>
+            </div>
+
+            <button onclick="limparSalaSelecionada()">Ver todas</button>
+          </div>
+
+          <div id="listaSalas" class="empty">Carregando salas...</div>
+
+          <div class="sala-eventos" id="eventosSalaBox" style="display:none;">
+            <h3 id="tituloSalaSelecionada">Sala</h3>
+            <div id="eventosSalaSelecionada"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const dataInicio = document.getElementById("dataInicio");
+    const dataFim = document.getElementById("dataFim");
+    const filtroStatus = document.getElementById("filtroStatus");
+    const filtroOrigem = document.getElementById("filtroOrigem");
+
+    let eventosBase = [];
+    let eventosFiltrados = [];
+    let salaSelecionada = null;
+
+    function isoHoje() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function addDias(iso, dias) {
+      const d = new Date(`${iso}T12:00:00`);
+      d.setDate(d.getDate() + dias);
+      return d.toISOString().slice(0, 10);
+    }
+
+    function setPeriodo(tipo) {
+      document.querySelectorAll(".quick button").forEach(b => b.classList.remove("active"));
+
+      const hoje = isoHoje();
+
+      if (tipo === "hoje") {
+        dataInicio.value = hoje;
+        dataFim.value = hoje;
+        document.getElementById("qHoje").classList.add("active");
+      }
+
+      if (tipo === "amanha") {
+        const amanha = addDias(hoje, 1);
+        dataInicio.value = amanha;
+        dataFim.value = amanha;
+        document.getElementById("qAmanha").classList.add("active");
+      }
+
+      if (tipo === "7dias") {
+        dataInicio.value = hoje;
+        dataFim.value = addDias(hoje, 7);
+        document.getElementById("q7").classList.add("active");
+      }
+
+      if (tipo === "mes") {
+        const d = new Date(`${hoje}T12:00:00`);
+        const inicio = new Date(d.getFullYear(), d.getMonth(), 1);
+        const fim = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+        dataInicio.value = inicio.toISOString().slice(0, 10);
+        dataFim.value = fim.toISOString().slice(0, 10);
+        document.getElementById("qMes").classList.add("active");
+      }
+
+      salaSelecionada = null;
+      carregarPainel();
+    }
+
+    function statusClasse(status) {
+      const s = String(status || "").toLowerCase();
+
+      if (s.includes("cancel")) return "cancelado";
+      if (s.includes("espera")) return "espera";
+
+      return "confirmado";
+    }
+
+    function statusValor(status) {
+      const s = statusClasse(status);
+
+      if (s === "cancelado") return "cancelado";
+      if (s === "espera") return "em espera";
+
+      return "confirmado";
+    }
+
+    function statusTexto(status) {
+      const s = statusClasse(status);
+
+      if (s === "cancelado") return "Cancelado";
+      if (s === "espera") return "Em espera";
+
+      return "Confirmado";
+    }
+
+    function hora(ev) {
+      const ini = ev.horaInicial ? String(ev.horaInicial).slice(0,5) : "";
+      const fim = ev.horaFinal ? String(ev.horaFinal).slice(0,5) : "";
+
+      if (ini && fim) return `${ini} às ${fim}`;
+
+      return ini || "Horário não informado";
+    }
+
+    function dataBR(iso) {
+      if (!iso) return "";
+      const [ano, mes, dia] = String(iso).split("-");
+      return `${dia}/${mes}/${ano}`;
+    }
+
+    function ordenar(eventos) {
+      return [...eventos].sort((a, b) => {
+        const da = `${a.data || ""} ${a.horaInicial || ""}`;
+        const db = `${b.data || ""} ${b.horaInicial || ""}`;
+        return da.localeCompare(db);
+      });
+    }
+
+    async function buscarData(data) {
+      const resp = await fetch(`/api/agenda-dia?data=${encodeURIComponent(data)}`);
+      const json = await resp.json();
+
+      if (!json.ok) throw new Error(json.message || "Erro ao carregar agenda.");
+
+      return json.eventos || [];
+    }
+
+    async function buscarPeriodo(inicio, fim) {
+      const eventos = [];
+      let atual = inicio;
+
+      while (atual <= fim) {
+        const lista = await buscarData(atual);
+        eventos.push(...lista);
+        atual = addDias(atual, 1);
+      }
+
+      return eventos;
+    }
+
+    function aplicarFiltros() {
+      const status = filtroStatus.value;
+      const origem = filtroOrigem.value;
+
+      eventosFiltrados = eventosBase.filter(ev => {
+        if (status !== "todos" && statusValor(ev.status) !== status) return false;
+        if (origem !== "todos" && ev.origem !== origem) return false;
+        return true;
+      });
+
+      renderizar();
+    }
+
+    async function carregarPainel() {
+      const inicio = dataInicio.value || isoHoje();
+      const fim = dataFim.value || inicio;
+
+      document.getElementById("listaEventos").className = "empty";
+      document.getElementById("listaEventos").innerHTML = "Carregando eventos...";
+
+      document.getElementById("listaSalas").className = "empty";
+      document.getElementById("listaSalas").innerHTML = "Carregando salas...";
+
+      try {
+        eventosBase = ordenar(await buscarPeriodo(inicio, fim));
+        salaSelecionada = null;
+        aplicarFiltros();
+      } catch (error) {
+        document.getElementById("listaEventos").className = "empty";
+        document.getElementById("listaEventos").innerHTML = "Erro: " + error.message;
+        document.getElementById("listaSalas").className = "empty";
+        document.getElementById("listaSalas").innerHTML = "Não foi possível carregar salas.";
+      }
+    }
+
+    function renderizar() {
+      const confirmados = eventosFiltrados.filter(e => statusClasse(e.status) === "confirmado");
+      const espera = eventosFiltrados.filter(e => statusClasse(e.status) === "espera");
+      const cancelados = eventosFiltrados.filter(e => statusClasse(e.status) === "cancelado");
+
+      document.getElementById("mEventos").textContent = eventosFiltrados.length;
+      document.getElementById("mConfirmados").textContent = confirmados.length;
+      document.getElementById("mEspera").textContent = espera.length;
+      document.getElementById("mCancelados").textContent = cancelados.length;
+
+      renderEventos();
+      renderSalas();
+      renderSalaSelecionada();
+    }
+
+    function renderEventos() {
+      const lista = salaSelecionada
+        ? eventosFiltrados.filter(ev => (ev.sala || "Sem sala informada") === salaSelecionada)
+        : eventosFiltrados;
+
+      document.getElementById("subAgenda").textContent = salaSelecionada
+        ? `Mostrando somente: ${salaSelecionada}`
+        : "Todos os eventos filtrados";
+
+      if (!lista.length) {
+        document.getElementById("listaEventos").className = "empty";
+        document.getElementById("listaEventos").innerHTML = "Nenhum evento encontrado.";
+        return;
+      }
+
+      document.getElementById("listaEventos").className = "";
+      document.getElementById("listaEventos").innerHTML = lista.map(ev => {
+        const cls = statusClasse(ev.status);
+
+        return `
+          <div class="event ${cls}">
+            <div class="event-top">
+              <strong>${ev.titulo || ev.empresa || "Evento sem nome"}</strong>
+              <span class="tag ${cls}">${statusTexto(ev.status)}</span>
+            </div>
+
+            <small>
+              Data: ${dataBR(ev.data)}<br>
+              Horário: ${hora(ev)}<br>
+              Sala: ${ev.sala || "Não informada"}<br>
+              Empresa: ${ev.empresa || "Não informada"}<br>
+              Origem: ${ev.origem === "manual" ? "Agenda manual" : "Supera"}
+            </small>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function agruparSalas() {
+      const salas = {};
+
+      eventosFiltrados.forEach(ev => {
+        const sala = ev.sala || "Sem sala informada";
+
+        if (!salas[sala]) salas[sala] = [];
+
+        salas[sala].push(ev);
+      });
+
+      return salas;
+    }
+
+    function renderSalas() {
+      const salas = agruparSalas();
+      const nomes = Object.keys(salas).sort();
+
+      if (!nomes.length) {
+        document.getElementById("listaSalas").className = "empty";
+        document.getElementById("listaSalas").innerHTML = "Nenhuma sala encontrada.";
+        return;
+      }
+
+      document.getElementById("listaSalas").className = "";
+      document.getElementById("listaSalas").innerHTML = nomes.map(sala => `
+        <button class="room ${salaSelecionada === sala ? "active" : ""}" onclick="selecionarSala('${encodeURIComponent(sala)}')">
+          <strong>${sala}</strong>
+          <span>${salas[sala].length} evento(s)</span>
+        </button>
+      `).join("");
+    }
+
+    function selecionarSala(salaCodificada) {
+      salaSelecionada = decodeURIComponent(salaCodificada);
+      renderizar();
+    }
+
+    function limparSalaSelecionada() {
+      salaSelecionada = null;
+      renderizar();
+    }
+
+    function renderSalaSelecionada() {
+      const box = document.getElementById("eventosSalaBox");
+      const titulo = document.getElementById("tituloSalaSelecionada");
+      const lista = document.getElementById("eventosSalaSelecionada");
+
+      if (!salaSelecionada) {
+        box.style.display = "none";
+        return;
+      }
+
+      const eventos = eventosFiltrados.filter(ev => (ev.sala || "Sem sala informada") === salaSelecionada);
+
+      titulo.textContent = salaSelecionada;
+      box.style.display = "block";
+
+      if (!eventos.length) {
+        lista.innerHTML = `<div class="empty">Nenhum evento nesta sala.</div>`;
+        return;
+      }
+
+      lista.innerHTML = eventos.map(ev => `
+        <div class="mini-event">
+          <strong>${hora(ev)} · ${ev.titulo || ev.empresa || "Evento sem nome"}</strong>
+          <span>${statusTexto(ev.status)} · ${ev.empresa || "Empresa não informada"}</span>
+        </div>
+      `).join("");
+    }
+
+    filtroStatus.addEventListener("change", aplicarFiltros);
+    filtroOrigem.addEventListener("change", aplicarFiltros);
+
+    setPeriodo("hoje");
+  </script>
+<script src="/js/cejas-menu-fixo.js?v=3"></script>
+</body>
+</html>

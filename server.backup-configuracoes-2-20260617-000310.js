@@ -1,9 +1,4 @@
 const express = require("express");
-const { registrarLoginPublicoCejas } = require("./lib/login-publico-cejas");
-const { registrarLoginCejas } = require("./lib/login-cejas");
-const { registrarMenuPermissoesCejas } = require("./lib/menu-permissoes-cejas");
-const { registrarChatCejasApi } = require("./lib/chat-cejas-api");
-const { registrarConfiguracoesCejas } = require("./lib/configuracoes-cejas");
 const { registrarOrcamentoPdfServidor } = require("./lib/orcamento-pdf-servidor");
 const { registrarServidorPdfViewer } = require("./lib/servidor-pdf-viewer");
 const { registrarDashboardPermissoesOrcamento } = require("./lib/dashboard-permissoes-orcamento");
@@ -52,196 +47,6 @@ async function parsePdfBuffer(buffer) {
 require("dotenv").config();
 
 const app = express();
-
-
-function cejasLoginPublico(req) {
-  const caminho = String(req.path || req.url || "");
-  return (
-    caminho === "/login.html" ||
-    caminho === "/api/login-admin-fix-cejas" ||
-    caminho === "/api/public/login-cejas" ||
-    caminho === "/api/auth/login-cejas" ||
-    caminho === "/api/auth/solicitar-redefinicao" ||
-    caminho === "/api/auth/redefinir-senha" ||
-    caminho.startsWith("/assets/") ||
-    caminho.startsWith("/js/") ||
-    caminho.startsWith("/css/") ||
-    caminho === "/favicon.ico"
-  );
-}
-
-
-
-
-function cejasRotaPublica(req) {
-  const p = req.path || req.url || "";
-
-  return (
-    p === "/" ||
-    p === "/login.html" ||
-    p === "/favicon.ico" ||
-    p.startsWith("/api/auth/") ||
-    p.startsWith("/assets/") ||
-    p.startsWith("/js/") ||
-    p.startsWith("/css/") ||
-    p.startsWith("/public/")
-  );
-}
-
-
-app.use("/assets", express.static(require("path").join(__dirname, "assets")));
-
-
-
-
-
-
-
-
-
-app.use("/js", express.static(require("path").join(__dirname, "js")));
-app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
-
-
-
-
-// CEJAS_FIX_RELATORIO_DELETE_START
-// Relatório atual: quando apagar, remove dados locais e limpa Supabase.
-app.get("/api/relatorio-atual", (req, res, next) => {
-  const fs = require("fs");
-  const path = require("path");
-
-  const arquivo = path.join(__dirname, "data", "relatorio-supera.json");
-
-  if (!fs.existsSync(arquivo)) {
-    return res.json({
-      ok: false,
-      vazio: true,
-      message: "Nenhum relatório atual carregado.",
-      resumo: {
-        faturamentoPrevisto: 0,
-        receitaConfirmada: 0,
-        descontos: 0,
-        totalEventos: 0,
-        confirmados: 0,
-        emEspera: 0,
-        cancelados: 0
-      },
-      eventos: []
-    });
-  }
-
-  next();
-});
-
-app.delete("/api/relatorio-atual", async (_req, res) => {
-  const fs = require("fs");
-  const path = require("path");
-
-  const removidos = [];
-  const erros = [];
-
-  function removerArquivo(caminho) {
-    try {
-      if (fs.existsSync(caminho)) {
-        fs.rmSync(caminho, { recursive: true, force: true });
-        removidos.push(path.relative(__dirname, caminho));
-      }
-    } catch (error) {
-      erros.push({ caminho: path.relative(__dirname, caminho), erro: error.message });
-    }
-  }
-
-  [
-    path.join(__dirname, "data", "relatorio-supera.json"),
-    path.join(__dirname, "data", "ultimo-relatorio-texto-extraido.txt"),
-    path.join(__dirname, "data", "relatorio-atual.json")
-  ].forEach(removerArquivo);
-
-  [
-    path.join(__dirname, "uploads", "relatorios"),
-    path.join(__dirname, "uploads", "supera"),
-    path.join(__dirname, "uploads", "importar-relatorio")
-  ].forEach(removerArquivo);
-
-  try {
-    const { supabaseAdmin, isSupabaseConfigured } = require("./lib/supabase");
-
-    if (isSupabaseConfigured && isSupabaseConfigured() && supabaseAdmin) {
-      // Primeiro tenta apagar eventos vinculados a relatórios.
-      try {
-        const rels = await supabaseAdmin
-          .from("cejas_relatorios")
-          .select("id");
-
-        const ids = (rels.data || []).map((r) => r.id).filter(Boolean);
-
-        if (ids.length) {
-          await supabaseAdmin
-            .from("cejas_eventos")
-            .delete()
-            .in("relatorio_id", ids);
-        }
-      } catch (error) {
-        erros.push({ supabase: "cejas_eventos por relatorio_id", erro: error.message });
-      }
-
-      // Depois tenta apagar eventos do Supera pela origem.
-      try {
-        await supabaseAdmin
-          .from("cejas_eventos")
-          .delete()
-          .eq("origem", "supera");
-      } catch (error) {
-        erros.push({ supabase: "cejas_eventos origem supera", erro: error.message });
-      }
-
-      // Remove os relatórios salvos para não sobrecarregar.
-      try {
-        await supabaseAdmin
-          .from("cejas_relatorios")
-          .delete()
-          .neq("id", "00000000-0000-0000-0000-000000000000");
-      } catch (error) {
-        erros.push({ supabase: "cejas_relatorios", erro: error.message });
-      }
-    }
-  } catch (error) {
-    erros.push({ supabase: "conexao", erro: error.message });
-  }
-
-  return res.json({
-    ok: true,
-    message: "Relatório atual apagado com sucesso.",
-    removidos,
-    erros,
-    resumo: {
-      faturamentoPrevisto: 0,
-      receitaConfirmada: 0,
-      descontos: 0,
-      totalEventos: 0,
-      confirmados: 0,
-      emEspera: 0,
-      cancelados: 0
-    },
-    eventos: []
-  });
-});
-// CEJAS_FIX_RELATORIO_DELETE_END
-
-
-
-
-
-
-
-// Força a tela Configurações 2.0, evitando cache/rota antiga.
-app.get("/configuracoes.html", (_req, res) => {
-  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
-  res.sendFile(require("path").join(__dirname, "configuracoes.html"));
-});
-
-
 
 
 // Proteção CEJAS: somente Superadmin pode excluir arquivos/pastas do Servidor.
@@ -400,15 +205,7 @@ function isAuthenticated(req, res, next) {
 
   if (!req.session || !req.session.user) {
     if (req.path.startsWith("/api/")) {
-      if (typeof cejasRotaPublica === "function" && cejasRotaPublica(req)) {
-      return next();
-    }
-
-    if (typeof cejasLoginPublico === "function" && cejasLoginPublico(req)) {
-      return next();
-    }
-
-    return res.status(401).json({ ok: false, message: "Sessão expirada." });
+      return res.status(401).json({ ok: false, message: "Sessão expirada." });
     }
 
     return res.redirect("/login.html");
@@ -417,15 +214,7 @@ function isAuthenticated(req, res, next) {
   if (remainingSessionMs(req) <= 0) {
     return req.session.destroy(() => {
       if (req.path.startsWith("/api/")) {
-        if (typeof cejasRotaPublica === "function" && cejasRotaPublica(req)) {
-      return next();
-    }
-
-    if (typeof cejasLoginPublico === "function" && cejasLoginPublico(req)) {
-      return next();
-    }
-
-    return res.status(401).json({ ok: false, message: "Sessão expirada." });
+        return res.status(401).json({ ok: false, message: "Sessão expirada." });
       }
 
       return res.redirect("/login.html");
@@ -438,11 +227,6 @@ function isAuthenticated(req, res, next) {
 app.use(express.urlencoded({ extended: true, limit: "60mb" }));
 app.use("/js", express.static(path.join(__dirname, "public/js")));
 app.use(express.json({ limit: "60mb" }));
-
-// Login público precisa vir antes das proteções
-registrarLoginPublicoCejas(app);
-registrarMenuPermissoesCejas(app);
-
 
 app.use(
   session({
@@ -2118,25 +1902,6 @@ registrarServidorPdfViewer(app);
 
 
 registrarOrcamentoPdfServidor(app);
-
-
-registrarConfiguracoesCejas(app);
-
-
-
-
-
-registrarChatCejasApi(app);
-
-
-
-
-
-
-registrarLoginCejas(app);
-
-
-
 
 app.listen(PORT, () => {
   console.log(`✅ Sistema de Gestão CEJAS rodando em http://localhost:${PORT}`);

@@ -54,25 +54,6 @@ require("dotenv").config();
 const app = express();
 
 
-function cejasLoginPublico(req) {
-  const caminho = String(req.path || req.url || "");
-  return (
-    caminho === "/login.html" ||
-    caminho === "/api/login-admin-fix-cejas" ||
-    caminho === "/api/public/login-cejas" ||
-    caminho === "/api/auth/login-cejas" ||
-    caminho === "/api/auth/solicitar-redefinicao" ||
-    caminho === "/api/auth/redefinir-senha" ||
-    caminho.startsWith("/assets/") ||
-    caminho.startsWith("/js/") ||
-    caminho.startsWith("/css/") ||
-    caminho === "/favicon.ico"
-  );
-}
-
-
-
-
 function cejasRotaPublica(req) {
   const p = req.path || req.url || "";
 
@@ -404,10 +385,6 @@ function isAuthenticated(req, res, next) {
       return next();
     }
 
-    if (typeof cejasLoginPublico === "function" && cejasLoginPublico(req)) {
-      return next();
-    }
-
     return res.status(401).json({ ok: false, message: "Sessão expirada." });
     }
 
@@ -418,10 +395,6 @@ function isAuthenticated(req, res, next) {
     return req.session.destroy(() => {
       if (req.path.startsWith("/api/")) {
         if (typeof cejasRotaPublica === "function" && cejasRotaPublica(req)) {
-      return next();
-    }
-
-    if (typeof cejasLoginPublico === "function" && cejasLoginPublico(req)) {
       return next();
     }
 
