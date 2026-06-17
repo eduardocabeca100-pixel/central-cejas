@@ -1,5 +1,4 @@
 const express = require("express");
-const { syncRelatorioAtualComSupabase } = require("./lib/sync-relatorio-supabase");
 const session = require("express-session");
 const bcrypt = require("bcryptjs");
 const path = require("path");
@@ -1732,51 +1731,6 @@ app.delete("/api/servidor/item", (req, res) => {
 
 
 app.use(express.static(path.join(__dirname), { dotfiles: "deny" }));
-
-
-// Sincronização automática do último relatório do Supera com o Supabase.
-// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
-const RELATORIO_SUPERA_AUTO_SYNC_FILE = path.join(__dirname, "data", "relatorio-supera.json");
-let relatorioAutoSyncTimer = null;
-let relatorioAutoSyncUltimoMtime = 0;
-
-function iniciarAutoSyncRelatorioSupabase() {
-  try {
-    fs.mkdirSync(path.join(__dirname, "data"), { recursive: true });
-
-    fs.watchFile(RELATORIO_SUPERA_AUTO_SYNC_FILE, { interval: 1500 }, (curr) => {
-      if (!curr || !curr.mtimeMs) return;
-      if (curr.mtimeMs === relatorioAutoSyncUltimoMtime) return;
-
-      relatorioAutoSyncUltimoMtime = curr.mtimeMs;
-
-      clearTimeout(relatorioAutoSyncTimer);
-
-      relatorioAutoSyncTimer = setTimeout(async () => {
-        try {
-          console.log("🔄 Novo relatório detectado. Sincronizando com Supabase...");
-
-          const result = await syncRelatorioAtualComSupabase();
-
-          if (result.ok) {
-            console.log(`✅ Supabase atualizado: ${result.eventosInseridos} evento(s) enviados.`);
-          } else {
-            console.log("⚠️ Supabase não sincronizado:", result.message);
-          }
-        } catch (error) {
-          console.error("❌ Erro na sincronização automática com Supabase:", error.message);
-        }
-      }, 1200);
-    });
-
-    console.log("✅ Auto Sync Supabase ativo para relatórios do Supera.");
-  } catch (error) {
-    console.log("⚠️ Auto Sync Supabase não iniciado:", error.message);
-  }
-}
-
-iniciarAutoSyncRelatorioSupabase();
-
 
 app.listen(PORT, () => {
   console.log(`✅ Sistema de Gestão CEJAS rodando em http://localhost:${PORT}`);
