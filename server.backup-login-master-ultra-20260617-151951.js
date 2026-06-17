@@ -1,4 +1,6 @@
 const express = require("express");
+const { registrarLoginPublicoCejas } = require("./lib/login-publico-cejas");
+const { registrarLoginCejas } = require("./lib/login-cejas");
 const { registrarMenuPermissoesCejas } = require("./lib/menu-permissoes-cejas");
 const { registrarChatCejasApi } = require("./lib/chat-cejas-api");
 const { registrarConfiguracoesCejas } = require("./lib/configuracoes-cejas");
@@ -52,14 +54,39 @@ require("dotenv").config();
 const app = express();
 
 
+function cejasLoginPublico(req) {
+  const caminho = String(req.path || req.url || "");
+  return (
+    caminho === "/login.html" ||
+    caminho === "/api/login-admin-fix-cejas" ||
+    caminho === "/api/public/login-cejas" ||
+    caminho === "/api/auth/login-cejas" ||
+    caminho === "/api/auth/solicitar-redefinicao" ||
+    caminho === "/api/auth/redefinir-senha" ||
+    caminho.startsWith("/assets/") ||
+    caminho.startsWith("/js/") ||
+    caminho.startsWith("/css/") ||
+    caminho === "/favicon.ico"
+  );
+}
 
 
 
 
+function cejasRotaPublica(req) {
+  const p = req.path || req.url || "";
 
-
-
-
+  return (
+    p === "/" ||
+    p === "/login.html" ||
+    p === "/favicon.ico" ||
+    p.startsWith("/api/auth/") ||
+    p.startsWith("/assets/") ||
+    p.startsWith("/js/") ||
+    p.startsWith("/css/") ||
+    p.startsWith("/public/")
+  );
+}
 
 
 app.use("/assets", express.static(require("path").join(__dirname, "assets")));
@@ -183,11 +210,6 @@ app.delete("/api/relatorio-atual", async (_req, res) => {
     erros.push({ supabase: "conexao", erro: error.message });
   }
 
-  // CEJAS_RECRIAR_PASTA_RELATORIOS_APOS_DELETE
-  try {
-    fs.mkdirSync(path.join(__dirname, "uploads", "relatorios"), { recursive: true });
-  } catch {}
-
   return res.json({
     ok: true,
     message: "Relatório atual apagado com sucesso.",
@@ -310,7 +332,7 @@ app.get("/js/agenda-plus.js", (_req, res) => {
 app.use("/js", express.static(path.join(__dirname, "public", "js")));
 const PORT = process.env.PORT || 5500;
 
-const IDLE_SESSION_MS = 8 * 60 * 60 * 1000;
+const IDLE_SESSION_MS = 5 * 60 * 1000;
 
 const DATA_DIR = path.join(__dirname, "data");
 const ITEMS_FILE = path.join(DATA_DIR, "orcamento-itens.json");
@@ -364,19 +386,12 @@ function remainingSessionMs(req) {
   return Math.max(0, req.session.expiresAt - Date.now());
 }
 
-
 function isPublicPath(req) {
-  const p = String(req.path || req.url || "").split("?")[0];
-
   return (
-    p === "/" ||
-    p === "/login.html" ||
-    p === "/api/login" ||
-    p === "/favicon.ico" ||
-    p.startsWith("/assets/") ||
-    p.startsWith("/js/") ||
-    p.startsWith("/css/") ||
-    p.startsWith("/public/")
+    req.path === "/" ||
+    req.path === "/login.html" ||
+    req.path === "/api/login" ||
+    req.path.startsWith("/assets/")
   );
 }
 
@@ -385,7 +400,15 @@ function isAuthenticated(req, res, next) {
 
   if (!req.session || !req.session.user) {
     if (req.path.startsWith("/api/")) {
-      return res.status(401).json({ ok: false, message: "Sessão expirada." });
+      if (typeof cejasRotaPublica === "function" && cejasRotaPublica(req)) {
+      return next();
+    }
+
+    if (typeof cejasLoginPublico === "function" && cejasLoginPublico(req)) {
+      return next();
+    }
+
+    return res.status(401).json({ ok: false, message: "Sessão expirada." });
     }
 
     return res.redirect("/login.html");
@@ -394,7 +417,15 @@ function isAuthenticated(req, res, next) {
   if (remainingSessionMs(req) <= 0) {
     return req.session.destroy(() => {
       if (req.path.startsWith("/api/")) {
-        return res.status(401).json({ ok: false, message: "Sessão expirada." });
+        if (typeof cejasRotaPublica === "function" && cejasRotaPublica(req)) {
+      return next();
+    }
+
+    if (typeof cejasLoginPublico === "function" && cejasLoginPublico(req)) {
+      return next();
+    }
+
+    return res.status(401).json({ ok: false, message: "Sessão expirada." });
       }
 
       return res.redirect("/login.html");
@@ -409,8 +440,8 @@ app.use("/js", express.static(path.join(__dirname, "public/js")));
 app.use(express.json({ limit: "60mb" }));
 
 // Login público precisa vir antes das proteções
-
-
+registrarLoginPublicoCejas(app);
+registrarMenuPermissoesCejas(app);
 
 
 app.use(
@@ -430,9 +461,6 @@ app.use(
 
 app.use(isAuthenticated);
 
-// Menu/permissões precisa vir depois da sessão para reconhecer Superadmin
-registrarMenuPermissoesCejas(app);
-
 app.get("/", (req, res) => {
   if (req.session.user) return res.redirect("/dashboard.html");
   return res.redirect("/login.html");
@@ -440,95 +468,48 @@ app.get("/", (req, res) => {
 
 app.post("/api/login", async (req, res) => {
   try {
-    const { email, senha, lembrar } = req.body;
+    const { email, senha } = req.body;
     const normalizedEmail = String(email || "").trim().toLowerCase();
 
-    if (!normalizedEmail.endsWith("@cejas.com.br")) {
-      return res.status(403).json({
-        ok: false,
-        message: "Use apenas e-mail institucional @cejas.com.br."
-      });
-    }
-
-    const adminEmail = String(process.env.ADMIN_EMAIL || "").trim().toLowerCase();
+    const adminEmail = process.env.ADMIN_EMAIL;
     const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH;
-    const maxAge = lembrar ? 1000 * 60 * 60 * 24 * 30 : IDLE_SESSION_MS;
 
     if (
       adminEmail &&
       adminPasswordHash &&
-      normalizedEmail === adminEmail &&
+      normalizedEmail === adminEmail.toLowerCase() &&
       await bcrypt.compare(String(senha || ""), adminPasswordHash)
     ) {
       req.session.user = {
         id: "admin-eduardo",
-        name: "Eduardo",
-        nome: "Eduardo",
-        displayName: "EDUARDO",
+        name: "Eduardo Cabeça",
+        nome: "Eduardo Cabeça",
+        displayName: "EDUARDO CABEÇA",
         email: adminEmail,
-        role: "Superadmin",
-        cargo: "Superadmin",
-        tipo: "superadmin",
-        permissoes: ["*"],
-        permissions: ["*"],
-        superadmin: true,
-        admin: true,
-        isSuperAdmin: true,
-        isAdmin: true,
-        tipo: "superadmin"
+        role: "Super Admin",
+        cargo: "Super Admin",
+        tipo: "administrador",
+        permissoes: ["*"]
       };
 
-      req.session.usuario = req.session.user;
-      req.session.currentUser = req.session.user;
-      req.session.authUser = req.session.user;
-      req.session.usuarioAtual = req.session.user;
-      req.session.usuarioLogado = req.session.user;
+      if (typeof touchSession === "function") touchSession(req);
 
-      req.session.email = req.session.user.email;
-      req.session.nome = req.session.user.nome;
-      req.session.name = req.session.user.nome;
-      req.session.cargo = req.session.user.cargo;
-      req.session.role = req.session.user.cargo;
-      req.session.tipo = "superadmin";
-
-      req.session.permissoes = ["*"];
-      req.session.permissions = ["*"];
-
-      req.session.superadmin = true;
-      req.session.admin = true;
-      req.session.isSuperAdmin = true;
-      req.session.isAdmin = true;
-      req.session.logado = true;
-      req.session.loggedIn = true;
-      req.session.isLoggedIn = true;
-      req.session.autenticado = true;
-      req.session.authenticated = true;
-      req.session.isAuthenticated = true;
-      req.session.expiresAt = Date.now() + maxAge;
-      req.session.cookie.maxAge = maxAge;
-
-      return req.session.save((error) => {
-        if (error) {
-          return res.status(500).json({ ok: false, message: "Erro ao salvar sessão." });
-        }
-
-        return res.json({
-          ok: true,
-          redirect: "/dashboard.html",
-          remainingMs: remainingSessionMs(req)
-        });
+      return res.json({
+        ok: true,
+        redirect: "/dashboard.html",
+        remainingMs: typeof remainingSessionMs === "function" ? remainingSessionMs(req) : null
       });
     }
 
     const users = readUsers();
     const user = users.find(item => {
-      return String(item.email || "").toLowerCase() === normalizedEmail && item.status !== "inativo";
+      return item.email.toLowerCase() === normalizedEmail && item.status !== "inativo";
     });
 
     if (!user || !user.senhaHash) {
       return res.status(401).json({
         ok: false,
-        message: "E-mail ou senha inválidos."
+        message: "Email ou senha inválidos."
       });
     }
 
@@ -537,7 +518,7 @@ app.post("/api/login", async (req, res) => {
     if (!senhaValida) {
       return res.status(401).json({
         ok: false,
-        message: "E-mail ou senha inválidos."
+        message: "Email ou senha inválidos."
       });
     }
 
@@ -550,30 +531,15 @@ app.post("/api/login", async (req, res) => {
       role: user.cargo,
       cargo: user.cargo,
       tipo: user.tipo,
-      permissoes: user.permissoes || [],
-      permissions: user.permissoes || [],
-      superadmin: Boolean((user.permissoes || []).includes("*")),
-      admin: Boolean((user.permissoes || []).includes("*"))
+      permissoes: user.permissoes || []
     };
 
-    req.session.usuario = req.session.user;
-    req.session.email = req.session.user.email;
-    req.session.nome = req.session.user.nome;
-    req.session.cargo = req.session.user.cargo;
-    req.session.permissoes = req.session.user.permissoes;
-    req.session.expiresAt = Date.now() + maxAge;
-    req.session.cookie.maxAge = maxAge;
+    if (typeof touchSession === "function") touchSession(req);
 
-    return req.session.save((error) => {
-      if (error) {
-        return res.status(500).json({ ok: false, message: "Erro ao salvar sessão." });
-      }
-
-      return res.json({
-        ok: true,
-        redirect: "/dashboard.html",
-        remainingMs: remainingSessionMs(req)
-      });
+    return res.json({
+      ok: true,
+      redirect: "/dashboard.html",
+      remainingMs: typeof remainingSessionMs === "function" ? remainingSessionMs(req) : null
     });
   } catch (error) {
     return res.status(500).json({
@@ -739,10 +705,7 @@ fs.mkdirSync(path.join(__dirname, "data"), { recursive: true });
 fs.mkdirSync(RELATORIO_UPLOAD_DIR, { recursive: true });
 
 const relatorioStorage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    fs.mkdirSync(RELATORIO_UPLOAD_DIR, { recursive: true });
-    cb(null, RELATORIO_UPLOAD_DIR);
-  },
+  destination: (_req, _file, cb) => cb(null, RELATORIO_UPLOAD_DIR),
   filename: (_req, file, cb) => {
     const safeName = Date.now() + "-" + String(file.originalname || "relatorio.pdf").replace(/[^a-zA-Z0-9._-]/g, "-");
     cb(null, safeName);
@@ -1224,10 +1187,7 @@ app.get("/api/relatorio-atual", (_req, res) => {
   }
 });
 
-app.post("/api/importar-relatorio", (req, res, next) => {
-  fs.mkdirSync(RELATORIO_UPLOAD_DIR, { recursive: true });
-  next();
-}, relatorioUpload.single("relatorio"), async (req, res) => {
+app.post("/api/importar-relatorio", relatorioUpload.single("relatorio"), async (req, res) => {
   try {
     console.log("📥 Upload recebido:", req.file?.originalname);
 
@@ -2173,7 +2133,7 @@ registrarChatCejasApi(app);
 
 
 
-
+registrarLoginCejas(app);
 
 
 

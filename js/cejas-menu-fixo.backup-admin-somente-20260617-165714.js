@@ -2,7 +2,7 @@
   if (window.__CEJAS_MENU_FIXO__) return;
   window.__CEJAS_MENU_FIXO__ = true;
 
-  const MENU_OPERACIONAL = [
+  const MENU_COMERCIAL = [
     { href: "/dashboard.html", texto: "▦ Painel Geral" },
     { href: "/agenda.html", texto: "◫ Agenda Dinâmica" },
     { href: "/painel-dia.html", texto: "▣ Painel do Dia" },
@@ -13,8 +13,21 @@
     { href: "/contratos.html", texto: "Contratos" }
   ];
 
-  const ADMIN_HREFS = ["configuracoes", "usuarios", "importar-relatorio"];
-  const ADMIN_TEXTOS = ["configurações", "configuracoes", "acessos", "usuários", "usuarios", "importar relatório", "importar relatorio"];
+  const ADMIN_HREFS = [
+    "configuracoes",
+    "usuarios",
+    "importar-relatorio"
+  ];
+
+  const ADMIN_TEXTOS = [
+    "configurações",
+    "configuracoes",
+    "acessos",
+    "usuários",
+    "usuarios",
+    "importar relatório",
+    "importar relatorio"
+  ];
 
   let ultimoUsuario = null;
   let ultimoMenu = null;
@@ -32,7 +45,7 @@
   }
 
   function limparAdministrativo(usuario) {
-    if (usuario && usuario.superadmin) return;
+    if (usuario?.superadmin) return;
 
     document.querySelectorAll("aside a, nav a, main a").forEach((a) => {
       const href = String(a.getAttribute("href") || "").toLowerCase();
@@ -55,6 +68,16 @@
     });
   }
 
+  function removerCardsExtrasPainelDia() {
+    document.querySelectorAll('[data-card-painel-dia="true"]').forEach((el) => el.remove());
+
+    document.querySelectorAll('main a[href="/painel-dia.html"], main a[href="painel-dia.html"]').forEach((a) => {
+      const card = a.closest(".card, article, section, div");
+      if (card) card.remove();
+      else a.remove();
+    });
+  }
+
   function atualizarUsuario(usuario) {
     if (!usuario) return;
 
@@ -67,6 +90,21 @@
 
     document.querySelectorAll(".user span, #usuarioCargo").forEach((el) => {
       el.textContent = cargo;
+    });
+
+    document.querySelectorAll(".user").forEach((box) => {
+      const strong = box.querySelector("strong");
+      const span = box.querySelector("span");
+
+      if (strong) strong.textContent = nome;
+      if (span) span.textContent = cargo;
+    });
+
+    document.querySelectorAll(".avatar, .logo-user-avatar").forEach((avatar) => {
+      const txt = String(avatar.textContent || "").trim();
+      if (txt.length <= 2) {
+        avatar.textContent = nome.slice(0, 1).toUpperCase();
+      }
     });
   }
 
@@ -90,7 +128,7 @@
         cargo: "Comercial",
         superadmin: false
       },
-      menu: MENU_OPERACIONAL
+      menu: MENU_COMERCIAL
     };
   }
 
@@ -105,38 +143,30 @@
       aside.appendChild(nav);
     }
 
-    if (forcar || !ultimoUsuario || !ultimoMenu) {
+    if (forcar || !ultimoMenu || !ultimoUsuario) {
       const dados = await buscarMenu();
       ultimoUsuario = dados.usuario || { nome: "Usuário", cargo: "Comercial", superadmin: false };
-      ultimoMenu = dados.menu || MENU_OPERACIONAL;
-    }
-
-    if (!ultimoUsuario.superadmin) {
-      ultimoMenu = ultimoMenu.filter((item) => {
-        const href = String(item.href || "").toLowerCase();
-        const texto = String(item.texto || "").toLowerCase();
-
-        return !ADMIN_HREFS.some((x) => href.includes(x)) &&
-               !ADMIN_TEXTOS.some((x) => texto.includes(x));
-      });
+      ultimoMenu = dados.menu || MENU_COMERCIAL;
     }
 
     nav.innerHTML = htmlMenu(ultimoMenu);
 
     atualizarUsuario(ultimoUsuario);
     limparAdministrativo(ultimoUsuario);
+    removerCardsExtrasPainelDia();
   }
 
   document.addEventListener("DOMContentLoaded", () => {
     aplicarMenu(true);
 
+    // Impede scripts antigos de recolocarem itens administrativos depois.
     setTimeout(() => aplicarMenu(false), 300);
     setTimeout(() => aplicarMenu(false), 900);
     setTimeout(() => aplicarMenu(false), 1800);
-
     setInterval(() => {
       atualizarUsuario(ultimoUsuario);
       limparAdministrativo(ultimoUsuario);
+      removerCardsExtrasPainelDia();
     }, 1500);
   });
 })();

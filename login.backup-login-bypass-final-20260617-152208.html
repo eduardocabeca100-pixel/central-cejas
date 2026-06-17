@@ -114,12 +114,6 @@
       border: 1px solid rgba(239,68,68,.38);
     }
 
-    .msg.ok {
-      display: block;
-      background: rgba(34,197,94,.18);
-      border: 1px solid rgba(34,197,94,.38);
-    }
-
     .field {
       display: grid;
       gap: 8px;
@@ -145,8 +139,13 @@
       outline: none;
     }
 
-    .pass { position: relative; }
-    .pass input { padding-right: 58px; }
+    .pass {
+      position: relative;
+    }
+
+    .pass input {
+      padding-right: 58px;
+    }
 
     .eye {
       position: absolute;
@@ -207,11 +206,6 @@
       box-shadow: 0 18px 50px rgba(0,0,0,.25);
     }
 
-    .btn:disabled {
-      opacity: .65;
-      cursor: not-allowed;
-    }
-
     .notice {
       margin-top: 18px;
       border: 1px solid rgba(255,255,255,.14);
@@ -246,7 +240,7 @@
 
       <div id="mensagem" class="msg"></div>
 
-      <form id="formLogin" autocomplete="on">
+      <form action="/entrar-master-cejas" method="POST" autocomplete="on">
         <div class="field">
           <label>E-mail institucional</label>
           <input name="email" id="email" type="email" placeholder="nome@cejas.com.br" autocomplete="username" required>
@@ -262,82 +256,38 @@
 
         <div class="row">
           <label class="remember">
-            <input name="lembrar" id="lembrar" type="checkbox">
+            <input name="lembrar" type="checkbox">
             Manter-me conectado
           </label>
 
-          <a href="#" onclick="alert('Redefinição de senha será reativada depois que o login principal estiver estável.'); return false;">Esqueci minha senha</a>
+          <a href="#" onclick="alert('Redefinição será reativada depois.'); return false;">Esqueci minha senha</a>
         </div>
 
-        <button class="btn" id="btnEntrar" type="submit">Entrar no sistema</button>
+        <button class="btn" type="submit">Entrar no sistema</button>
       </form>
 
-      <div class="notice">Acesso restrito ao login institucional do CEJAS.</div>
+      <div class="notice">
+        Acesso restrito ao login institucional do CEJAS.
+      </div>
     </section>
   </main>
 
   <script>
-    const form = document.getElementById("formLogin");
-    const email = document.getElementById("email");
     const senha = document.getElementById("senha");
-    const lembrar = document.getElementById("lembrar");
-    const btn = document.getElementById("btnEntrar");
-    const msg = document.getElementById("mensagem");
     const toggle = document.getElementById("toggleSenha");
-
-    function mostrar(texto, tipo = "err") {
-      msg.textContent = texto || "";
-      msg.className = texto ? "msg " + tipo : "msg";
-    }
+    const msg = document.getElementById("mensagem");
 
     toggle.addEventListener("click", () => {
       senha.type = senha.type === "password" ? "text" : "password";
     });
 
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      mostrar("");
+    const params = new URLSearchParams(window.location.search);
+    const erro = params.get("erro");
 
-      const payload = {
-        email: email.value.trim().toLowerCase(),
-        senha: senha.value,
-        lembrar: lembrar.checked
-      };
-
-      if (!payload.email.endsWith("@cejas.com.br")) {
-        mostrar("Use apenas e-mail institucional @cejas.com.br.");
-        return;
-      }
-
-      btn.disabled = true;
-      btn.textContent = "Entrando...";
-
-      try {
-        const resposta = await fetch("/api/login", {
-          method: "POST",
-          credentials: "same-origin",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        const dados = await resposta.json();
-
-        if (!resposta.ok || !dados.ok) {
-          throw new Error(dados.message || "Não foi possível entrar.");
-        }
-
-        mostrar("Login confirmado. Abrindo painel...", "ok");
-
-        setTimeout(() => {
-          window.location.href = dados.redirect || "/dashboard.html";
-        }, 250);
-      } catch (error) {
-        mostrar(error.message || "Erro ao entrar.");
-      } finally {
-        btn.disabled = false;
-        btn.textContent = "Entrar no sistema";
-      }
-    });
+    if (erro) {
+      msg.textContent = erro;
+      msg.className = "msg err";
+    }
   </script>
 </body>
 </html>

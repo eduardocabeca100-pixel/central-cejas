@@ -183,11 +183,6 @@ app.delete("/api/relatorio-atual", async (_req, res) => {
     erros.push({ supabase: "conexao", erro: error.message });
   }
 
-  // CEJAS_RECRIAR_PASTA_RELATORIOS_APOS_DELETE
-  try {
-    fs.mkdirSync(path.join(__dirname, "uploads", "relatorios"), { recursive: true });
-  } catch {}
-
   return res.json({
     ok: true,
     message: "Relatório atual apagado com sucesso.",
@@ -739,10 +734,7 @@ fs.mkdirSync(path.join(__dirname, "data"), { recursive: true });
 fs.mkdirSync(RELATORIO_UPLOAD_DIR, { recursive: true });
 
 const relatorioStorage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    fs.mkdirSync(RELATORIO_UPLOAD_DIR, { recursive: true });
-    cb(null, RELATORIO_UPLOAD_DIR);
-  },
+  destination: (_req, _file, cb) => cb(null, RELATORIO_UPLOAD_DIR),
   filename: (_req, file, cb) => {
     const safeName = Date.now() + "-" + String(file.originalname || "relatorio.pdf").replace(/[^a-zA-Z0-9._-]/g, "-");
     cb(null, safeName);
@@ -1224,10 +1216,7 @@ app.get("/api/relatorio-atual", (_req, res) => {
   }
 });
 
-app.post("/api/importar-relatorio", (req, res, next) => {
-  fs.mkdirSync(RELATORIO_UPLOAD_DIR, { recursive: true });
-  next();
-}, relatorioUpload.single("relatorio"), async (req, res) => {
+app.post("/api/importar-relatorio", relatorioUpload.single("relatorio"), async (req, res) => {
   try {
     console.log("📥 Upload recebido:", req.file?.originalname);
 

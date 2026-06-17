@@ -183,11 +183,6 @@ app.delete("/api/relatorio-atual", async (_req, res) => {
     erros.push({ supabase: "conexao", erro: error.message });
   }
 
-  // CEJAS_RECRIAR_PASTA_RELATORIOS_APOS_DELETE
-  try {
-    fs.mkdirSync(path.join(__dirname, "uploads", "relatorios"), { recursive: true });
-  } catch {}
-
   return res.json({
     ok: true,
     message: "Relatório atual apagado com sucesso.",
@@ -410,7 +405,7 @@ app.use(express.json({ limit: "60mb" }));
 
 // Login público precisa vir antes das proteções
 
-
+registrarMenuPermissoesCejas(app);
 
 
 app.use(
@@ -429,9 +424,6 @@ app.use(
 );
 
 app.use(isAuthenticated);
-
-// Menu/permissões precisa vir depois da sessão para reconhecer Superadmin
-registrarMenuPermissoesCejas(app);
 
 app.get("/", (req, res) => {
   if (req.session.user) return res.redirect("/dashboard.html");
@@ -474,36 +466,16 @@ app.post("/api/login", async (req, res) => {
         superadmin: true,
         admin: true,
         isSuperAdmin: true,
-        isAdmin: true,
-        tipo: "superadmin"
+        isAdmin: true
       };
 
       req.session.usuario = req.session.user;
-      req.session.currentUser = req.session.user;
-      req.session.authUser = req.session.user;
-      req.session.usuarioAtual = req.session.user;
-      req.session.usuarioLogado = req.session.user;
-
       req.session.email = req.session.user.email;
       req.session.nome = req.session.user.nome;
-      req.session.name = req.session.user.nome;
       req.session.cargo = req.session.user.cargo;
-      req.session.role = req.session.user.cargo;
-      req.session.tipo = "superadmin";
-
-      req.session.permissoes = ["*"];
-      req.session.permissions = ["*"];
-
+      req.session.permissoes = req.session.user.permissoes;
       req.session.superadmin = true;
       req.session.admin = true;
-      req.session.isSuperAdmin = true;
-      req.session.isAdmin = true;
-      req.session.logado = true;
-      req.session.loggedIn = true;
-      req.session.isLoggedIn = true;
-      req.session.autenticado = true;
-      req.session.authenticated = true;
-      req.session.isAuthenticated = true;
       req.session.expiresAt = Date.now() + maxAge;
       req.session.cookie.maxAge = maxAge;
 
@@ -739,10 +711,7 @@ fs.mkdirSync(path.join(__dirname, "data"), { recursive: true });
 fs.mkdirSync(RELATORIO_UPLOAD_DIR, { recursive: true });
 
 const relatorioStorage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    fs.mkdirSync(RELATORIO_UPLOAD_DIR, { recursive: true });
-    cb(null, RELATORIO_UPLOAD_DIR);
-  },
+  destination: (_req, _file, cb) => cb(null, RELATORIO_UPLOAD_DIR),
   filename: (_req, file, cb) => {
     const safeName = Date.now() + "-" + String(file.originalname || "relatorio.pdf").replace(/[^a-zA-Z0-9._-]/g, "-");
     cb(null, safeName);
@@ -1224,10 +1193,7 @@ app.get("/api/relatorio-atual", (_req, res) => {
   }
 });
 
-app.post("/api/importar-relatorio", (req, res, next) => {
-  fs.mkdirSync(RELATORIO_UPLOAD_DIR, { recursive: true });
-  next();
-}, relatorioUpload.single("relatorio"), async (req, res) => {
+app.post("/api/importar-relatorio", relatorioUpload.single("relatorio"), async (req, res) => {
   try {
     console.log("📥 Upload recebido:", req.file?.originalname);
 
