@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Sistema de Gestão CEJAS | Agenda Dinâmica</title>
+
+  <style>
+    :root {
+      --bg: #050505;
+      --sidebar: #0b0b10;
+      --panel: #111114;
+      --card: #18181d;
+      --card-soft: #202026;
+      --border: rgba(255,255,255,.09);
+      --text: #fff;
+      --muted: #b3b3b3;
+      --purple: #a855f7;
+      --pink: #ff61d2;
+      --green: #22c55e;
+      --red: #ef4444;
+      --blue: #60a5fa;
+      --yellow: #facc15;
+      --gradient: linear-gradient(135deg, #7B61FF, #FF61D2);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body,
+    button,
+    input,
+    select {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 270px 1fr;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      padding: 24px 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 26px;
+    }
+
+    .logo {
+      width: 45px;
+      height: 45px;
+      border-radius: 12px;
+      border: 1px solid #9b5cff;
+      display: grid;
+      place-items: center;
+      color: #ff61d2;
+      font-weight: 900;
+      font-size: 28px;
+    }
+
+    .brand h1 {
+      font-size: 16px;
+      line-height: 1.05;
+    }
+
+    .brand p {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .user-card {
+      background: #171717;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 26px;
+    }
+
+    .user-card strong {
+      display: block;
+      font-size: 15px;
+    }
+
+    .user-card span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .nav a {
+      color: #c7c7c7;
+      text-decoration: none;
+      padding: 13px 14px;
+      border-radius: 13px;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .nav a.active {
+      color: #fff;
+      background: var(--gradient);
+    }
+
+    .help {
+      position: absolute;
+      left: 18px;
+      bottom: 18px;
+      width: 235px;
+      background: rgba(123,97,255,.13);
+      border: 1px solid rgba(123,97,255,.28);
+      border-radius: 16px;
+      padding: 16px;
+      color: #ddd;
+      font-size: 13px;
+    }
+
+    .help strong {
+      display: block;
+      color: #fff;
+      margin-bottom: 6px;
+      font-size: 15px;
+    }
+
+    .main {
+      height: 100vh;
+      overflow-y: auto;
+      padding: 32px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .eyebrow {
+      color: #aaa;
+      letter-spacing: .45em;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 34px;
+      line-height: 1;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin-top: 9px;
+      max-width: 780px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 13px 17px;
+      color: #fff;
+      font-weight: 900;
+      cursor: pointer;
+      background: #1f2937;
+      transition: .2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+    }
+
+    .btn.gradient {
+      background: var(--gradient);
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: 1fr 170px 170px 170px 170px;
+      gap: 12px;
+      margin-bottom: 20px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 16px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      color: var(--muted);
+      font-weight: 900;
+      margin-bottom: 7px;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.11);
+      background: #0e0e12;
+      color: #fff;
+      border-radius: 12px;
+      padding: 12px;
+      outline: none;
+      font-weight: 700;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .stat-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      font-weight: 900;
+      margin-bottom: 10px;
+    }
+
+    .stat-card strong {
+      font-size: 28px;
+    }
+
+    .calendar-layout {
+      display: grid;
+      grid-template-columns: minmax(700px, 1fr) 430px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .calendar-panel,
+    .day-panel,
+    .list-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 18px;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      gap: 12px;
+    }
+
+    .month-title {
+      font-size: 24px;
+      font-weight: 950;
+      text-transform: capitalize;
+    }
+
+    .calendar-nav {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #191920;
+      color: #fff;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+
+    .day-cell {
+      min-height: 112px;
+      background: #15151a;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 9px;
+      cursor: pointer;
+      transition: .2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .day-cell:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255,255,255,.22);
+      background: #1b1b22;
+    }
+
+    .day-cell.muted {
+      opacity: .35;
+    }
+
+    .day-cell.selected {
+      border-color: #ff61d2;
+      box-shadow: 0 0 0 1px rgba(255,97,210,.45), 0 12px 34px rgba(123,97,255,.16);
+    }
+
+    .day-number {
+      font-weight: 950;
+      font-size: 14px;
+      margin-bottom: 7px;
+    }
+
+    .event-pill {
+      display: block;
+      width: 100%;
+      padding: 4px 7px;
+      border-radius: 8px;
+      color: #06110a;
+      font-size: 10px;
+      font-weight: 900;
+      margin-bottom: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .event-pill.confirmado {
+      background: rgba(34,197,94,.9);
+    }
+
+    .event-pill.em_espera {
+      background: rgba(168,85,247,.92);
+      color: #fff;
+    }
+
+    .event-pill.cancelado {
+      background: rgba(239,68,68,.92);
+      color: #fff;
+      text-decoration: line-through;
+    }
+
+    .more {
+      color: var(--muted);
+      font-size: 10px;
+      margin-top: 4px;
+      font-weight: 800;
+    }
+
+    .legend {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 14px;
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 800;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+    }
+
+    .dot.green { background: var(--green); }
+    .dot.purple { background: var(--purple); }
+    .dot.red { background: var(--red); }
+
+    .day-panel h3,
+    .list-panel h3 {
+      font-size: 20px;
+      margin-bottom: 6px;
+    }
+
+    .day-date {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
+    .day-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .mini-stat {
+      background: #0f1014;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 10px;
+    }
+
+    .mini-stat span {
+      color: var(--muted);
+      display: block;
+      font-size: 10px;
+      text-transform: uppercase;
+      font-weight: 900;
+      margin-bottom: 5px;
+    }
+
+    .mini-stat strong {
+      font-size: 18px;
+    }
+
+    .event-card {
+      background: #101015;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+
+    .event-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .event-title {
+      font-weight: 950;
+      font-size: 15px;
+      line-height: 1.25;
+    }
+
+    .badge {
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 950;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .badge.confirmado {
+      background: rgba(34,197,94,.14);
+      color: var(--green);
+    }
+
+    .badge.em_espera {
+      background: rgba(168,85,247,.16);
+      color: #c084fc;
+    }
+
+    .badge.cancelado {
+      background: rgba(239,68,68,.16);
+      color: var(--red);
+    }
+
+    .event-meta {
+      color: #d1d5db;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .event-value {
+      margin-top: 10px;
+      font-weight: 950;
+      color: #fff;
+    }
+
+    .empty {
+      color: var(--muted);
+      background: #0f1014;
+      border: 1px dashed rgba(255,255,255,.14);
+      padding: 20px;
+      text-align: center;
+      border-radius: 16px;
+    }
+
+    .list-panel {
+      margin-top: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+    }
+
+    td {
+      color: #d6d6d6;
+    }
+
+    @media (max-width: 1300px) {
+      body {
+        overflow: auto;
+      }
+
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .main {
+        height: auto;
+      }
+
+      .filters {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .stats {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .calendar-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">M</div>
+        <div>
+          <h1>SISTEMA DE GESTÃO CEJAS</h1>
+          <p>Painel Administrativo</p>
+        </div>
+      </div>
+
+      <div class="user-card">
+        <strong>Eduardo</strong>
+        <span>Super Admin</span>
+      </div>
+
+      <nav class="nav">
+        <a href="dashboard.html">▦ Painel Geral</a>
+        <a class="active" href="agenda.html">▣ Agenda Dinâmica</a>
+        <a href="orcamentos.html">◉ Orçamentos</a>
+        <a href="importar-relatorio.html">▤ Importar Relatório (PDF)</a>
+        <a href="tarefas.html">☑ Tarefas Pendentes</a>
+        <a href="servidor.html">▣ Servidor</a>
+        <a href="usuarios.html">◌ Acessos / Usuários</a>
+        <a href="contratos.html">Contratos</a>
+        <a href="configuracoes.html">⚙ Configurações</a>
+      </nav>
+
+      <div class="help">
+        <strong>Agenda automática</strong>
+        Os eventos vêm do último PDF importado do Supera.
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Agenda integrada ao Supera</div>
+          <h2>Agenda Dinâmica</h2>
+          <p class="subtitle">
+            Cada novo relatório importado atualiza automaticamente esta agenda com os eventos, salas, horários, status e valores.
+          </p>
+        </div>
+
+        <div class="actions">
+          <a class="btn" href="importar-relatorio.html">Importar novo PDF</a>
+          <a class="btn gradient" href="dashboard.html">Voltar ao painel</a>
+        </div>
+      </header>
+
+      <section class="filters">
+        <div class="field">
+          <label>Buscar</label>
+          <input id="searchInput" type="search" placeholder="Empresa, sala, evento ou responsável">
+        </div>
+
+        <div class="field">
+          <label>Status</label>
+          <select id="statusFilter">
+            <option value="todos">Todos</option>
+            <option value="confirmado">Confirmados</option>
+            <option value="em_espera">Em espera</option>
+            <option value="cancelado">Cancelados</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Sala</label>
+          <select id="roomFilter">
+            <option value="todas">Todas as salas</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Mês</label>
+          <select id="monthFilter"></select>
+        </div>
+
+        <div class="field">
+          <label>Ação</label>
+          <button class="btn gradient" onclick="resetFilters()" style="width:100%;justify-content:center;">Limpar filtros</button>
+        </div>
+      </section>
+
+      <section class="stats">
+        <div class="stat-card">
+          <span>Total de eventos</span>
+          <strong id="totalEventos">0</strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Confirmados</span>
+          <strong id="totalConfirmados" style="color:var(--green);">0</strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Em espera</span>
+          <strong id="totalEspera" style="color:var(--purple);">0</strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Cancelados</span>
+          <strong id="totalCancelados" style="color:var(--red);">0</strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Receita confirmada</span>
+          <strong id="receitaConfirmada">R$ 0,00</strong>
+        </div>
+      </section>
+
+      <section class="calendar-layout">
+        <div class="calendar-panel">
+          <div class="calendar-header">
+            <div class="month-title" id="monthTitle">Carregando...</div>
+
+            <div class="calendar-nav">
+              <button class="nav-btn" onclick="changeMonth(-1)">‹</button>
+              <button class="btn" onclick="goToToday()">Hoje</button>
+              <button class="nav-btn" onclick="changeMonth(1)">›</button>
+            </div>
+          </div>
+
+          <div class="weekdays">
+            <div>Dom</div>
+            <div>Seg</div>
+            <div>Ter</div>
+            <div>Qua</div>
+            <div>Qui</div>
+            <div>Sex</div>
+            <div>Sáb</div>
+          </div>
+
+          <div class="calendar-grid" id="calendarGrid"></div>
+
+          <div class="legend">
+            <div class="legend-item"><span class="dot green"></span>Confirmado / Reservado</div>
+            <div class="legend-item"><span class="dot purple"></span>Em espera</div>
+            <div class="legend-item"><span class="dot red"></span>Cancelado</div>
+          </div>
+        </div>
+
+        <aside class="day-panel">
+          <h3 id="selectedDayTitle">Dia selecionado</h3>
+          <div class="day-date" id="selectedDayDate">Clique em uma data no calendário.</div>
+
+          <div class="day-summary">
+            <div class="mini-stat">
+              <span>Eventos</span>
+              <strong id="dayTotal">0</strong>
+            </div>
+
+            <div class="mini-stat">
+              <span>Receita</span>
+              <strong id="dayRevenue">R$ 0,00</strong>
+            </div>
+
+            <div class="mini-stat">
+              <span>Pendentes</span>
+              <strong id="dayPending">0</strong>
+            </div>
+          </div>
+
+          <div id="dayEvents"></div>
+        </aside>
+      </section>
+
+      <section class="list-panel">
+        <h3>Todos os eventos filtrados</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Hora</th>
+              <th>Evento</th>
+              <th>Empresa</th>
+              <th>Sala</th>
+              <th>Status</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody id="eventsTable"></tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    let allEvents = [];
+    let filteredEvents = [];
+    let currentDate = new Date(2026, 5, 1);
+    let selectedDateISO = "";
+
+    const money = (value) => Number(value || 0).toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
+
+    function statusText(status) {
+      if (status === "confirmado") return "Confirmado";
+      if (status === "em_espera") return "Em espera";
+      if (status === "cancelado") return "Cancelado";
+      return status || "";
+    }
+
+    function brToISO(dataBR) {
+      if (!dataBR || !dataBR.includes("/")) return "";
+      const [d, m, y] = dataBR.split("/");
+      return `${y}-${m}-${d}`;
+    }
+
+    function isoToBR(iso) {
+      if (!iso || !iso.includes("-")) return "";
+      const [y, m, d] = iso.split("-");
+      return `${d}/${m}/${y}`;
+    }
+
+    function formatMonth(date) {
+      return date.toLocaleDateString("pt-BR", {
+        month: "long",
+        year: "numeric"
+      });
+    }
+
+    function normalize(text) {
+      return String(text || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+    }
+
+    function getEventsByDate(iso) {
+      return filteredEvents.filter(event => brToISO(event.data) === iso);
+    }
+
+    function getFilteredEvents() {
+      const search = normalize(document.getElementById("searchInput").value);
+      const status = document.getElementById("statusFilter").value;
+      const room = document.getElementById("roomFilter").value;
+
+      return allEvents.filter(event => {
+        if (status !== "todos" && event.status !== status) return false;
+        if (room !== "todas" && event.sala !== room) return false;
+
+        if (search) {
+          const haystack = normalize([
+            event.data,
+            event.horaInicial,
+            event.horaFinal,
+            event.evento,
+            event.empresa,
+            event.sala,
+            event.status,
+            event.produtos?.join(" ")
+          ].join(" "));
+
+          if (!haystack.includes(search)) return false;
+        }
+
+        return true;
+      });
+    }
+
+    function updateStats() {
+      const total = filteredEvents.length;
+      const confirmados = filteredEvents.filter(e => e.status === "confirmado").length;
+      const espera = filteredEvents.filter(e => e.status === "em_espera").length;
+      const cancelados = filteredEvents.filter(e => e.status === "cancelado").length;
+
+      const receita = filteredEvents
+        .filter(e => e.status === "confirmado")
+        .reduce((acc, e) => acc + Number(e.valor || 0), 0);
+
+      document.getElementById("totalEventos").textContent = total;
+      document.getElementById("totalConfirmados").textContent = confirmados;
+      document.getElementById("totalEspera").textContent = espera;
+      document.getElementById("totalCancelados").textContent = cancelados;
+      document.getElementById("receitaConfirmada").textContent = money(receita);
+    }
+
+    function populateRoomFilter() {
+      const select = document.getElementById("roomFilter");
+      const current = select.value;
+
+      const rooms = [...new Set(allEvents.map(e => e.sala).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b));
+
+      select.innerHTML = '<option value="todas">Todas as salas</option>' +
+        rooms.map(room => `<option value="${room}">${room}</option>`).join("");
+
+      if (rooms.includes(current)) {
+        select.value = current;
+      }
+    }
+
+    function populateMonthFilter() {
+      const select = document.getElementById("monthFilter");
+
+      const months = [...new Set(allEvents.map(event => {
+        const iso = brToISO(event.data);
+        return iso ? iso.slice(0, 7) : "";
+      }).filter(Boolean))].sort();
+
+      select.innerHTML = months.map(month => {
+        const [year, m] = month.split("-");
+        const label = new Date(Number(year), Number(m) - 1, 1).toLocaleDateString("pt-BR", {
+          month: "long",
+          year: "numeric"
+        });
+
+        return `<option value="${month}">${label}</option>`;
+      }).join("");
+
+      const currentMonth = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}`;
+
+      if (months.includes(currentMonth)) {
+        select.value = currentMonth;
+      } else if (months.length) {
+        select.value = months[0];
+        const [year, month] = months[0].split("-");
+        currentDate = new Date(Number(year), Number(month) - 1, 1);
+      }
+    }
+
+    function renderCalendar() {
+      const grid = document.getElementById("calendarGrid");
+      const monthTitle = document.getElementById("monthTitle");
+
+      monthTitle.textContent = formatMonth(currentDate);
+
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+
+      const firstDay = new Date(year, month, 1);
+      const startDate = new Date(firstDay);
+      startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+      const cells = [];
+
+      for (let i = 0; i < 42; i++) {
+        const date = new Date(startDate);
+        date.setDate(startDate.getDate() + i);
+
+        const iso = date.toISOString().slice(0, 10);
+        const dayEvents = getEventsByDate(iso);
+        const visibleEvents = dayEvents.slice(0, 3);
+
+        const muted = date.getMonth() !== month ? "muted" : "";
+        const selected = iso === selectedDateISO ? "selected" : "";
+
+        cells.push(`
+          <div class="day-cell ${muted} ${selected}" onclick="selectDay('${iso}')">
+            <div class="day-number">${date.getDate()}</div>
+            ${visibleEvents.map(event => `
+              <span class="event-pill ${event.status}">
+                ${event.horaInicial || ""} ${event.sala || event.evento || ""}
+              </span>
+            `).join("")}
+            ${dayEvents.length > 3 ? `<div class="more">+${dayEvents.length - 3} eventos</div>` : ""}
+          </div>
+        `);
+      }
+
+      grid.innerHTML = cells.join("");
+    }
+
+    function renderDayPanel() {
+      const title = document.getElementById("selectedDayTitle");
+      const dateLabel = document.getElementById("selectedDayDate");
+      const container = document.getElementById("dayEvents");
+
+      if (!selectedDateISO) {
+        title.textContent = "Dia selecionado";
+        dateLabel.textContent = "Clique em uma data no calendário.";
+        container.innerHTML = `<div class="empty">Nenhum dia selecionado.</div>`;
+        document.getElementById("dayTotal").textContent = "0";
+        document.getElementById("dayRevenue").textContent = money(0);
+        document.getElementById("dayPending").textContent = "0";
+        return;
+      }
+
+      const events = getEventsByDate(selectedDateISO);
+      const receita = events
+        .filter(e => e.status === "confirmado")
+        .reduce((acc, e) => acc + Number(e.valor || 0), 0);
+
+      const pendentes = events.filter(e => e.status === "em_espera").length;
+
+      title.textContent = "Agenda do dia";
+      dateLabel.textContent = isoToBR(selectedDateISO);
+
+      document.getElementById("dayTotal").textContent = events.length;
+      document.getElementById("dayRevenue").textContent = money(receita);
+      document.getElementById("dayPending").textContent = pendentes;
+
+      if (!events.length) {
+        container.innerHTML = `<div class="empty">Nenhum evento para este dia.</div>`;
+        return;
+      }
+
+      container.innerHTML = events.map(event => `
+        <article class="event-card">
+          <div class="event-top">
+            <div class="event-title">${event.evento || "Evento sem nome"}</div>
+            <span class="badge ${event.status}">${statusText(event.status)}</span>
+          </div>
+
+          <div class="event-meta">
+            <div><strong>Horário:</strong> ${event.horaInicial || "--"} até ${event.horaFinal || "--"}</div>
+            <div><strong>Sala:</strong> ${event.sala || "Não identificada"}</div>
+            <div><strong>Empresa:</strong> ${event.empresa || "Não identificada"}</div>
+            <div><strong>Participantes:</strong> ${event.participantes || 0}</div>
+          </div>
+
+          <div class="event-value">${money(event.valor || 0)}</div>
+        </article>
+      `).join("");
+    }
+
+    function renderTable() {
+      const table = document.getElementById("eventsTable");
+
+      if (!filteredEvents.length) {
+        table.innerHTML = `<tr><td colspan="7">Nenhum evento encontrado.</td></tr>`;
+        return;
+      }
+
+      table.innerHTML = filteredEvents.map(event => `
+        <tr>
+          <td>${event.data || ""}</td>
+          <td>${event.horaInicial || ""} até ${event.horaFinal || ""}</td>
+          <td>${event.evento || ""}</td>
+          <td>${event.empresa || ""}</td>
+          <td>${event.sala || ""}</td>
+          <td><span class="badge ${event.status}">${statusText(event.status)}</span></td>
+          <td>${money(event.valor || 0)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function applyFilters() {
+      filteredEvents = getFilteredEvents();
+      updateStats();
+      renderCalendar();
+      renderDayPanel();
+      renderTable();
+    }
+
+    function selectDay(iso) {
+      selectedDateISO = iso;
+      renderCalendar();
+      renderDayPanel();
+    }
+
+    function changeMonth(direction) {
+      currentDate.setMonth(currentDate.getMonth() + direction);
+      const value = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}`;
+      const monthFilter = document.getElementById("monthFilter");
+
+      if ([...monthFilter.options].some(option => option.value === value)) {
+        monthFilter.value = value;
+      }
+
+      renderCalendar();
+    }
+
+    function goToToday() {
+      const today = new Date();
+      currentDate = new Date(today.getFullYear(), today.getMonth(), 1);
+      selectedDateISO = today.toISOString().slice(0, 10);
+      renderCalendar();
+      renderDayPanel();
+    }
+
+    function resetFilters() {
+      document.getElementById("searchInput").value = "";
+      document.getElementById("statusFilter").value = "todos";
+      document.getElementById("roomFilter").value = "todas";
+      applyFilters();
+    }
+
+    async function loadAgenda() {
+      try {
+        const response = await fetch("/api/relatorio-atual", { cache: "no-store" });
+        const data = await response.json();
+
+        if (!data.ok || !data.report) {
+          throw new Error("Relatório não encontrado.");
+        }
+
+        allEvents = data.report.eventos || [];
+        filteredEvents = [...allEvents];
+
+        populateRoomFilter();
+        populateMonthFilter();
+
+        const firstEvent = allEvents[0];
+
+        if (firstEvent?.data) {
+          selectedDateISO = brToISO(firstEvent.data);
+          const [year, month] = selectedDateISO.split("-");
+          currentDate = new Date(Number(year), Number(month) - 1, 1);
+        }
+
+        applyFilters();
+      } catch (error) {
+        document.getElementById("calendarGrid").innerHTML = `<div class="empty" style="grid-column: 1 / -1;">Importe primeiro um PDF do Supera.</div>`;
+        document.getElementById("dayEvents").innerHTML = `<div class="empty">Nenhum relatório importado.</div>`;
+      }
+    }
+
+    document.getElementById("searchInput").addEventListener("input", applyFilters);
+    document.getElementById("statusFilter").addEventListener("change", applyFilters);
+    document.getElementById("roomFilter").addEventListener("change", applyFilters);
+
+    document.getElementById("monthFilter").addEventListener("change", (event) => {
+      const [year, month] = event.target.value.split("-");
+      currentDate = new Date(Number(year), Number(month) - 1, 1);
+      selectedDateISO = "";
+      applyFilters();
+    });
+
+    loadAgenda();
+  </script>
+
+<script>
+(function () {
+  const PAGE_PERMS = {
+    "dashboard.html": "painel",
+    "agenda.html": "agenda",
+    "orcamentos.html": "orcamentos",
+    "importar-relatorio.html": "relatorios",
+    "tarefas.html": "tarefas",
+    "servidor.html": "servidor",
+    "financeiro.html": "financeiro",
+    "usuarios.html": "usuarios",
+    "configuracoes.html": "configuracoes"
+  };
+
+  async function aplicarPermissoesMenu() {
+    try {
+      const response = await fetch("/api/me", { cache: "no-store" });
+      const data = await response.json();
+
+      if (!data.ok || !data.user) return;
+
+      const permissoes = data.user.permissoes || [];
+      const admin = permissoes.includes("*");
+
+      document.querySelectorAll("a[href$='.html']").forEach(link => {
+        const href = link.getAttribute("href");
+        const page = href.split("/").pop();
+        const perm = PAGE_PERMS[page];
+
+        if (!perm) return;
+
+        if (!admin && !permissoes.includes(perm)) {
+          link.style.display = "none";
+        }
+      });
+    } catch {}
+  }
+
+  aplicarPermissoesMenu();
+})();
+</script>
+
+  
+  
+  <script src="/js/agenda-plus.js?v=20"></script>
+</body>
+</html>

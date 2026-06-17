@@ -713,6 +713,7 @@
         <a href="tarefas.html">☑ Tarefas Pendentes</a>
         <a href="servidor.html">▣ Servidor</a>
         <a href="usuarios.html">◌ Acessos / Usuários</a>
+        <a href="contratos.html">Contratos</a>
         <a href="configuracoes.html">⚙ Configurações</a>
       </nav>
     </aside>
@@ -1551,6 +1552,381 @@ document.addEventListener("DOMContentLoaded", () => {
 
   aplicarPermissoesMenu();
 })();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.__CEJAS_PDF_ORCAMENTO_ATIVO__) return;
+  window.__CEJAS_PDF_ORCAMENTO_ATIVO__ = true;
+
+  function carregarScript(src) {
+    return new Promise((resolve, reject) => {
+      if ([...document.scripts].some((s) => s.src.includes(src))) {
+        resolve();
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = () => reject(new Error("Não foi possível carregar " + src));
+      document.head.appendChild(script);
+    });
+  }
+
+  async function garantirBibliotecasPDF() {
+    if (!window.html2canvas) {
+      await carregarScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
+    }
+
+    if (!window.jspdf) {
+      await carregarScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+    }
+  }
+
+  function limparTexto(valor) {
+    return String(valor || "")
+      .replace(/\s+/g, " ")
+      .replace(/^[\s:–—-]+|[\s:–—-]+$/g, "")
+      .trim();
+  }
+
+  function normalizarData(data) {
+    if (!data) return "";
+
+    const texto = String(data).trim();
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(texto)) return texto;
+
+    const br = texto.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+
+    if (br) {
+      return `${br[3]}-${br[2].padStart(2, "0")}-${br[1].padStart(2, "0")}`;
+    }
+
+    return "";
+  }
+
+  function buscarCampoPorChaves(chaves) {
+    const campos = Array.from(document.querySelectorAll("input, textarea, select"));
+
+    for (const campo of campos) {
+      const textoCampo = [
+        campo.name,
+        campo.id,
+        campo.placeholder,
+        campo.getAttribute("aria-label"),
+        campo.closest("label")?.textContent,
+        campo.parentElement?.textContent,
+        campo.previousElementSibling?.textContent
+      ].join(" ").toLowerCase();
+
+      if (chaves.some((chave) => textoCampo.includes(chave)) && campo.value) {
+        return campo;
+      }
+    }
+
+    return null;
+  }
+
+  function valorCampo(chaves) {
+    const campo = buscarCampoPorChaves(chaves);
+    return campo ? limparTexto(campo.value) : "";
+  }
+
+  function encontrarFolhaDoOrcamento() {
+    const candidatos = Array.from(document.querySelectorAll("div, section, article, main"))
+      .map((el) => {
+        const texto = String(el.innerText || "");
+        const rect = el.getBoundingClientRect();
+
+        const temDocumento =
+          texto.includes("DOCUMENTO AUXILIAR DE VENDA") ||
+          texto.includes("ORÇAMENTO LOCAÇÃO") ||
+          texto.includes("TOTAL GERAL");
+
+        const pareceFormulario =
+          texto.includes("EMISSOR COMERCIAL") ||
+          texto.includes("REGRAS DE PREÇO") ||
+          texto.includes("CRONOGRAMA") ||
+          texto.includes("ADICIONAR ITEM DA TABELA");
+
+        if (!temDocumento) return null;
+        if (pareceFormulario) return null;
+        if (rect.width < 350 || rect.height < 400) return null;
+
+        return {
+          el,
+          area: rect.width * rect.height,
+          texto: texto.length
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => {
+        if (a.texto !== b.texto) return a.texto - b.texto;
+        return a.area - b.area;
+      });
+
+    if (candidatos.length) {
+      return candidatos[0].el;
+    }
+
+    const todos = Array.from(document.querySelectorAll("div, section, article"));
+
+    const fallback = todos.find((el) => {
+      const texto = String(el.innerText || "");
+      return (
+        texto.includes("DOCUMENTO AUXILIAR DE VENDA") &&
+        texto.includes("TOTAL GERAL")
+      );
+    });
+
+    return fallback || document.querySelector("main") || document.body;
+  }
+
+  function extrairPorTexto(texto, rotulos) {
+    for (const rotulo of rotulos) {
+      const regex = new RegExp(rotulo + "\\s*[:–—-]?\\s*([^\\n\\r]+)", "i");
+      const match = texto.match(regex);
+
+      if (match && match[1]) {
+        const valor = limparTexto(match[1]);
+
+        if (valor && valor.length < 120 && !/R\$|subtotal|total|desconto|valor/i.test(valor)) {
+          return valor;
+        }
+      }
+    }
+
+    return "";
+  }
+
+  function dadosOrcamento() {
+    const folha = encontrarFolhaDoOrcamento();
+    const texto = folha.innerText || document.body.innerText || "";
+
+    const empresa =
+      valorCampo(["empresa solicitante", "empresa", "cliente", "contratante", "solicitante"]) ||
+      extrairPorTexto(texto, ["solicitante", "empresa solicitante", "empresa", "cliente", "contratante"]);
+
+    const nomeEvento =
+      valorCampo(["nome do evento", "nome evento", "evento"]) ||
+      extrairPorTexto(texto, ["evento", "nome do evento"]);
+
+    let dataEvento = "";
+
+    const dataInput = Array.from(document.querySelectorAll('input[type="date"]')).find((input) => input.value);
+    if (dataInput) dataEvento = dataInput.value;
+
+    if (!dataEvento) {
+      const matchData =
+        texto.match(/\b(\d{1,2}\/\d{1,2}\/\d{4})\b/) ||
+        texto.match(/\b(\d{4}-\d{2}-\d{2})\b/);
+
+      if (matchData) dataEvento = matchData[1];
+    }
+
+    return {
+      empresa: limparTexto(empresa),
+      nomeEvento: limparTexto(nomeEvento),
+      dataEvento: normalizarData(dataEvento)
+    };
+  }
+
+  async function blobParaBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(String(reader.result).split(",")[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  function baixarBlob(blob, nomeArquivo) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = nomeArquivo;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }
+
+  async function gerarPdfBlob() {
+    await garantirBibliotecasPDF();
+
+    const folhaOriginal = encontrarFolhaDoOrcamento();
+    const { jsPDF } = window.jspdf;
+
+    const rect = folhaOriginal.getBoundingClientRect();
+
+    const wrapper = document.createElement("div");
+    wrapper.style.position = "fixed";
+    wrapper.style.left = "-100000px";
+    wrapper.style.top = "0";
+    wrapper.style.width = rect.width + "px";
+    wrapper.style.background = "#ffffff";
+    wrapper.style.padding = "0";
+    wrapper.style.margin = "0";
+    wrapper.style.zIndex = "-1";
+
+    const clone = folhaOriginal.cloneNode(true);
+    clone.style.transform = "none";
+    clone.style.margin = "0";
+    clone.style.boxShadow = "none";
+    clone.style.background = "#ffffff";
+
+    wrapper.appendChild(clone);
+    document.body.appendChild(wrapper);
+
+    const canvas = await window.html2canvas(clone, {
+      scale: 2.5,
+      useCORS: true,
+      backgroundColor: "#ffffff"
+    });
+
+    document.body.removeChild(wrapper);
+
+    const imgData = canvas.toDataURL("image/jpeg", 0.98);
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    const pageWidth = 210;
+    const pageHeight = 297;
+    const margin = 8;
+    const usableWidth = pageWidth - margin * 2;
+
+    const imgWidth = usableWidth;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    let heightLeft = imgHeight;
+    let position = margin;
+
+    pdf.addImage(imgData, "JPEG", margin, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight - margin * 2;
+
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight + margin;
+      pdf.addPage();
+      pdf.addImage(imgData, "JPEG", margin, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight - margin * 2;
+    }
+
+    return pdf.output("blob");
+  }
+
+  async function gerarPdfSalvarServidor() {
+    const btn = document.querySelector("#btnGerarPdfSalvarServidor");
+    const textoOriginal = btn ? btn.textContent : "Salvar PDF no Servidor";
+
+    try {
+      const dados = dadosOrcamento();
+
+      if (!dados.empresa && !dados.nomeEvento) {
+        alert("Não encontrei automaticamente a empresa ou o nome do evento. Preencha os campos do orçamento antes de salvar.");
+        return;
+      }
+
+      if (!dados.dataEvento) {
+        alert("Não encontrei automaticamente a data do evento. Preencha a data no cronograma antes de salvar.");
+        return;
+      }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Salvando PDF...";
+      }
+
+      const pdfBlob = await gerarPdfBlob();
+      const pdfBase64 = await blobParaBase64(pdfBlob);
+
+      const resposta = await fetch("/api/orcamentos/salvar-pdf-servidor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...dados,
+          pdfBase64
+        })
+      });
+
+      const resultado = await resposta.json();
+
+      if (!resultado.ok) {
+        throw new Error(resultado.message || "Erro ao salvar PDF no servidor.");
+      }
+
+      baixarBlob(pdfBlob, resultado.arquivo);
+
+      alert(
+        "PDF salvo no Servidor CEJAS.\\n\\n" +
+        "Pasta: " + resultado.pasta + "\\n" +
+        "Arquivo: " + resultado.arquivo
+      );
+    } catch (error) {
+      alert("Erro: " + error.message);
+      console.error(error);
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = textoOriginal;
+      }
+    }
+  }
+
+  const btn = document.createElement("button");
+  btn.id = "btnGerarPdfSalvarServidor";
+  btn.type = "button";
+  btn.textContent = "Salvar PDF no Servidor";
+  btn.style.border = "0";
+  btn.style.borderRadius = "10px";
+  btn.style.padding = "12px 16px";
+  btn.style.background = "linear-gradient(135deg, #8b5cf6, #ec4899)";
+  btn.style.color = "white";
+  btn.style.fontWeight = "900";
+  btn.style.cursor = "pointer";
+  btn.style.boxShadow = "0 12px 30px rgba(0,0,0,.25)";
+  btn.style.whiteSpace = "nowrap";
+
+  btn.addEventListener("click", gerarPdfSalvarServidor);
+
+  function colocarBotaoAoLadoDoPDF() {
+    const botoes = Array.from(document.querySelectorAll("button, a"));
+
+    const botaoPdf = botoes.find((el) => {
+      const texto = String(el.textContent || "").toLowerCase();
+      return texto.includes("imprimir") || texto.includes("gerar pdf") || texto.includes("exportar");
+    });
+
+    if (botaoPdf && botaoPdf.parentElement) {
+      const grupo = botaoPdf.parentElement;
+      grupo.style.display = "flex";
+      grupo.style.gap = "10px";
+      grupo.style.alignItems = "center";
+      grupo.style.flexWrap = "wrap";
+
+      botaoPdf.insertAdjacentElement("afterend", btn);
+      return true;
+    }
+
+    return false;
+  }
+
+  if (!colocarBotaoAoLadoDoPDF()) {
+    setTimeout(colocarBotaoAoLadoDoPDF, 600);
+    setTimeout(colocarBotaoAoLadoDoPDF, 1500);
+  }
+});
 </script>
 
 </body>

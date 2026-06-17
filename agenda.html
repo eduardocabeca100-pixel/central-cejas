@@ -623,6 +623,7 @@
         <a href="tarefas.html">☑ Tarefas Pendentes</a>
         <a href="servidor.html">▣ Servidor</a>
         <a href="usuarios.html">◌ Acessos / Usuários</a>
+        <a href="contratos.html">Contratos</a>
         <a href="configuracoes.html">⚙ Configurações</a>
       </nav>
 
@@ -1164,6 +1165,1164 @@
   aplicarPermissoesMenu();
 })();
 </script>
+
+  
+  
+  
+
+
+
+
+
+
+
+<script>
+console.log("✅ Agenda Plus exclusiva da Agenda Dinâmica carregou.");
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (document.querySelector(".agenda-plus-fab")) return;
+
+  const style = document.createElement("style");
+  style.innerHTML = `
+    .agenda-plus-fab {
+      border: 0;
+      border-radius: 16px;
+      padding: 16px 22px;
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+      color: white;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 18px 50px rgba(0,0,0,.35);
+      white-space: nowrap;
+    }
+
+    .agenda-plus-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,.75);
+      backdrop-filter: blur(12px);
+      padding: 20px;
+    }
+
+    .agenda-plus-overlay.ativo {
+      display: flex;
+    }
+
+    .agenda-plus-card {
+      width: min(1080px, 100%);
+      max-height: 92vh;
+      overflow: auto;
+      border-radius: 26px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: #111827;
+      color: white;
+      padding: 26px;
+      box-shadow: 0 30px 100px rgba(0,0,0,.6);
+      font-family: Arial, sans-serif;
+    }
+
+    .agenda-plus-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+
+    .agenda-plus-top h2 {
+      margin: 0 0 6px;
+      font-size: 30px;
+    }
+
+    .agenda-plus-top p {
+      margin: 0;
+      color: rgba(255,255,255,.7);
+    }
+
+    .agenda-plus-close {
+      border: 0;
+      border-radius: 12px;
+      width: 42px;
+      height: 42px;
+      background: rgba(255,255,255,.1);
+      color: white;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .agenda-plus-grid {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 18px;
+    }
+
+    .agenda-plus-box {
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 20px;
+      background: rgba(255,255,255,.04);
+      padding: 16px;
+    }
+
+    .agenda-plus-box h3 {
+      margin: 0 0 12px;
+    }
+
+    .agenda-plus-field {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .agenda-plus-field label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: rgba(255,255,255,.65);
+      font-weight: 900;
+    }
+
+    .agenda-plus-field input,
+    .agenda-plus-field select,
+    .agenda-plus-field textarea {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 14px;
+      padding: 12px;
+      background: rgba(255,255,255,.07);
+      color: white;
+      outline: none;
+    }
+
+    .agenda-plus-field textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .agenda-plus-two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .agenda-plus-three {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    .agenda-plus-save,
+    .agenda-plus-load {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+      color: white;
+      font-weight: 900;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .agenda-plus-filter-line {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 12px 0;
+    }
+
+    .agenda-plus-event {
+      border: 1px solid rgba(255,255,255,.1);
+      border-left: 5px solid #22c55e;
+      border-radius: 16px;
+      padding: 12px;
+      margin-bottom: 10px;
+      background: rgba(255,255,255,.055);
+    }
+
+    .agenda-plus-event.em-espera {
+      border-left-color: #a855f7;
+    }
+
+    .agenda-plus-event.cancelado {
+      border-left-color: #ef4444;
+    }
+
+    .agenda-plus-event.manual {
+      background: linear-gradient(135deg, rgba(139,92,246,.16), rgba(255,255,255,.04));
+      border-top: 1px solid rgba(139,92,246,.35);
+    }
+
+    .agenda-plus-event strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 15px;
+    }
+
+    .agenda-plus-event small {
+      color: rgba(255,255,255,.72);
+      line-height: 1.5;
+    }
+
+    .agenda-plus-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 900;
+      margin-bottom: 8px;
+      background: rgba(255,255,255,.1);
+    }
+
+    .agenda-plus-tag.manual-tag {
+      background: rgba(139,92,246,.22);
+      color: #ddd6fe;
+    }
+
+    .agenda-plus-tag.supera-tag {
+      background: rgba(34,197,94,.18);
+      color: #bbf7d0;
+    }
+
+    .agenda-plus-status {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .agenda-plus-status button {
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 999px;
+      padding: 8px 10px;
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+      background: rgba(255,255,255,.08);
+      font-size: 12px;
+    }
+
+    .agenda-plus-status button[data-status="confirmado"] {
+      background: rgba(34,197,94,.22);
+    }
+
+    .agenda-plus-status button[data-status="em espera"] {
+      background: rgba(168,85,247,.22);
+    }
+
+    .agenda-plus-status button[data-status="cancelado"] {
+      background: rgba(239,68,68,.22);
+    }
+
+    .status-bolinhas {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .status-bolinha-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      padding: 11px 12px;
+      background: rgba(255,255,255,.055);
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .status-bolinha-option input {
+      display: none;
+    }
+
+    .status-bolinha {
+      width: 15px;
+      height: 15px;
+      border-radius: 999px;
+      box-shadow: 0 0 0 4px rgba(255,255,255,.06);
+    }
+
+    .status-bolinha.confirmado {
+      background: #22c55e;
+    }
+
+    .status-bolinha.espera {
+      background: #a855f7;
+    }
+
+    .status-bolinha.cancelado {
+      background: #ef4444;
+    }
+
+    .status-bolinha-option:has(input:checked) {
+      border-color: rgba(236,72,153,.75);
+      background: rgba(236,72,153,.13);
+    }
+
+    @media (max-width: 850px) {
+      .agenda-plus-grid,
+      .agenda-plus-two,
+      .agenda-plus-three,
+      .agenda-plus-filter-line {
+        grid-template-columns: 1fr;
+      }
+    }
+  `;
+
+  document.head.appendChild(style);
+
+  const hoje = new Date().toISOString().slice(0, 10);
+  let eventosCarregados = [];
+
+  const btn = document.createElement("button");
+  btn.className = "agenda-plus-fab";
+  btn.type = "button";
+  btn.textContent = "+ Adicionar agenda";
+
+  const modal = document.createElement("div");
+  modal.className = "agenda-plus-overlay";
+  modal.innerHTML = `
+    <div class="agenda-plus-card">
+      <div class="agenda-plus-top">
+        <div>
+          <h2>Agenda do dia</h2>
+          <p>Agenda manual primeiro. Depois aparecem os eventos do Supera.</p>
+        </div>
+        <button class="agenda-plus-close" type="button">×</button>
+      </div>
+
+      <div class="agenda-plus-grid">
+        <section class="agenda-plus-box">
+          <h3>Eventos</h3>
+
+          <div class="agenda-plus-three">
+            <div class="agenda-plus-field">
+              <label>Data</label>
+              <input id="agendaPlusData" type="date" value="${hoje}">
+            </div>
+
+            <div class="agenda-plus-field">
+              <label>Origem</label>
+              <select id="agendaPlusFiltroOrigem">
+                <option value="todos">Todas</option>
+                <option value="manual">Somente manual</option>
+                <option value="supera">Somente Supera</option>
+              </select>
+            </div>
+
+            <div class="agenda-plus-field">
+              <label>Responsável</label>
+              <select id="agendaPlusFiltroResponsavel">
+                <option value="todos">Todos</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="agenda-plus-load" type="button">Carregar dia</button>
+
+          <div id="agendaPlusLista" style="margin-top:14px;">
+            Clique em carregar dia.
+          </div>
+        </section>
+
+        <section class="agenda-plus-box">
+          <h3>Adicionar item manual</h3>
+
+          <form id="agendaPlusForm">
+            <div class="agenda-plus-field">
+              <label>Título</label>
+              <input name="titulo" required placeholder="Ex: Reunião com Renato">
+            </div>
+
+            <div class="agenda-plus-two">
+              <div class="agenda-plus-field">
+                <label>Hora inicial</label>
+                <input name="horaInicial" type="time">
+              </div>
+
+              <div class="agenda-plus-field">
+                <label>Hora final</label>
+                <input name="horaFinal" type="time">
+              </div>
+            </div>
+
+            <div class="agenda-plus-field">
+              <label>Tipo</label>
+              <select name="tipo">
+                <option value="reuniao">Reunião</option>
+                <option value="comercial">Comercial</option>
+                <option value="visita">Visita</option>
+                <option value="pessoal">Pessoal</option>
+                <option value="medico">Médico</option>
+                <option value="tarefa">Tarefa</option>
+                <option value="outro">Outro</option>
+              </select>
+            </div>
+
+            <div class="agenda-plus-field">
+              <label>Status</label>
+              <div class="status-bolinhas">
+                <label class="status-bolinha-option">
+                  <input type="radio" name="status" value="confirmado" checked>
+                  <span class="status-bolinha confirmado"></span>
+                  Confirmado
+                </label>
+
+                <label class="status-bolinha-option">
+                  <input type="radio" name="status" value="em espera">
+                  <span class="status-bolinha espera"></span>
+                  Em espera
+                </label>
+
+                <label class="status-bolinha-option">
+                  <input type="radio" name="status" value="cancelado">
+                  <span class="status-bolinha cancelado"></span>
+                  Cancelado
+                </label>
+              </div>
+            </div>
+
+            <div class="agenda-plus-field">
+              <label>Visibilidade</label>
+              <select name="visibilidade">
+                <option value="privado">Privado</option>
+                <option value="equipe">Equipe</option>
+                <option value="todos">Todos</option>
+              </select>
+            </div>
+
+            <div class="agenda-plus-field">
+              <label>Descrição</label>
+              <textarea name="descricao" placeholder="Observações..."></textarea>
+            </div>
+
+            <button class="agenda-plus-save" type="submit">Salvar na agenda</button>
+          </form>
+        </section>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  function colocarBotaoNoTopo() {
+    const botoes = Array.from(document.querySelectorAll("a, button"));
+    const importar = botoes.find((el) => /importar novo pdf/i.test(el.textContent || ""));
+    const voltar = botoes.find((el) => /voltar ao painel/i.test(el.textContent || ""));
+    const alvo = importar || voltar;
+
+    if (alvo && alvo.parentElement) {
+      const grupo = alvo.parentElement;
+      grupo.style.display = "flex";
+      grupo.style.gap = "10px";
+      grupo.style.flexWrap = "wrap";
+      grupo.style.alignItems = "center";
+      grupo.insertBefore(btn, alvo);
+      return;
+    }
+
+    const main = document.querySelector("main") || document.body;
+    main.insertBefore(btn, main.firstChild);
+  }
+
+  colocarBotaoNoTopo();
+
+  const fechar = modal.querySelector(".agenda-plus-close");
+  const carregar = modal.querySelector(".agenda-plus-load");
+  const inputData = modal.querySelector("#agendaPlusData");
+  const filtroOrigem = modal.querySelector("#agendaPlusFiltroOrigem");
+  const filtroResponsavel = modal.querySelector("#agendaPlusFiltroResponsavel");
+  const lista = modal.querySelector("#agendaPlusLista");
+  const form = modal.querySelector("#agendaPlusForm");
+
+  function statusClasse(status) {
+    const s = String(status || "confirmado").toLowerCase();
+    if (s.includes("cancel")) return "cancelado";
+    if (s.includes("espera")) return "em-espera";
+    return "confirmado";
+  }
+
+  function responsavelEvento(ev) {
+    return ev.responsavelNome || ev.criadoPorNome || ev.responsavelEmail || ev.criadoPorEmail || (ev.origem === "supera" ? "Supera" : "Sem responsável");
+  }
+
+  function atualizarFiltroResponsavel(eventos) {
+    const atual = filtroResponsavel.value || "todos";
+    const nomes = [...new Set(eventos.map(responsavelEvento).filter(Boolean))].sort();
+
+    filtroResponsavel.innerHTML = `<option value="todos">Todos</option>` + nomes.map((nome) => {
+      const safe = String(nome).replace(/"/g, "&quot;");
+      return `<option value="${safe}">${nome}</option>`;
+    }).join("");
+
+    if (nomes.includes(atual)) {
+      filtroResponsavel.value = atual;
+    }
+  }
+
+  function aplicarFiltros() {
+    const origem = filtroOrigem.value;
+    const responsavel = filtroResponsavel.value;
+
+    let eventos = [...eventosCarregados];
+
+    if (origem !== "todos") {
+      eventos = eventos.filter((ev) => ev.origem === origem);
+    }
+
+    if (responsavel !== "todos") {
+      eventos = eventos.filter((ev) => responsavelEvento(ev) === responsavel);
+    }
+
+    // Garante novamente: manual primeiro.
+    eventos.sort((a, b) => {
+      if (a.origem !== b.origem) {
+        if (a.origem === "manual") return -1;
+        if (b.origem === "manual") return 1;
+      }
+
+      const ha = `${a.horaInicial || ""}`;
+      const hb = `${b.horaInicial || ""}`;
+      return ha.localeCompare(hb);
+    });
+
+    if (!eventos.length) {
+      lista.innerHTML = "Nenhum evento encontrado com esses filtros.";
+      return;
+    }
+
+    lista.innerHTML = eventos.map((ev) => `
+      <div class="agenda-plus-event ${statusClasse(ev.status)} ${ev.origem === "manual" ? "manual" : "supera"}" data-id="${ev.id}" data-origem="${ev.origem}">
+        <span class="agenda-plus-tag ${ev.origem === "manual" ? "manual-tag" : "supera-tag"}">
+          ${ev.origem === "manual" ? "Agenda manual" : "Supera"}
+        </span>
+
+        <strong>${ev.titulo || "Sem título"}</strong>
+
+        <small>
+          Status: ${ev.status || "confirmado"}
+          ${ev.horaInicial ? `<br>Horário: ${String(ev.horaInicial).slice(0,5)}${ev.horaFinal ? " até " + String(ev.horaFinal).slice(0,5) : ""}` : ""}
+          ${ev.sala ? `<br>Sala: ${ev.sala}` : ""}
+          ${ev.empresa ? `<br>Empresa: ${ev.empresa}` : ""}
+          <br>Responsável: ${responsavelEvento(ev)}
+        </small>
+
+        <div class="agenda-plus-status">
+          <button type="button" data-status="confirmado">🟢 Confirmado</button>
+          <button type="button" data-status="em espera">🟣 Em espera</button>
+          <button type="button" data-status="cancelado">🔴 Cancelado</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  async function carregarEventos() {
+    const data = inputData.value || hoje;
+    lista.innerHTML = "Carregando...";
+
+    try {
+      const resp = await fetch(`/api/agenda-dia?data=${encodeURIComponent(data)}`);
+      const json = await resp.json();
+
+      if (!json.ok) {
+        lista.innerHTML = "Erro: " + (json.message || "Não foi possível carregar agenda.");
+        return;
+      }
+
+      eventosCarregados = json.eventos || [];
+
+      atualizarFiltroResponsavel(eventosCarregados);
+      aplicarFiltros();
+    } catch (err) {
+      lista.innerHTML = "Erro de conexão com a API: " + err.message;
+    }
+  }
+
+  async function alterarStatus(card, status) {
+    const origem = card.dataset.origem;
+    const id = card.dataset.id;
+
+    const resp = await fetch(`/api/agenda-dia/status/${origem}/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status })
+    });
+
+    const json = await resp.json();
+
+    if (!json.ok) {
+      alert(json.message || "Erro ao alterar status.");
+      return;
+    }
+
+    await carregarEventos();
+  }
+
+  btn.addEventListener("click", () => {
+    modal.classList.add("ativo");
+    carregarEventos();
+  });
+
+  fechar.addEventListener("click", () => {
+    modal.classList.remove("ativo");
+  });
+
+  carregar.addEventListener("click", carregarEventos);
+  filtroOrigem.addEventListener("change", aplicarFiltros);
+  filtroResponsavel.addEventListener("change", aplicarFiltros);
+
+  lista.addEventListener("click", async (event) => {
+    const botao = event.target.closest("button[data-status]");
+    if (!botao) return;
+
+    const card = botao.closest(".agenda-plus-event");
+    if (!card) return;
+
+    await alterarStatus(card, botao.dataset.status);
+  });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const dados = Object.fromEntries(new FormData(form).entries());
+    dados.data = inputData.value || hoje;
+
+    const resp = await fetch("/api/agenda-dia/manual", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dados)
+    });
+
+    const json = await resp.json();
+
+    if (!json.ok) {
+      alert(json.message || "Erro ao salvar item.");
+      return;
+    }
+
+    form.reset();
+    form.querySelector('input[name="status"][value="confirmado"]').checked = true;
+
+    await carregarEventos();
+    alert("Item salvo na agenda.");
+  });
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<!-- CEJAS_ORIGEM_E_BOLINHAS_FINAL_START -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("✅ Filtro Origem + bolinhas finais carregados.");
+
+  const style = document.createElement("style");
+  style.innerHTML = `
+    .cejas-origem-filter {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .cejas-origem-filter label {
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.65);
+    }
+
+    .cejas-origem-filter select {
+      height: 54px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.035);
+      color: white;
+      padding: 0 16px;
+      font-weight: 800;
+      outline: none;
+    }
+
+    .cejas-dia-card-plus {
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      padding: 16px;
+      margin-top: 12px;
+      background: rgba(255,255,255,.035);
+    }
+
+    .cejas-dia-card-plus.manual {
+      border-left: 5px solid #a855f7;
+      background: linear-gradient(135deg, rgba(168,85,247,.14), rgba(255,255,255,.035));
+    }
+
+    .cejas-dia-card-plus.supera {
+      border-left: 5px solid #22c55e;
+    }
+
+    .cejas-dia-card-plus.cancelado {
+      border-left-color: #ef4444;
+    }
+
+    .cejas-dia-card-plus.em-espera {
+      border-left-color: #a855f7;
+    }
+
+    .cejas-dia-card-topo {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .cejas-dia-card-plus h3 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.15;
+      color: white;
+    }
+
+    .cejas-dia-pill-status {
+      flex: 0 0 auto;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .cejas-dia-pill-status.confirmado {
+      background: rgba(34,197,94,.18);
+      color: #4ade80;
+    }
+
+    .cejas-dia-pill-status.em-espera {
+      background: rgba(168,85,247,.20);
+      color: #d8b4fe;
+    }
+
+    .cejas-dia-pill-status.cancelado {
+      background: rgba(239,68,68,.18);
+      color: #f87171;
+    }
+
+    .cejas-dia-tag-origem {
+      display: inline-flex;
+      width: fit-content;
+      border-radius: 999px;
+      padding: 4px 8px;
+      margin-bottom: 8px;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    .cejas-dia-tag-origem.manual {
+      background: rgba(168,85,247,.24);
+      color: #ddd6fe;
+    }
+
+    .cejas-dia-tag-origem.supera {
+      background: rgba(34,197,94,.16);
+      color: #bbf7d0;
+    }
+
+    .cejas-dia-card-plus p {
+      margin: 0;
+      color: rgba(255,255,255,.78);
+      line-height: 1.55;
+      font-weight: 650;
+    }
+
+    .cejas-status-bolinhas {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 13px;
+      padding-top: 11px;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+
+    .cejas-status-bolinhas button {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,.28);
+      cursor: pointer;
+      transition: .15s ease;
+      box-shadow: 0 0 0 4px rgba(255,255,255,.04);
+    }
+
+    .cejas-status-bolinhas button:hover {
+      transform: scale(1.16);
+      filter: brightness(1.2);
+    }
+
+    .cejas-status-bolinhas button.ativo {
+      border-color: white;
+      box-shadow: 0 0 0 5px rgba(255,255,255,.16);
+    }
+
+    .cejas-bolinha-confirmado {
+      background: #22c55e;
+    }
+
+    .cejas-bolinha-espera {
+      background: #a855f7;
+    }
+
+    .cejas-bolinha-cancelado {
+      background: #ef4444;
+    }
+
+    .cejas-dia-vazio {
+      border: 1px dashed rgba(255,255,255,.16);
+      border-radius: 16px;
+      padding: 14px;
+      color: rgba(255,255,255,.68);
+      font-weight: 700;
+      margin-top: 12px;
+    }
+  `;
+  document.head.appendChild(style);
+
+  let eventosDia = [];
+  let dataAtual = null;
+
+  function normalizarStatus(status) {
+    const s = String(status || "confirmado").toLowerCase();
+
+    if (s.includes("cancel")) return "cancelado";
+    if (s.includes("espera") || s.includes("pendente")) return "em espera";
+
+    return "confirmado";
+  }
+
+  function classeStatus(status) {
+    return normalizarStatus(status).replace(/\s+/g, "-");
+  }
+
+  function isoParaBR(iso) {
+    const p = String(iso || "").split("-");
+    if (p.length !== 3) return iso;
+    return `${p[2]}/${p[1]}/${p[0]}`;
+  }
+
+  function brParaISO(br) {
+    const m = String(br || "").match(/(\d{2})\/(\d{2})\/(\d{4})/);
+    if (!m) return new Date().toISOString().slice(0, 10);
+    return `${m[3]}-${m[2]}-${m[1]}`;
+  }
+
+  function valorBR(valor) {
+    return Number(valor || 0).toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
+  }
+
+  function responsavel(ev) {
+    return ev.responsavelNome || ev.criadoPorNome || ev.responsavelEmail || ev.criadoPorEmail || (ev.origem === "supera" ? "Supera" : "Sem responsável");
+  }
+
+  function encontrarFiltroContainer() {
+    const labels = Array.from(document.querySelectorAll("label, div, span"));
+    const statusLabel = labels.find(el => (el.textContent || "").trim().toLowerCase() === "status");
+
+    if (!statusLabel) return null;
+
+    let bloco = statusLabel.parentElement;
+
+    for (let i = 0; i < 5; i++) {
+      if (!bloco) break;
+
+      const rect = bloco.getBoundingClientRect();
+
+      if (rect.width > 600 && rect.height > 60) {
+        return bloco;
+      }
+
+      bloco = bloco.parentElement;
+    }
+
+    return null;
+  }
+
+  function inserirFiltroOrigem() {
+    if (document.querySelector("#cejasFiltroOrigemAgenda")) return;
+
+    const container = encontrarFiltroContainer();
+
+    if (!container) {
+      setTimeout(inserirFiltroOrigem, 1000);
+      return;
+    }
+
+    const field = document.createElement("div");
+    field.className = "cejas-origem-filter";
+    field.innerHTML = `
+      <label>Origem</label>
+      <select id="cejasFiltroOrigemAgenda">
+        <option value="todos">Todos</option>
+        <option value="manual">Agenda manual</option>
+        <option value="supera">Supera</option>
+      </select>
+    `;
+
+    const acaoLabel = Array.from(container.querySelectorAll("label, div, span"))
+      .find(el => (el.textContent || "").trim().toLowerCase() === "ação");
+
+    if (acaoLabel && acaoLabel.parentElement) {
+      container.insertBefore(field, acaoLabel.parentElement);
+    } else {
+      container.appendChild(field);
+    }
+
+    field.querySelector("select").addEventListener("change", renderizarAgendaDia);
+  }
+
+  function encontrarAgendaDiaCard() {
+    const candidatos = Array.from(document.querySelectorAll("aside, section, div, article"));
+
+    return candidatos.find((el) => {
+      const texto = (el.innerText || "").toLowerCase();
+      const rect = el.getBoundingClientRect();
+
+      return texto.includes("agenda do dia") &&
+        texto.includes("eventos") &&
+        texto.includes("receita") &&
+        rect.width > 260 &&
+        rect.width < 620 &&
+        rect.height > 180;
+    });
+  }
+
+  function dataDaAgenda(card) {
+    const texto = card?.innerText || "";
+    const m = texto.match(/(\d{2}\/\d{2}\/\d{4})/);
+    if (m) return brParaISO(m[1]);
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function montarBaseAgendaDia(card) {
+    if (card.dataset.cejasRenderFinal === "true") return;
+
+    card.dataset.cejasRenderFinal = "true";
+    dataAtual = dataDaAgenda(card);
+
+    card.innerHTML = `
+      <h2 style="margin:0 0 4px;">Agenda do dia</h2>
+      <p style="margin:0;color:rgba(255,255,255,.68);font-weight:700;">${isoParaBR(dataAtual)}</p>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0;">
+        <div style="border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:10px;">
+          <small style="opacity:.7;font-weight:900;">EVENTOS</small>
+          <strong id="cejasTotalDia" style="display:block;font-size:22px;">0</strong>
+        </div>
+
+        <div style="border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:10px;">
+          <small style="opacity:.7;font-weight:900;">RECEITA</small>
+          <strong id="cejasReceitaDia" style="display:block;font-size:22px;">R$ 0,00</strong>
+        </div>
+
+        <div style="border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:10px;">
+          <small style="opacity:.7;font-weight:900;">PENDENTES</small>
+          <strong id="cejasPendentesDia" style="display:block;font-size:22px;">0</strong>
+        </div>
+      </div>
+
+      <div id="cejasAgendaDiaLista">
+        <div class="cejas-dia-vazio">Carregando agenda...</div>
+      </div>
+    `;
+  }
+
+  function eventosFiltrados() {
+    const origem = document.querySelector("#cejasFiltroOrigemAgenda")?.value || "todos";
+    const statusSelect = Array.from(document.querySelectorAll("select")).find((select) => {
+      const label = select.closest("div")?.innerText?.toLowerCase() || "";
+      return label.includes("status");
+    });
+
+    const status = statusSelect?.value || "Todos";
+
+    let eventos = [...eventosDia];
+
+    if (origem !== "todos") {
+      eventos = eventos.filter(ev => ev.origem === origem);
+    }
+
+    if (status && !/todos/i.test(status)) {
+      eventos = eventos.filter(ev => normalizarStatus(ev.status) === normalizarStatus(status));
+    }
+
+    eventos.sort((a, b) => {
+      if (a.origem !== b.origem) {
+        if (a.origem === "manual") return -1;
+        if (b.origem === "manual") return 1;
+      }
+
+      return String(a.horaInicial || "").localeCompare(String(b.horaInicial || ""));
+    });
+
+    return eventos;
+  }
+
+  function renderizarAgendaDia() {
+    const lista = document.querySelector("#cejasAgendaDiaLista");
+    if (!lista) return;
+
+    const eventos = eventosFiltrados();
+
+    const totalEl = document.querySelector("#cejasTotalDia");
+    const receitaEl = document.querySelector("#cejasReceitaDia");
+    const pendentesEl = document.querySelector("#cejasPendentesDia");
+
+    const receita = eventos
+      .filter(ev => ev.origem === "supera")
+      .reduce((soma, ev) => soma + Number(ev.valor || 0), 0);
+
+    const pendentes = eventos.filter(ev => normalizarStatus(ev.status) === "em espera").length;
+
+    if (totalEl) totalEl.textContent = String(eventos.length);
+    if (receitaEl) receitaEl.textContent = valorBR(receita);
+    if (pendentesEl) pendentesEl.textContent = String(pendentes);
+
+    if (!eventos.length) {
+      lista.innerHTML = `<div class="cejas-dia-vazio">Nenhum evento encontrado.</div>`;
+      return;
+    }
+
+    lista.innerHTML = eventos.map(ev => {
+      const status = normalizarStatus(ev.status);
+      const classe = classeStatus(status);
+      const origemClasse = ev.origem === "manual" ? "manual" : "supera";
+
+      return `
+        <article class="cejas-dia-card-plus ${origemClasse} ${classe}" data-origem="${ev.origem}" data-id="${ev.id}">
+          <span class="cejas-dia-tag-origem ${origemClasse}">
+            ${ev.origem === "manual" ? "Agenda manual" : "Supera"}
+          </span>
+
+          <div class="cejas-dia-card-topo">
+            <h3>${ev.titulo || "Sem título"}</h3>
+            <span class="cejas-dia-pill-status ${classe}">${status}</span>
+          </div>
+
+          <p>
+            ${ev.horaInicial ? `<b>Horário:</b> ${String(ev.horaInicial).slice(0,5)}${ev.horaFinal ? " até " + String(ev.horaFinal).slice(0,5) : ""}<br>` : ""}
+            ${ev.sala ? `<b>Sala:</b> ${ev.sala}<br>` : ""}
+            ${ev.empresa ? `<b>Empresa:</b> ${ev.empresa}<br>` : ""}
+            ${ev.participantes ? `<b>Participantes:</b> ${ev.participantes}<br>` : ""}
+            <b>Responsável:</b> ${responsavel(ev)}
+            ${ev.valor ? `<br><br><b>${valorBR(ev.valor)}</b>` : ""}
+          </p>
+
+          <div class="cejas-status-bolinhas">
+            <button title="Confirmado" type="button" class="cejas-bolinha-confirmado ${status === "confirmado" ? "ativo" : ""}" data-status="confirmado"></button>
+            <button title="Em espera" type="button" class="cejas-bolinha-espera ${status === "em espera" ? "ativo" : ""}" data-status="em espera"></button>
+            <button title="Cancelado" type="button" class="cejas-bolinha-cancelado ${status === "cancelado" ? "ativo" : ""}" data-status="cancelado"></button>
+          </div>
+        </article>
+      `;
+    }).join("");
+  }
+
+  async function carregarAgendaDia() {
+    inserirFiltroOrigem();
+
+    const card = encontrarAgendaDiaCard();
+
+    if (!card) {
+      setTimeout(carregarAgendaDia, 1000);
+      return;
+    }
+
+    montarBaseAgendaDia(card);
+
+    try {
+      const resp = await fetch(`/api/agenda-dia?data=${encodeURIComponent(dataAtual)}`);
+      const json = await resp.json();
+
+      if (!json.ok) {
+        document.querySelector("#cejasAgendaDiaLista").innerHTML = `<div class="cejas-dia-vazio">Erro: ${json.message}</div>`;
+        return;
+      }
+
+      eventosDia = json.eventos || [];
+      renderizarAgendaDia();
+    } catch (error) {
+      document.querySelector("#cejasAgendaDiaLista").innerHTML = `<div class="cejas-dia-vazio">Erro: ${error.message}</div>`;
+    }
+  }
+
+  async function alterarStatus(card, status) {
+    const origem = card.dataset.origem;
+    const id = card.dataset.id;
+
+    const resp = await fetch(`/api/agenda-dia/status/${origem}/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status })
+    });
+
+    const json = await resp.json();
+
+    if (!json.ok) {
+      alert(json.message || "Erro ao alterar status.");
+      return;
+    }
+
+    const item = eventosDia.find(ev => ev.id === id && ev.origem === origem);
+    if (item) item.status = status;
+
+    renderizarAgendaDia();
+  }
+
+  document.addEventListener("click", async (event) => {
+    const bolinha = event.target.closest(".cejas-status-bolinhas button[data-status]");
+    if (!bolinha) return;
+
+    const card = bolinha.closest(".cejas-dia-card-plus");
+    if (!card) return;
+
+    await alterarStatus(card, bolinha.dataset.status);
+  });
+
+  const originalFetch = window.fetch;
+
+  window.fetch = async function(...args) {
+    const resposta = await originalFetch.apply(this, args);
+
+    try {
+      const url = String(args[0] || "");
+      if (url.includes("/api/agenda-dia/manual")) {
+        setTimeout(carregarAgendaDia, 700);
+      }
+    } catch (_) {}
+
+    return resposta;
+  };
+
+  setTimeout(carregarAgendaDia, 800);
+});
+</script>
+<!-- CEJAS_ORIGEM_E_BOLINHAS_FINAL_END -->
 
 </body>
 </html>

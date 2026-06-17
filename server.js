@@ -1,4 +1,10 @@
 const express = require("express");
+const { registrarOrcamentoPdfServidor } = require("./lib/orcamento-pdf-servidor");
+const { registrarServidorPdfViewer } = require("./lib/servidor-pdf-viewer");
+const { registrarDashboardPermissoesOrcamento } = require("./lib/dashboard-permissoes-orcamento");
+const { registrarAgendaDiaLivre } = require("./lib/agenda-dia-livre");
+const { registrarAgendaDiaApi } = require("./lib/agenda-dia-api");
+const { registrarRotasCejasFase2 } = require("./lib/cejas-fase2");
 const { syncRelatorioAtualComSupabase } = require("./lib/sync-relatorio-supabase");
 const session = require("express-session");
 const bcrypt = require("bcryptjs");
@@ -41,6 +47,94 @@ async function parsePdfBuffer(buffer) {
 require("dotenv").config();
 
 const app = express();
+
+
+// Proteção CEJAS: somente Superadmin pode excluir arquivos/pastas do Servidor.
+// Essa proteção envolve todas as rotas DELETE /api/servidor...
+function cejasUsuarioSessaoParaExclusao(req) {
+  const sessao = req.session || {};
+  const usuario = sessao.usuario || sessao.user || sessao.admin || {};
+
+  return {
+    email:
+      usuario.email ||
+      sessao.email ||
+      sessao.userEmail ||
+      sessao.adminEmail ||
+      null,
+    tipo:
+      usuario.tipo ||
+      usuario.tipo_usuario ||
+      usuario.role ||
+      sessao.tipo ||
+      null,
+    permissoes:
+      usuario.permissoes ||
+      usuario.permissions ||
+      sessao.permissoes ||
+      []
+  };
+}
+
+function cejasEhSuperadmin(req) {
+  const usuario = cejasUsuarioSessaoParaExclusao(req);
+
+  if (process.env.ADMIN_EMAIL && usuario.email === process.env.ADMIN_EMAIL) return true;
+  if (usuario.tipo === "superadmin" || usuario.tipo === "admin_master") return true;
+  if (Array.isArray(usuario.permissoes) && usuario.permissoes.includes("*")) return true;
+
+  return false;
+}
+
+const cejasOriginalDelete = app.delete.bind(app);
+
+app.delete = function(route, ...handlers) {
+  if (String(route).startsWith("/api/servidor")) {
+    return cejasOriginalDelete(route, (req, res, next) => {
+      if (!cejasEhSuperadmin(req)) {
+        return res.status(403).json({
+          ok: false,
+          message: "Somente o Superadmin pode excluir arquivos ou pastas do servidor."
+        });
+      }
+
+      next();
+    }, ...handlers);
+  }
+
+  return cejasOriginalDelete(route, ...handlers);
+};
+
+// Bloqueia o fluxo antigo que salvava orçamento em JSON.
+app.post("/api/orcamentos/auto-salvar-servidor", (_req, res) => {
+  return res.status(410).json({
+    ok: false,
+    message: "Fluxo antigo desativado. Orçamentos agora devem ser salvos somente em PDF."
+  });
+});
+
+
+
+registrarAgendaDiaLivre(app, express);
+
+
+
+
+
+// Arquivo JS do Agenda Plus servido diretamente para evitar erro 404/MIME.
+app.get("/js/agenda-plus.js", (_req, res) => {
+  const arquivo = path.join(__dirname, "public", "js", "agenda-plus.js");
+
+  if (!fs.existsSync(arquivo)) {
+    return res.status(404).type("text/plain").send("agenda-plus.js não encontrado");
+  }
+
+  res.type("application/javascript");
+  res.sendFile(arquivo);
+});
+
+
+app.use("/js", express.static(path.join(__dirname, "public", "js")));
 const PORT = process.env.PORT || 5500;
 
 const IDLE_SESSION_MS = 5 * 60 * 1000;
@@ -130,8 +224,9 @@ function isAuthenticated(req, res, next) {
   next();
 }
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.urlencoded({ extended: true, limit: "60mb" }));
+app.use("/js", express.static(path.join(__dirname, "public/js")));
+app.use(express.json({ limit: "60mb" }));
 
 app.use(
   session({
@@ -1777,6 +1872,36 @@ function iniciarAutoSyncRelatorioSupabase() {
 
 iniciarAutoSyncRelatorioSupabase();
 
+
+
+registrarRotasCejasFase2(app);
+
+
+
+
+
+
+
+
+
+
+
+registrarAgendaDiaApi(app);
+
+
+registrarDashboardPermissoesOrcamento(app);
+
+
+
+
+
+
+
+
+registrarServidorPdfViewer(app);
+
+
+registrarOrcamentoPdfServidor(app);
 
 app.listen(PORT, () => {
   console.log(`✅ Sistema de Gestão CEJAS rodando em http://localhost:${PORT}`);

@@ -556,6 +556,7 @@
         <a href="tarefas.html">☑ Tarefas Pendentes</a>
         <a class="active" href="servidor.html">▣ Servidor</a>
         <a href="usuarios.html">◌ Acessos / Usuários</a>
+        <a href="contratos.html">Contratos</a>
         <a href="configuracoes.html">⚙ Configurações</a>
       </nav>
 
@@ -1006,5 +1007,220 @@
 
     loadTree();
   </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.__CEJAS_MODAL_PDF_SERVIDOR__) return;
+  window.__CEJAS_MODAL_PDF_SERVIDOR__ = true;
+
+  const style = document.createElement("style");
+  style.innerHTML = `
+    .pdf-servidor-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,.78);
+      backdrop-filter: blur(10px);
+      padding: 24px;
+    }
+
+    .pdf-servidor-overlay.ativo {
+      display: flex;
+    }
+
+    .pdf-servidor-card {
+      width: min(980px, 96vw);
+      height: min(820px, 92vh);
+      border-radius: 24px;
+      overflow: hidden;
+      background: #111827;
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 30px 100px rgba(0,0,0,.65);
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .pdf-servidor-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      color: white;
+      background: rgba(255,255,255,.06);
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+
+    .pdf-servidor-top strong {
+      font-size: 15px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .pdf-servidor-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pdf-servidor-actions a,
+    .pdf-servidor-actions button {
+      border: 0;
+      border-radius: 12px;
+      padding: 9px 12px;
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      background: rgba(255,255,255,.12);
+    }
+
+    .pdf-servidor-actions a {
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    }
+
+    .pdf-servidor-frame {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: white;
+    }
+  `;
+  document.head.appendChild(style);
+
+  const overlay = document.createElement("div");
+  overlay.className = "pdf-servidor-overlay";
+  overlay.innerHTML = `
+    <div class="pdf-servidor-card">
+      <div class="pdf-servidor-top">
+        <strong id="pdfServidorTitulo">PDF</strong>
+
+        <div class="pdf-servidor-actions">
+          <a id="pdfServidorBaixar" href="#" download>Baixar PDF</a>
+          <button type="button" id="pdfServidorFechar">Fechar</button>
+        </div>
+      </div>
+
+      <iframe class="pdf-servidor-frame" id="pdfServidorFrame"></iframe>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  const frame = overlay.querySelector("#pdfServidorFrame");
+  const titulo = overlay.querySelector("#pdfServidorTitulo");
+  const baixar = overlay.querySelector("#pdfServidorBaixar");
+  const fechar = overlay.querySelector("#pdfServidorFechar");
+
+  function abrirPdfServidor(caminho) {
+    if (!caminho || !String(caminho).toLowerCase().endsWith(".pdf")) {
+      alert("Este arquivo não é PDF.");
+      return;
+    }
+
+    const url = "/api/servidor/visualizar-pdf?path=" + encodeURIComponent(caminho);
+
+    titulo.textContent = caminho.split("/").pop();
+    frame.src = url;
+    baixar.href = url;
+    baixar.download = caminho.split("/").pop();
+    overlay.classList.add("ativo");
+  }
+
+  fechar.addEventListener("click", () => {
+    overlay.classList.remove("ativo");
+    frame.src = "";
+  });
+
+  overlay.addEventListener("click", (event) => {
+    if (event.target === overlay) {
+      overlay.classList.remove("ativo");
+      frame.src = "";
+    }
+  });
+
+  const antigaAbrirArquivo = window.abrirArquivo;
+
+  window.abrirArquivo = function(caminho) {
+    if (String(caminho || "").toLowerCase().endsWith(".pdf")) {
+      abrirPdfServidor(caminho);
+      return;
+    }
+
+    if (typeof antigaAbrirArquivo === "function") {
+      return antigaAbrirArquivo.apply(this, arguments);
+    }
+
+    alert("Este arquivo não é PDF.");
+  };
+
+  document.addEventListener("click", (event) => {
+    const botao = event.target.closest("button, a");
+    if (!botao) return;
+
+    const texto = String(botao.textContent || "").trim().toLowerCase();
+
+    if (texto !== "abrir") return;
+
+    const onclick = botao.getAttribute("onclick") || "";
+    const match = onclick.match(/abrirArquivo\(['"](.+?)['"]\)/);
+
+    if (match && match[1] && match[1].toLowerCase().endsWith(".pdf")) {
+      event.preventDefault();
+      event.stopPropagation();
+      abrirPdfServidor(match[1]);
+    }
+  }, true);
+
+  window.abrirPdfServidor = abrirPdfServidor;
+});
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  if (window.__CEJAS_PROTECAO_EXCLUIR_SERVIDOR__) return;
+  window.__CEJAS_PROTECAO_EXCLUIR_SERVIDOR__ = true;
+
+  async function usuarioAtual() {
+    try {
+      const resposta = await fetch("/api/usuario-atual");
+      const dados = await resposta.json();
+      return dados.usuario || {};
+    } catch {
+      return {};
+    }
+  }
+
+  function esconderExcluir() {
+    document.querySelectorAll("button, a").forEach((el) => {
+      const texto = String(el.textContent || "").trim().toLowerCase();
+
+      if (texto === "excluir" || texto.includes("excluir")) {
+        el.style.display = "none";
+      }
+    });
+  }
+
+  const usuario = await usuarioAtual();
+  const superadmin =
+    usuario.superadmin === true ||
+    usuario.tipo === "superadmin" ||
+    usuario.tipo === "admin_master" ||
+    (Array.isArray(usuario.permissoes) && usuario.permissoes.includes("*"));
+
+  if (!superadmin) {
+    esconderExcluir();
+
+    const observer = new MutationObserver(esconderExcluir);
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+});
+</script>
+
 </body>
 </html>

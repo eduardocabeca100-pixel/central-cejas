@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contratos | Sistema de Gestão CEJAS</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, Arial, sans-serif;
+      color: white;
+      background:
+        radial-gradient(circle at top left, rgba(139,92,246,.25), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(236,72,153,.16), transparent 35%),
+        #070711;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      min-height: 100vh;
+    }
+
+    aside {
+      border-right: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.04);
+      padding: 28px 20px;
+    }
+
+    .brand {
+      font-weight: 900;
+      font-size: 20px;
+      margin-bottom: 30px;
+    }
+
+    nav a {
+      display: block;
+      color: rgba(255,255,255,.76);
+      text-decoration: none;
+      padding: 12px 14px;
+      border-radius: 14px;
+      margin-bottom: 6px;
+    }
+
+    nav a:hover,
+    nav a.active {
+      color: white;
+      background: rgba(255,255,255,.09);
+    }
+
+    main {
+      padding: 34px;
+    }
+
+    .hero {
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 28px;
+      padding: 28px;
+      background: linear-gradient(135deg, rgba(139,92,246,.18), rgba(236,72,153,.08));
+      box-shadow: 0 30px 90px rgba(0,0,0,.25);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(28px, 4vw, 48px);
+    }
+
+    p {
+      color: rgba(255,255,255,.72);
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 22px;
+    }
+
+    .card {
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 22px;
+      padding: 18px;
+      background: rgba(255,255,255,.055);
+    }
+
+    .card strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        display: none;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside>
+      <div class="brand">Sistema CEJAS</div>
+      <nav>
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/agenda.html">Agenda</a>
+        <a href="/orcamentos.html">Orçamentos</a>
+        <a href="/servidor.html">Servidor</a>
+        <a href="/tarefas.html">Tarefas</a>
+        <a href="/contratos.html" class="active">Contratos</a>
+        <a href="/configuracoes.html">Configurações</a>
+      </nav>
+    </aside>
+
+    <main>
+      <section class="hero">
+        <h1>Contratos</h1>
+        <p>
+          Esta aba será usada para modelos de contrato do CEJAS.
+          Primeiro vamos deixar a estrutura criada. Depois vamos colocar seu contrato base,
+          campos automáticos e geração do documento final.
+        </p>
+
+        <div class="grid">
+          <div class="card">
+            <strong>Modelo base</strong>
+            <p>Contrato padrão com os dados do cliente, evento, datas, valores e regras.</p>
+          </div>
+
+          <div class="card">
+            <strong>Preenchimento automático</strong>
+            <p>Os dados poderão vir do orçamento e da agenda para evitar retrabalho.</p>
+          </div>
+
+          <div class="card">
+            <strong>Arquivo final</strong>
+            <p>O contrato poderá ser salvo na mesma pasta do evento dentro do servidor CEJAS.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

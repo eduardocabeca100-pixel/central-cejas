@@ -523,6 +523,7 @@
         <a href="tarefas.html">☑ Tarefas Pendentes</a>
         <a href="servidor.html">▣ Servidor</a>
         <a href="usuarios.html">◌ Acessos / Usuários</a>
+        <a href="contratos.html">Contratos</a>
         <a href="configuracoes.html">⚙ Configurações</a>
       </nav>
 
@@ -848,6 +849,111 @@
 
   aplicarPermissoesMenu();
 })();
+</script>
+
+  
+  
+
+
+
+
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const resposta = await fetch("/api/usuario-atual");
+    const dados = await resposta.json();
+
+    if (!dados.ok) return;
+
+    const usuario = dados.usuario || {};
+    const modulos = dados.modulos || [];
+    const permitidosHref = new Set(modulos.map((m) => String(m.href || "").replace(/^\//, "")));
+    const permitidosNome = new Set(modulos.map((m) => String(m.nome || "").toLowerCase()));
+
+    function limparHref(href) {
+      return String(href || "")
+        .split("/")
+        .pop()
+        .split("?")[0]
+        .split("#")[0];
+    }
+
+    function moduloPermitidoPorTexto(texto) {
+      const t = String(texto || "").toLowerCase();
+
+      if (t.includes("agenda") && permitidosNome.has("agenda dinâmica")) return true;
+      if (t.includes("orçamento") && permitidosNome.has("orçamentos")) return true;
+      if (t.includes("importar") && permitidosNome.has("importar relatório")) return true;
+      if (t.includes("relatório") && permitidosNome.has("importar relatório")) return true;
+      if (t.includes("tarefa") && permitidosNome.has("tarefas pendentes")) return true;
+      if (t.includes("servidor") && permitidosNome.has("servidor")) return true;
+      if (t.includes("usuário") && permitidosNome.has("acessos / usuários")) return true;
+      if (t.includes("acesso") && permitidosNome.has("acessos / usuários")) return true;
+      if (t.includes("contrato") && permitidosNome.has("contratos")) return true;
+      if (t.includes("configura") && permitidosNome.has("configurações")) return true;
+      if (t.includes("painel") && permitidosNome.has("painel geral")) return true;
+
+      return false;
+    }
+
+    // Atualiza nome/cargo no card lateral.
+    document.querySelectorAll("body *").forEach((el) => {
+      if (!el.children.length) {
+        const txt = String(el.textContent || "").trim();
+
+        if (/^Eduardo$/i.test(txt) || /^Renato$/i.test(txt)) {
+          el.textContent = usuario.nome || txt;
+        }
+
+        if (/Super Admin|Superadmin|Administrador/i.test(txt)) {
+          el.textContent = usuario.cargo || (usuario.superadmin ? "Superadmin" : "Comercial");
+        }
+      }
+    });
+
+    // Esconde links não permitidos no menu.
+    document.querySelectorAll("a[href]").forEach((link) => {
+      const hrefLimpo = limparHref(link.getAttribute("href"));
+      const texto = link.textContent || "";
+
+      const ehModulo =
+        /agenda|orcamento|orçamentos|importar|relatorio|relatório|tarefas|servidor|usuarios|usuários|acessos|contratos|configuracoes|configurações|dashboard|painel/i.test(
+          `${hrefLimpo} ${texto}`
+        );
+
+      if (!ehModulo) return;
+
+      const permitidoPorHref = permitidosHref.has(hrefLimpo);
+      const permitidoPorTexto = moduloPermitidoPorTexto(texto);
+
+      if (!permitidoPorHref && !permitidoPorTexto) {
+        const bloco = link.closest("li, .card, .module, .module-card, .dashboard-card, article, nav a") || link;
+        bloco.style.display = "none";
+      }
+    });
+
+    // Esconde cards de módulos/ferramentas bloqueados.
+    document.querySelectorAll("article, .card, .module, .module-card, .dashboard-card, section div").forEach((card) => {
+      const texto = String(card.textContent || "");
+
+      const pareceModulo =
+        /agenda dinâmica|orçamentos|importar relatório|tarefas pendentes|servidor|acessos|usuários|contratos|configurações/i.test(texto);
+
+      if (!pareceModulo) return;
+
+      if (!moduloPermitidoPorTexto(texto)) {
+        card.style.display = "none";
+      }
+    });
+
+    console.log("✅ Permissões aplicadas no dashboard:", usuario.nome, usuario.cargo, modulos.map(m => m.nome));
+  } catch (error) {
+    console.log("⚠️ Não foi possível aplicar permissões no dashboard:", error.message);
+  }
+});
 </script>
 
 </body>
