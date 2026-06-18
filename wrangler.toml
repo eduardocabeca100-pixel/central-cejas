@@ -1,0 +1,31 @@
+name = "central-cejas"
+type = "javascript"
+account_id = ""
+workers_dev = true
+route = ""
+zone_id = ""
+main = "server.js"
+compatibility_date = "2024-12-16"
+
+# Variáveis de ambiente
+[env.production]
+name = "central-cejas-prod"
+routes = [
+  { pattern = "central-cejas.com/*", zone_name = "central-cejas.com" }
+]
+
+[build]
+cwd = "."
+command = "npm install"
+
+[build.upload]
+format = "modules"
+
+# Suporte a Node.js
+[env.production.build]
+command = "npm install"
+
+# Variáveis de ambiente - adicione suas variáveis aqui
+[env.production.vars]
+NODE_ENV = "production"
+PORT = "5500"
