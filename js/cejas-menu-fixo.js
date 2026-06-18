@@ -36,6 +36,14 @@
     }).join("");
   }
 
+  function aplicarMenu(nav, menu) {
+    const novoHtml = htmlMenu(menu);
+
+    if (nav.innerHTML.trim() !== novoHtml.trim()) {
+      nav.innerHTML = novoHtml;
+    }
+  }
+
   function limparAjuda() {
     document.querySelectorAll("aside *").forEach((el) => {
       const texto = String(el.textContent || "").toLowerCase();
@@ -92,15 +100,13 @@
       aside.appendChild(nav);
     }
 
+    aplicarMenu(nav, [...MENU_BASE, ...MENU_ADMIN]);
+
     const usuario = await buscarUsuario();
     const superadmin = Boolean(usuario.superadmin);
 
     const menu = superadmin ? [...MENU_BASE, ...MENU_ADMIN] : MENU_BASE;
-    const novoHtml = htmlMenu(menu);
-
-    if (nav.innerHTML.trim() !== novoHtml.trim()) {
-      nav.innerHTML = novoHtml;
-    }
+    aplicarMenu(nav, menu);
 
     atualizarUsuario(usuario);
     limparAjuda();

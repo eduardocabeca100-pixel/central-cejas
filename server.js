@@ -2104,6 +2104,27 @@ app.delete("/api/servidor/item", (req, res) => {
 
 app.use(express.static(path.join(__dirname), { dotfiles: "deny" }));
 
+app.use((error, _req, res, _next) => {
+  console.error("Erro interno tratado pelo servidor:", error);
+
+  let message = error.message || "Erro interno ao processar arquivo.";
+
+  if (error instanceof multer.MulterError) {
+    if (error.code === "LIMIT_FILE_SIZE") {
+      message = "Arquivo muito grande para upload.";
+    } else if (error.code === "LIMIT_FILE_COUNT") {
+      message = "Quantidade de arquivos acima do limite permitido.";
+    } else {
+      message = "Erro no upload: " + error.message;
+    }
+  }
+
+  return res.status(500).json({
+    ok: false,
+    message
+  });
+});
+
 
 // Sincronização automática do último relatório do Supera com o Supabase.
 // Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.

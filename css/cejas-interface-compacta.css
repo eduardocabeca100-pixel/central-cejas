@@ -1,0 +1,291 @@
+/* CEJAS: densidade visual compacta e estavel para uso em 100% do navegador. */
+@media (min-width: 900px) {
+  :root {
+    --cejas-sidebar-width: 180px;
+    --cejas-radius: 13px;
+  }
+
+  html {
+    font-size: 12.8px;
+    background: #050505;
+  }
+
+  body,
+  input,
+  button,
+  select,
+  textarea {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  }
+
+  body {
+    text-size-adjust: 100%;
+  }
+
+  body:has(> .app) .app,
+  body:has(> .layout) .layout {
+    grid-template-columns: var(--cejas-sidebar-width) minmax(0, 1fr) !important;
+    min-width: 0;
+  }
+
+  body:has(> aside) {
+    grid-template-columns: var(--cejas-sidebar-width) minmax(0, 1fr) !important;
+  }
+
+  .sidebar,
+  body > aside,
+  .layout > aside {
+    display: block !important;
+    min-width: 0;
+    padding: 14px 11px !important;
+  }
+
+  .main,
+  body > main,
+  .layout > main {
+    min-width: 0;
+    padding: 19px !important;
+  }
+
+  .brand,
+  .logo {
+    gap: 8px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .brand .logo,
+  .brand img,
+  .logo-box,
+  .brand-mark {
+    width: 30px !important;
+    height: 30px !important;
+    flex: 0 0 30px !important;
+    border-radius: 8px !important;
+    font-size: 19px !important;
+    line-height: 1 !important;
+  }
+
+  .brand h1,
+  .brand strong,
+  .logo strong {
+    font-size: 11px !important;
+    line-height: 1.08 !important;
+    letter-spacing: 0 !important;
+  }
+
+  .brand p,
+  .brand span,
+  .logo span {
+    font-size: 9.5px !important;
+  }
+
+  .user,
+  .user-card {
+    padding: 10px !important;
+    margin-bottom: 14px !important;
+    border-radius: 12px !important;
+  }
+
+  .avatar,
+  .user-avatar {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 13px !important;
+  }
+
+  nav,
+  .nav {
+    gap: 5px !important;
+  }
+
+  nav a,
+  .nav a {
+    padding: 7px 9px !important;
+    border-radius: 8px !important;
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+  }
+
+  .help,
+  .ajuda,
+  .support {
+    display: none !important;
+  }
+
+  .topbar,
+  .top {
+    gap: 11px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .eyebrow,
+  .kicker {
+    font-size: 8px !important;
+    letter-spacing: .32em !important;
+  }
+
+  h1 {
+    font-size: clamp(22px, 2.1vw, 29px) !important;
+    line-height: 1.05 !important;
+  }
+
+  h2 {
+    font-size: clamp(19px, 1.9vw, 24px) !important;
+    line-height: 1.05 !important;
+  }
+
+  h3 {
+    font-size: 14px !important;
+  }
+
+  .subtitle,
+  .sub,
+  p {
+    font-size: 11.5px;
+  }
+
+  .actions {
+    gap: 6px !important;
+  }
+
+  .btn,
+  button {
+    padding: 8px 10px !important;
+    border-radius: 9px !important;
+    font-size: 11px !important;
+  }
+
+  .card,
+  .stat-card,
+  .module-card,
+  .panel,
+  .calendar-panel,
+  .day-panel,
+  .list-panel,
+  .upload-card,
+  .upload-panel,
+  .box,
+  .col {
+    border-radius: var(--cejas-radius) !important;
+  }
+
+  .card,
+  .stat-card,
+  .module-card,
+  .calendar-panel,
+  .day-panel,
+  .list-panel,
+  .panel-head,
+  .upload-card,
+  .upload-panel {
+    padding: 11px !important;
+  }
+
+  .stat-card strong,
+  .card strong {
+    font-size: 19px !important;
+    line-height: 1.05 !important;
+  }
+
+  .stat-card span,
+  .card small,
+  th {
+    font-size: 8px !important;
+  }
+
+  .module-grid,
+  .stats,
+  .grid-cards,
+  .summary-grid {
+    gap: 10px !important;
+  }
+
+  .module-grid {
+    grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)) !important;
+  }
+
+  .stats {
+    grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)) !important;
+  }
+
+  .grid-cards {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important;
+  }
+
+  .content-grid {
+    grid-template-columns: minmax(0, 1.35fr) minmax(210px, .85fr) minmax(200px, .75fr) !important;
+  }
+
+  input,
+  select,
+  textarea,
+  .search {
+    padding: 8px 10px !important;
+    border-radius: 9px !important;
+    font-size: 11px !important;
+  }
+
+  th,
+  td {
+    padding: 8px 9px !important;
+  }
+
+  .calendar-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 320px) !important;
+    gap: 11px !important;
+    align-items: start !important;
+    min-width: 0;
+  }
+
+  .calendar-panel,
+  .day-panel {
+    min-width: 0;
+  }
+
+  .day-cell {
+    min-height: 70px !important;
+    border-radius: 10px !important;
+    padding: 6px !important;
+  }
+
+  .day-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .mini-stat {
+    min-width: 0;
+    padding: 8px !important;
+  }
+
+  .mini-stat span {
+    font-size: 8px !important;
+  }
+
+  .mini-stat strong {
+    font-size: 16px !important;
+  }
+
+  .day-panel {
+    display: block !important;
+    position: sticky;
+    top: 14px;
+    max-height: calc(100vh - 34px);
+    overflow: auto;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1500px) {
+  .content-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1300px) {
+  .calendar-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 280px) !important;
+  }
+
+  .filters {
+    grid-template-columns: minmax(0, 1.6fr) repeat(2, minmax(120px, 1fr)) !important;
+  }
+}
