@@ -2198,6 +2198,6 @@ registrarChatCejasApi(app);
 
 
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Sistema de Gestão CEJAS rodando em http://localhost:${PORT}`);
 });
