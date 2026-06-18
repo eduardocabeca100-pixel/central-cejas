@@ -1,8 +1,8 @@
 (function () {
-  if (window.__CEJAS_MENU_FIXO__) return;
-  window.__CEJAS_MENU_FIXO__ = true;
+  if (window.__CEJAS_MENU_FIXO_ESTAVEL__) return;
+  window.__CEJAS_MENU_FIXO_ESTAVEL__ = true;
 
-  const MENU_OPERACIONAL = [
+  const MENU_BASE = [
     { href: "/dashboard.html", texto: "▦ Painel Geral" },
     { href: "/agenda.html", texto: "◫ Agenda Dinâmica" },
     { href: "/painel-dia.html", texto: "▣ Painel do Dia" },
@@ -14,78 +14,74 @@
     { href: "/contratos.html", texto: "Contratos" }
   ];
 
+  const MENU_ADMIN = [
+    { href: "/importar-relatorio.html", texto: "▤ Importar Relatório (PDF)" },
+    { href: "/usuarios.html", texto: "◦ Acessos / Usuários" },
+    { href: "/configuracoes.html", texto: "⚙ Configurações" }
+  ];
+
   const ADMIN_HREFS = ["configuracoes", "usuarios", "importar-relatorio"];
-  const ADMIN_TEXTOS = ["configurações", "configuracoes", "acessos", "usuários", "usuarios", "importar relatório", "importar relatorio"];
 
-  let ultimoUsuario = null;
-  let ultimoMenu = null;
-
-  function ativo(href) {
-    return location.pathname.replace(/\/+$/, "") === href;
+  function normalizarPath(path) {
+    return String(path || "").replace(/\/+$/, "");
   }
 
-  function htmlMenu(itens) {
-    return itens.map((item) => `
-      <a href="${item.href}" class="${ativo(item.href) ? "active" : ""}">
-        ${item.texto}
-      </a>
-    `).join("");
+  function htmlMenu(menu) {
+    const atual = normalizarPath(location.pathname);
+
+    return menu.map((item) => {
+      const ativo = normalizarPath(item.href) === atual ? "active" : "";
+
+      return `<a href="${item.href}" class="${ativo}">${item.texto}</a>`;
+    }).join("");
   }
 
-  function limparAdministrativo(usuario) {
-    if (usuario && usuario.superadmin) return;
+  function limparAjuda() {
+    document.querySelectorAll("aside *").forEach((el) => {
+      const texto = String(el.textContent || "").toLowerCase();
 
-    document.querySelectorAll("aside a, nav a").forEach((a) => {
-      const href = String(a.getAttribute("href") || "").toLowerCase();
-      const texto = String(a.textContent || "").toLowerCase();
-
-      const adminHref = ADMIN_HREFS.some((x) => href.includes(x));
-      const adminTexto = ADMIN_TEXTOS.some((x) => texto.includes(x));
-
-      if (adminHref || adminTexto) a.remove();
+      if (texto.includes("precisa de ajuda")) {
+        const card = el.closest(".help, .ajuda, .support, .card, div");
+        if (card) card.remove();
+      }
     });
   }
 
   function atualizarUsuario(usuario) {
-    if (!usuario) return;
+    const nome = usuario?.nome || usuario?.name || "Eduardo";
+    const cargo = usuario?.superadmin ? "Superadmin" : (usuario?.cargo || "Superadmin");
 
-    const nome = usuario.nome || "Usuário";
-    const cargo = usuario.superadmin ? "Superadmin" : usuario.cargo || "Comercial";
-
-    document.querySelectorAll(".user strong, #usuarioNome").forEach((el) => {
+    document.querySelectorAll("#usuarioNome, aside .user strong").forEach((el) => {
       el.textContent = nome;
     });
 
-    document.querySelectorAll(".user span, #usuarioCargo").forEach((el) => {
+    document.querySelectorAll("#usuarioCargo, aside .user span").forEach((el) => {
       el.textContent = cargo;
+    });
+
+    document.querySelectorAll("aside .avatar, aside .user-avatar").forEach((el) => {
+      el.textContent = nome.charAt(0).toUpperCase();
     });
   }
 
-  async function buscarMenu() {
+  async function buscarUsuario() {
     try {
-      const resposta = await fetch("/api/menu-usuario-atual?ts=" + Date.now(), {
-        cache: "no-store"
+      const res = await fetch("/api/menu-usuario-atual?ts=" + Date.now(), {
+        cache: "no-store",
+        credentials: "same-origin"
       });
 
-      const dados = await resposta.json();
+      const dados = await res.json();
 
-      if (dados.ok && Array.isArray(dados.menu)) {
-        return dados;
+      if (dados && dados.ok) {
+        return dados.usuario || {};
       }
     } catch {}
 
-    return {
-      ok: true,
-      usuario: {
-        nome: "Usuário",
-        cargo: "Comercial",
-        superadmin: false
-      },
-      menu: MENU_OPERACIONAL
-    };
+    return { nome: "Eduardo", cargo: "Superadmin", superadmin: true };
   }
 
-  async function aplicarMenu(forcar = false) {
+  async function iniciar() {
     const aside = document.querySelector("aside");
     if (!aside) return;
 
@@ -96,112 +92,29 @@
       aside.appendChild(nav);
     }
 
-    if (forcar || !ultimoUsuario || !ultimoMenu) {
-      const dados = await buscarMenu();
-      ultimoUsuario = dados.usuario || { nome: "Usuário", cargo: "Comercial", superadmin: false };
-      ultimoMenu = dados.menu || MENU_OPERACIONAL;
+    const usuario = await buscarUsuario();
+    const superadmin = Boolean(usuario.superadmin);
+
+    const menu = superadmin ? [...MENU_BASE, ...MENU_ADMIN] : MENU_BASE;
+    const novoHtml = htmlMenu(menu);
+
+    if (nav.innerHTML.trim() !== novoHtml.trim()) {
+      nav.innerHTML = novoHtml;
     }
 
-    if (!ultimoUsuario.superadmin) {
-      ultimoMenu = ultimoMenu.filter((item) => {
-        const href = String(item.href || "").toLowerCase();
-        const texto = String(item.texto || "").toLowerCase();
+    atualizarUsuario(usuario);
+    limparAjuda();
 
-        return !ADMIN_HREFS.some((x) => href.includes(x)) &&
-               !ADMIN_TEXTOS.some((x) => texto.includes(x));
-      });
-    }
-
-    nav.innerHTML = htmlMenu(ultimoMenu);
-
-    atualizarUsuario(ultimoUsuario);
-    limparAdministrativo(ultimoUsuario);
+    // Garantia única, sem intervalo infinito/piscando
+    setTimeout(() => {
+      atualizarUsuario(usuario);
+      limparAjuda();
+    }, 500);
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    aplicarMenu(true);
-
-    setTimeout(() => aplicarMenu(false), 300);
-    setTimeout(() => aplicarMenu(false), 900);
-    setTimeout(() => aplicarMenu(false), 1800);
-
-    setInterval(() => {
-      atualizarUsuario(ultimoUsuario);
-      limparAdministrativo(ultimoUsuario);
-    }, 1500);
-  });
-})();
-
-/* CEJAS_FIX_FINANCEIRO_CLICAVEL */
-(function () {
-  if (window.__CEJAS_FINANCEIRO_CLICAVEL__) return;
-  window.__CEJAS_FINANCEIRO_CLICAVEL__ = true;
-
-  function criarLinkFinanceiro() {
-    const a = document.createElement("a");
-    a.href = "/financeiro.html";
-    a.textContent = "💰 Financeiro";
-    a.style.pointerEvents = "auto";
-    a.style.cursor = "pointer";
-    a.addEventListener("click", function (event) {
-      event.preventDefault();
-      window.location.href = "/financeiro.html";
-    });
-    return a;
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", iniciar);
+  } else {
+    iniciar();
   }
-
-  function corrigirFinanceiro() {
-    const aside = document.querySelector("aside");
-    if (!aside) return;
-
-    let nav = aside.querySelector("nav");
-
-    if (!nav) {
-      nav = document.createElement("nav");
-      aside.appendChild(nav);
-    }
-
-    const itens = Array.from(nav.children);
-    const itemFinanceiro = itens.find((el) => {
-      return String(el.textContent || "").toLowerCase().includes("financeiro");
-    });
-
-    if (itemFinanceiro) {
-      if (itemFinanceiro.tagName.toLowerCase() === "a") {
-        itemFinanceiro.setAttribute("href", "/financeiro.html");
-        itemFinanceiro.style.pointerEvents = "auto";
-        itemFinanceiro.style.cursor = "pointer";
-        itemFinanceiro.onclick = function (event) {
-          event.preventDefault();
-          window.location.href = "/financeiro.html";
-        };
-      } else {
-        itemFinanceiro.replaceWith(criarLinkFinanceiro());
-      }
-
-      return;
-    }
-
-    const link = criarLinkFinanceiro();
-
-    const itemOrcamentos = itens.find((el) => {
-      return String(el.textContent || "").toLowerCase().includes("orçamento") ||
-             String(el.textContent || "").toLowerCase().includes("orcamento");
-    });
-
-    if (itemOrcamentos && itemOrcamentos.parentNode) {
-      itemOrcamentos.insertAdjacentElement("afterend", link);
-    } else {
-      nav.appendChild(link);
-    }
-  }
-
-  document.addEventListener("DOMContentLoaded", function () {
-    corrigirFinanceiro();
-    setTimeout(corrigirFinanceiro, 300);
-    setTimeout(corrigirFinanceiro, 900);
-    setTimeout(corrigirFinanceiro, 1800);
-  });
-
-  setInterval(corrigirFinanceiro, 1500);
 })();

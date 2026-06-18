@@ -10,7 +10,7 @@
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: Arial, sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: #0f1014;
       color: #f7f7f7;
       display: grid;
@@ -37,6 +37,21 @@
       width: 54px;
       height: 54px;
       object-fit: contain;
+    }
+
+    .brand-mark {
+      width: 54px;
+      height: 54px;
+      flex: 0 0 54px;
+      border-radius: 14px;
+      border: 1px solid #9b5cff;
+      display: grid;
+      place-items: center;
+      color: #ff61d2;
+      font-weight: 1000;
+      font-size: 30px;
+      line-height: 1;
+      background: #0f1014;
     }
 
     .brand strong {
@@ -383,6 +398,13 @@
       height: 48px !important;
     }
 
+    .brand-mark {
+      width: 48px !important;
+      height: 48px !important;
+      flex-basis: 48px !important;
+      font-size: 27px !important;
+    }
+
     .brand strong {
       font-size: 15px !important;
       line-height: 1.1;
@@ -563,78 +585,29 @@
     }
 
   </style>
-
-<style id="cejas-financeiro-zoom-final">
-  /* CEJAS FINANCEIRO - escala final da página */
-  @media (min-width: 900px) {
-    body {
-      zoom: 0.78 !important;
-      width: 128.3% !important;
-      min-height: 128.3vh !important;
-      overflow-x: hidden !important;
-    }
-
-    main {
-      padding-top: 26px !important;
-    }
-
-    h1 {
-      font-size: 34px !important;
-    }
-
-    .grid-cards {
-      grid-template-columns: repeat(6, minmax(130px, 1fr)) !important;
-      gap: 14px !important;
-    }
-
-    .card {
-      min-height: 92px !important;
-    }
-
-    .panel {
-      max-width: none !important;
-    }
-  }
-
-  @media (max-width: 899px) {
-    body {
-      zoom: 0.86 !important;
-      width: 116.3% !important;
-      min-height: 116.3vh !important;
-      overflow-x: hidden !important;
-    }
-
-    main {
-      padding: 18px !important;
-    }
-
-    .grid-cards {
-      grid-template-columns: repeat(2, minmax(130px, 1fr)) !important;
-    }
-  }
-</style>
-
 </head>
 <body>
-  <aside>
-    <div class="brand">
-      <img src="/assets/cejas-login-logo.png" onerror="this.src='/assets/logo.svg'" alt="CEJAS">
-      <div>
-        <strong>CEJAS</strong>
-        <span>Sistema interno</span>
-      </div>
+  
+<aside>
+  <div class="brand brand-padrao-cejas">
+    <div class="brand-mark">M</div>
+    <div>
+      <strong>SISTEMA DE GESTÃO<br>CEJAS</strong>
+      <span>Painel Administrativo</span>
     </div>
+  </div>
 
-    <div class="user">
-      <div class="avatar">E</div>
-      <div>
-        <strong id="usuarioNome">Eduardo</strong>
-        <span id="usuarioCargo">Superadmin</span>
-      </div>
+  <div class="user">
+    <div class="avatar">E</div>
+    <div>
+      <strong id="usuarioNome">Eduardo</strong>
+      <span id="usuarioCargo">Superadmin</span>
     </div>
+  </div>
 
-    <nav></nav>
-  </aside>
+  <nav></nav>
+</aside>
+
 
   <main>
     <section class="top">
@@ -1096,6 +1069,5 @@
   }
 })();
 </script>
-
 </body>
 </html>

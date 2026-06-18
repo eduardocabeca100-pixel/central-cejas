@@ -39,38 +39,41 @@ npm run dev
 
 Acesse: **http://localhost:5500**
 
-## 🌐 Deploy no Cloudflare Pages
+## 🌐 Deploy recomendado
 
-### Passo 1: Instale o Wrangler
+### Por que o Vercel não é adequado
+Este projeto é um backend Node.js/Express que usa `app.listen`, sessões, uploads de arquivos e lógica de servidor persistente. O Vercel funciona melhor com funções serverless, e não com um servidor Express completo.
+
+### Opção 1: Hospedar o backend em Render / Railway / Fly.io
+1. Crie um novo serviço Node.js.
+2. Configure o repositório `central-cejas`.
+3. Defina as variáveis de ambiente do backend: `SESSION_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`, `SUPABASE_URL`, `SUPABASE_KEY` e outras usadas no `.env`.
+4. Use o comando de build padrão e `npm start`.
+
+### Opção 2: Hospedar frontend estático + proxy Cloudflare Worker
+- O backend continua rodando no Render/Railway.
+- O Cloudflare Worker proxy envia `/api/*` para o backend.
+
+#### Deploy do Worker proxy
 ```bash
 npm install -g wrangler
-```
-
-### Passo 2: Faça Login
-```bash
 wrangler login
-```
-
-### Passo 3: Adicione Variáveis de Ambiente
-```bash
-wrangler secret put SUPABASE_URL
-wrangler secret put SUPABASE_KEY
-wrangler secret put SESSION_SECRET
-```
-
-### Passo 4: Deploy
-```bash
+wrangler secret put BACKEND_URL
 wrangler deploy
 ```
 
-### OU: Conexão GitHub Automática
+- `BACKEND_URL` deve apontar para o URL público do backend, por exemplo `https://central-cejas-backend.onrender.com`.
+- O Worker proxy roteia `/api/*` para esse backend.
 
-1. Acesse: https://dash.cloudflare.com
-2. Pages → Create a project → Connect to Git
-3. Selecione: `eduardocabeca100-pixel/central-cejas`
-4. Build command: `npm install`
-5. Adicione as variáveis de ambiente
-6. Deploy automático ao fazer push!
+### Deploy local
+```bash
+npm install
+cp .env.example .env
+# edite .env com as credenciais certas
+npm start
+```
+
+Acesse: **http://localhost:5500**
 
 ## 📁 Estrutura
 
