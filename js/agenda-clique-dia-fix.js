@@ -8,6 +8,8 @@
   };
 
   let painelLateralFixo = null;
+  let dataAtual = null;
+  let eventosAtuais = [];
 
   function pad(n) {
     return String(n).padStart(2, "0");
@@ -70,6 +72,19 @@
     if (n < 1 || n > 31) return null;
 
     return n;
+  }
+
+  function elementoVisivel(el) {
+    if (!el) return false;
+
+    const r = el.getBoundingClientRect();
+    const estilo = window.getComputedStyle ? window.getComputedStyle(el) : null;
+
+    return r.width > 0 &&
+      r.height > 0 &&
+      estilo?.display !== "none" &&
+      estilo?.visibility !== "hidden" &&
+      !el.closest(".agenda-plus-overlay, .agenda-plus-card");
   }
 
   function pegarMesAnoAtual() {
@@ -162,6 +177,29 @@
     return `${anoFinal}-${pad(mesFinal + 1)}-${pad(dia)}`;
   }
 
+  function extrairDataCelula(cell) {
+    if (!cell) return null;
+
+    const dataAttr =
+      cell.dataset?.date ||
+      cell.dataset?.data ||
+      cell.dataset?.iso ||
+      cell.getAttribute("data-date") ||
+      cell.getAttribute("data-data") ||
+      cell.getAttribute("data-iso");
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(String(dataAttr || ""))) {
+      return String(dataAttr);
+    }
+
+    const onclick = cell.getAttribute("onclick") || "";
+    const match = onclick.match(/selectDay\(['"](\d{4}-\d{2}-\d{2})['"]\)/);
+
+    if (match) return match[1];
+
+    return inferirData(cell);
+  }
+
   function contemCalendario(el) {
     const qtdDias = Array.from(el.querySelectorAll("div,button,article"))
       .filter(pareceCelulaCalendario)
@@ -171,12 +209,22 @@
   }
 
   function acharPainelLateral() {
-    if (painelLateralFixo && document.body.contains(painelLateralFixo)) {
+    if (painelLateralFixo && document.body.contains(painelLateralFixo) && elementoVisivel(painelLateralFixo)) {
+      return painelLateralFixo;
+    }
+
+    const painelVisivel = Array.from(document.querySelectorAll(
+      ".day-panel, [data-cejas-agenda-lateral='true']"
+    )).find((el) => elementoVisivel(el));
+
+    if (painelVisivel) {
+      painelLateralFixo = painelVisivel;
+      painelLateralFixo.setAttribute("data-cejas-agenda-lateral", "true");
       return painelLateralFixo;
     }
 
     const titulo = Array.from(document.querySelectorAll("h1,h2,h3,strong,div"))
-      .find((el) => textoLimpo(el).toLowerCase() === "agenda do dia");
+      .find((el) => textoLimpo(el).toLowerCase() === "agenda do dia" && elementoVisivel(el));
 
     if (!titulo) return null;
 
@@ -211,36 +259,50 @@
 
   function renderEvento(ev) {
     const status = statusClasse(ev.status);
+    const statusVisual = status === "espera" ? "em-espera" : status;
     const titulo = ev.titulo || ev.evento || ev.nome_evento || ev.empresa || "Evento sem nome";
     const sala = ev.sala || ev.nome_sala || "Não informada";
     const empresa = ev.empresa || ev.cliente || "Não informada";
     const participantes = ev.participantes || ev.qtd_pessoas || ev.quantidade || "-";
     const origem = ev.origem === "manual" ? "Manual" : "Supera";
     const valor = ev.valor || ev.valorFinal || ev.valor_final || ev.receita || 0;
+    const responsavel = ev.responsavelNome || ev.criadoPorNome || ev.responsavelEmail || ev.criadoPorEmail || origem;
 
     return `
-      <div class="cejas-dia-card ${status}">
-        <div class="cejas-dia-card-top">
-          <span class="cejas-origem">${origem}</span>
-          <span class="cejas-status ${status}">${statusTexto(ev.status)}</span>
+      <article class="cejas-dia-card-plus ${ev.origem === "manual" ? "manual" : "supera"} ${statusVisual}" data-origem="${ev.origem}" data-id="${ev.id}">
+        <span class="cejas-dia-tag-origem ${ev.origem === "manual" ? "manual" : "supera"}">
+          ${origem}
+        </span>
+
+        <div class="cejas-dia-card-topo">
+          <h3>${titulo}</h3>
+          <span class="cejas-dia-pill-status ${statusVisual}">${statusTexto(ev.status)}</span>
         </div>
 
-        <h3>${titulo}</h3>
+        <p>
+          <strong>Horário:</strong> ${hora(ev)}<br>
+          <strong>Sala:</strong> ${sala}<br>
+          <strong>Empresa:</strong> ${empresa}<br>
+          <strong>Participantes:</strong> ${participantes}<br>
+          <strong>Responsável:</strong> ${responsavel}
+          ${Number(valor || 0) > 0 ? `<br><br><strong>${dinheiro(valor)}</strong>` : ""}
+        </p>
 
-        <p><strong>Horário:</strong> ${hora(ev)}</p>
-        <p><strong>Sala:</strong> ${sala}</p>
-        <p><strong>Empresa:</strong> ${empresa}</p>
-        <p><strong>Participantes:</strong> ${participantes}</p>
-        <p><strong>Responsável:</strong> ${origem}</p>
-
-        ${Number(valor || 0) > 0 ? `<h4>${dinheiro(valor)}</h4>` : ""}
-      </div>
+        <div class="cejas-status-bolinhas">
+          <button title="Confirmado" type="button" class="cejas-bolinha-confirmado ${status === "confirmado" ? "ativo" : ""}" data-status="confirmado"></button>
+          <button title="Em espera" type="button" class="cejas-bolinha-espera ${status === "espera" ? "ativo" : ""}" data-status="em espera"></button>
+          <button title="Cancelado" type="button" class="cejas-bolinha-cancelado ${status === "cancelado" ? "ativo" : ""}" data-status="cancelado"></button>
+        </div>
+      </article>
     `;
   }
 
   function renderLateral(dataISO, eventos) {
     const painel = acharPainelLateral();
     if (!painel) return;
+
+    dataAtual = dataISO;
+    eventosAtuais = eventos;
 
     const receita = eventos.reduce((acc, ev) => {
       return acc + Number(ev.valor || ev.valorFinal || ev.valor_final || ev.receita || 0);
@@ -293,12 +355,47 @@
     }
   }
 
+  async function alterarStatus(card, status) {
+    const origem = card?.dataset?.origem;
+    const id = card?.dataset?.id;
+
+    if (!origem || !id) return;
+
+    const resposta = await fetch(`/api/agenda-dia/status/${origem}/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status })
+    });
+
+    const dados = await resposta.json();
+
+    if (!dados.ok) {
+      alert(dados.message || "Erro ao alterar status.");
+      return;
+    }
+
+    eventosAtuais = eventosAtuais.map((evento) => {
+      if (String(evento.id) === String(id) && evento.origem === origem) {
+        return { ...evento, status };
+      }
+
+      return evento;
+    });
+
+    renderLateral(dataAtual, eventosAtuais);
+  }
+
   function destacar(cell) {
     document.querySelectorAll(".cejas-dia-selecionado").forEach((x) => {
       x.classList.remove("cejas-dia-selecionado");
     });
 
+    document.querySelectorAll(".day-cell.selected").forEach((x) => {
+      x.classList.remove("selected");
+    });
+
     cell.classList.add("cejas-dia-selecionado");
+    cell.classList.add("selected");
   }
 
   function instalarClique() {
@@ -306,7 +403,7 @@
       const cell = acharCelulaClicada(event.target);
       if (!cell) return;
 
-      const dataISO = inferirData(cell);
+      const dataISO = extrairDataCelula(cell);
       if (!dataISO) return;
 
       event.preventDefault();
@@ -319,6 +416,22 @@
 
       setTimeout(() => carregarDia(dataISO), 120);
       setTimeout(() => carregarDia(dataISO), 450);
+    }, true);
+  }
+
+  function instalarStatus() {
+    document.addEventListener("click", async (event) => {
+      const botao = event.target.closest(".cejas-status-bolinhas button[data-status]");
+      if (!botao) return;
+
+      const card = botao.closest(".cejas-dia-card-plus");
+      if (!card) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+
+      await alterarStatus(card, botao.dataset.status);
     }, true);
   }
 
@@ -467,5 +580,6 @@
     instalarCss();
     acharPainelLateral();
     instalarClique();
+    instalarStatus();
   });
 })();
