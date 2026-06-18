@@ -8,6 +8,7 @@ uploads/
 data/usuarios.json
 data/relatorio-supera.json
 data/ultimo-relatorio-texto-extraido.txt
+data/agenda-manual-local.json
 
 # Arquivos de backup local
 *.backup-*.html

@@ -19,7 +19,7 @@ Sistema completo de gestão empresarial com dashboard, agenda dinâmica, chat in
 - Node.js 18+
 - npm
 - Supabase (banco de dados)
-- Cloudflare (para deploy)
+- Render (deploy recomendado)
 
 ## 🔧 Instalação Local
 
@@ -47,8 +47,10 @@ Este projeto é um backend Node.js/Express que usa `app.listen`, sessões, uploa
 ### Opção 1: Hospedar o backend em Render / Railway / Fly.io
 1. Crie um novo serviço Node.js.
 2. Configure o repositório `central-cejas`.
-3. Defina as variáveis de ambiente do backend: `SESSION_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`, `SUPABASE_URL`, `SUPABASE_KEY` e outras usadas no `.env`.
+3. Defina as variáveis de ambiente do backend: `SESSION_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ANON_KEY` e `SUPABASE_STORAGE_BUCKET`.
 4. Use o comando de build padrão e `npm start`.
+
+Para a Agenda e o Painel do Dia carregarem dados do banco no Render, a variável essencial é `SUPABASE_SERVICE_ROLE_KEY`. Use a chave `service_role` do projeto Supabase, não a chave anon/publishable.
 
 ### Opção 2: Hospedar frontend estático + proxy Cloudflare Worker
 - O backend continua rodando no Render/Railway.
@@ -103,7 +105,8 @@ central-cejas/
 ## 🐛 Troubleshooting
 
 **Erro de Supabase?**
-- Verifique SUPABASE_URL e SUPABASE_KEY no .env
+- Verifique `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` no `.env` ou nas Environment Variables do Render.
+- Se aparecer "Supabase não configurado" no Render, adicione a `SUPABASE_SERVICE_ROLE_KEY` e faça um novo deploy.
 - Teste: `curl -H "Authorization: Bearer $KEY" $URL/rest/v1/`
 
 **Upload não funciona?**

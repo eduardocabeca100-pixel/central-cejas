@@ -68,13 +68,16 @@ O Vercel é ideal para:
 No Render dashboard:
 ```
 SUPABASE_URL=https://seu-projeto.supabase.co
-SUPABASE_KEY=sua_chave_anon
+SUPABASE_SERVICE_ROLE_KEY=sua_chave_service_role
+SUPABASE_ANON_KEY=sua_chave_anon_ou_publishable
+SUPABASE_STORAGE_BUCKET=servidor-cejas
 SESSION_SECRET=uma_chave_muito_segura_e_longa_aqui
 NODE_ENV=production
-PORT=5500
 ADMIN_EMAIL=seu@email.com
 ADMIN_PASSWORD_HASH=bcrypt_hash_da_senha_admin
 ```
+
+No Render, nao defina `PORT` manualmente; a plataforma injeta essa variavel automaticamente. Use `PORT=5500` apenas no `.env` local.
 
 ### 1.3 Deploy
 
@@ -161,17 +164,19 @@ npm start
 - [ ] `.env` nunca é commitado (verificado em `.gitignore`)
 - [ ] `SESSION_SECRET` é uma string aleatória de 32+ caracteres
 - [ ] Senha admin é armazenada como hash bcrypt em `ADMIN_PASSWORD_HASH`
-- [ ] `SUPABASE_KEY` é a chave **anon**, não a chave do serviço
+- [ ] `SUPABASE_SERVICE_ROLE_KEY` é a chave **service_role** do Supabase
+- [ ] `SUPABASE_ANON_KEY` é a chave **anon/publishable**
 - [ ] CORS está configurado no Express (padrão aceita qualquer origem)
 
 ### Exemplo `.env` Real
 
 ```
 SUPABASE_URL=https://xyzabc123.supabase.co
-SUPABASE_KEY=eyJhbGc...SomeBase64String...
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGc...ServiceRoleSecret...
+SUPABASE_ANON_KEY=eyJhbGc...AnonPublishable...
+SUPABASE_STORAGE_BUCKET=servidor-cejas
 SESSION_SECRET=j8x#$%kL9@!mNp2qR3sT4uV5wX6yZ7aB8cD9eF0gH1iJ2
 NODE_ENV=production
-PORT=5500
 ADMIN_EMAIL=admin@cejas.com.br
 ADMIN_PASSWORD_HASH=$2b$10$... (bcrypt hash da senha)
 ```
