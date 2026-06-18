@@ -359,7 +359,261 @@
     .btn.danger:hover {
       background: rgba(239,68,68,.28);
     }
+
+    /* CEJAS_FINANCEIRO_COMPACTO_PADRAO */
+    html {
+      font-size: 14px;
+    }
+
+    body {
+      grid-template-columns: 250px minmax(0, 1fr) !important;
+      overflow-x: hidden;
+    }
+
+    aside {
+      padding: 20px 16px !important;
+    }
+
+    .brand {
+      margin-bottom: 18px !important;
+    }
+
+    .brand img {
+      width: 48px !important;
+      height: 48px !important;
+    }
+
+    .brand strong {
+      font-size: 15px !important;
+      line-height: 1.1;
+    }
+
+    .brand span {
+      font-size: 11px !important;
+    }
+
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 14px 0 20px;
+      padding: 13px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.09);
+    }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #915cff, #ff4ecb);
+      color: white;
+      font-weight: 1000;
+      font-size: 18px;
+    }
+
+    .user strong {
+      display: block;
+      font-size: 14px;
+      line-height: 1.2;
+    }
+
+    .user span {
+      display: block;
+      color: rgba(255,255,255,.62);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    nav {
+      gap: 5px !important;
+    }
+
+    nav a {
+      padding: 10px 12px !important;
+      border-radius: 13px !important;
+      font-size: 13px !important;
+      line-height: 1.2;
+    }
+
+    main {
+      padding: 22px 24px !important;
+      min-width: 0;
+    }
+
+    .top {
+      margin-bottom: 18px !important;
+    }
+
+    h1 {
+      font-size: 30px !important;
+      line-height: 1.1;
+    }
+
+    .sub {
+      font-size: 14px !important;
+    }
+
+    .actions {
+      gap: 8px !important;
+    }
+
+    .btn {
+      padding: 10px 13px !important;
+      border-radius: 13px !important;
+      font-size: 13px !important;
+    }
+
+    .grid-cards {
+      grid-template-columns: repeat(6, minmax(125px, 1fr)) !important;
+      gap: 10px !important;
+      margin-bottom: 18px !important;
+    }
+
+    .card {
+      padding: 14px !important;
+      border-radius: 18px !important;
+    }
+
+    .card small {
+      font-size: 10px !important;
+      margin-bottom: 7px !important;
+    }
+
+    .card strong {
+      font-size: 24px !important;
+      line-height: 1;
+    }
+
+    .panel {
+      border-radius: 20px !important;
+    }
+
+    .panel-head {
+      padding: 15px 16px !important;
+    }
+
+    .panel-head h2 {
+      font-size: 17px !important;
+    }
+
+    .search {
+      padding: 10px 12px !important;
+      border-radius: 13px !important;
+      font-size: 13px !important;
+    }
+
+    table {
+      min-width: 1000px !important;
+    }
+
+    th,
+    td {
+      padding: 11px 12px !important;
+      font-size: 13px !important;
+    }
+
+    th {
+      font-size: 10px !important;
+    }
+
+    .pill {
+      padding: 6px 9px !important;
+      font-size: 11px !important;
+    }
+
+    select {
+      width: 145px !important;
+      padding: 8px 9px !important;
+      font-size: 12px !important;
+      border-radius: 10px !important;
+    }
+
+    .orc-item {
+      padding: 7px 9px !important;
+      font-size: 11px !important;
+    }
+
+    .empty {
+      padding: 20px !important;
+      font-size: 13px !important;
+    }
+
+    .help,
+    .ajuda,
+    .support {
+      display: none !important;
+    }
+
+    @media (max-width: 980px) {
+      body {
+        grid-template-columns: 1fr !important;
+      }
+
+      aside {
+        min-height: auto !important;
+      }
+
+      .grid-cards {
+        grid-template-columns: repeat(2, minmax(130px, 1fr)) !important;
+      }
+    }
+
+  </style>
+
+<style id="cejas-financeiro-zoom-final">
+  /* CEJAS FINANCEIRO - escala final da página */
+  @media (min-width: 900px) {
+    body {
+      zoom: 0.78 !important;
+      width: 128.3% !important;
+      min-height: 128.3vh !important;
+      overflow-x: hidden !important;
+    }
+
+    main {
+      padding-top: 26px !important;
+    }
+
+    h1 {
+      font-size: 34px !important;
+    }
+
+    .grid-cards {
+      grid-template-columns: repeat(6, minmax(130px, 1fr)) !important;
+      gap: 14px !important;
+    }
+
+    .card {
+      min-height: 92px !important;
+    }
+
+    .panel {
+      max-width: none !important;
+    }
+  }
+
+  @media (max-width: 899px) {
+    body {
+      zoom: 0.86 !important;
+      width: 116.3% !important;
+      min-height: 116.3vh !important;
+      overflow-x: hidden !important;
+    }
+
+    main {
+      padding: 18px !important;
+    }
+
+    .grid-cards {
+      grid-template-columns: repeat(2, minmax(130px, 1fr)) !important;
+    }
+  }
 </style>
+
 </head>
 <body>
   <aside>
@@ -368,6 +622,14 @@
       <div>
         <strong>CEJAS</strong>
         <span>Sistema interno</span>
+      </div>
+    </div>
+
+    <div class="user">
+      <div class="avatar">E</div>
+      <div>
+        <strong id="usuarioNome">Eduardo</strong>
+        <span id="usuarioCargo">Superadmin</span>
       </div>
     </div>
 
