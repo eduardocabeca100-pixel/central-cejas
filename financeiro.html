@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Financeiro | CEJAS</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #0f1014;
+      color: #f7f7f7;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+    }
+
+    aside {
+      min-height: 100vh;
+      background: #15161c;
+      border-right: 1px solid rgba(255,255,255,.08);
+      padding: 24px 18px;
+      position: sticky;
+      top: 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 26px;
+    }
+
+    .brand img {
+      width: 54px;
+      height: 54px;
+      object-fit: contain;
+    }
+
+    .brand strong {
+      display: block;
+      font-size: 17px;
+      letter-spacing: .05em;
+    }
+
+    .brand span {
+      display: block;
+      color: rgba(255,255,255,.55);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    nav {
+      display: grid;
+      gap: 8px;
+    }
+
+    nav a {
+      color: rgba(255,255,255,.78);
+      text-decoration: none;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    nav a.active,
+    nav a:hover {
+      background: rgba(255,255,255,.10);
+      color: white;
+    }
+
+    main {
+      padding: 28px;
+      overflow-x: auto;
+    }
+
+    .top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 34px;
+      letter-spacing: -.04em;
+    }
+
+    .sub {
+      margin: 8px 0 0;
+      color: rgba(255,255,255,.58);
+      line-height: 1.45;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    button,
+    select,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 15px;
+      background: white;
+      color: #111216;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .btn.secondary {
+      background: rgba(255,255,255,.10);
+      color: white;
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .grid-cards {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(150px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: 0 24px 80px rgba(0,0,0,.22);
+    }
+
+    .card small {
+      display: block;
+      color: rgba(255,255,255,.55);
+      font-weight: 800;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: 11px;
+    }
+
+    .card strong {
+      display: block;
+      font-size: 26px;
+    }
+
+    .panel {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 24px;
+      overflow: hidden;
+    }
+
+    .panel-head {
+      padding: 18px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 19px;
+    }
+
+    .search {
+      width: min(380px, 100%);
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      color: white;
+      border-radius: 14px;
+      padding: 12px 14px;
+      outline: none;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1180px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      vertical-align: top;
+    }
+
+    th {
+      color: rgba(255,255,255,.55);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      background: rgba(0,0,0,.16);
+    }
+
+    .evento {
+      font-weight: 1000;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .muted {
+      color: rgba(255,255,255,.55);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 900;
+      background: rgba(255,255,255,.10);
+      color: white;
+      white-space: nowrap;
+    }
+
+    .ok { background: rgba(34,197,94,.18); color: #b7ffd1; }
+    .warn { background: rgba(245,158,11,.18); color: #ffe0a6; }
+    .bad { background: rgba(239,68,68,.18); color: #ffc2c2; }
+    .info { background: rgba(59,130,246,.18); color: #c9ddff; }
+
+    select {
+      width: 170px;
+      border: 1px solid rgba(255,255,255,.13);
+      background: #20222a;
+      color: white;
+      border-radius: 12px;
+      padding: 10px;
+      outline: none;
+    }
+
+    select:disabled {
+      opacity: .65;
+      cursor: not-allowed;
+    }
+
+    .orc-list {
+      display: grid;
+      gap: 6px;
+    }
+
+    .orc-item {
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.06);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .empty {
+      padding: 26px;
+      text-align: center;
+      color: rgba(255,255,255,.55);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.65);
+      place-items: center;
+      padding: 24px;
+      z-index: 50;
+    }
+
+    .modal.open { display: grid; }
+
+    .modal-card {
+      width: min(520px, 100%);
+      background: #181a21;
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: 0 35px 120px rgba(0,0,0,.45);
+    }
+
+    .modal-card h3 {
+      margin: 0 0 16px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      color: rgba(255,255,255,.60);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.13);
+      background: rgba(255,255,255,.07);
+      color: white;
+      border-radius: 14px;
+      padding: 12px;
+      outline: none;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    @media (max-width: 980px) {
+      body { grid-template-columns: 1fr; }
+      aside { position: relative; min-height: auto; }
+      .grid-cards { grid-template-columns: repeat(2, minmax(140px, 1fr)); }
+      .top { flex-direction: column; }
+      .actions { justify-content: flex-start; }
+    }
+  
+    /* CEJAS_FINANCEIRO_BOTOES_ACAO */
+    .btn.mini {
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 12px;
+    }
+
+    .btn.danger {
+      background: rgba(239,68,68,.18);
+      color: #ffc2c2;
+      border: 1px solid rgba(239,68,68,.35);
+    }
+
+    .btn.danger:hover {
+      background: rgba(239,68,68,.28);
+    }
+</style>
+</head>
+<body>
+  <aside>
+    <div class="brand">
+      <img src="/assets/cejas-login-logo.png" onerror="this.src='/assets/logo.svg'" alt="CEJAS">
+      <div>
+        <strong>CEJAS</strong>
+        <span>Sistema interno</span>
+      </div>
+    </div>
+
+    <nav></nav>
+  </aside>
+
+  <main>
+    <section class="top">
+      <div>
+        <h1>Financeiro / Faturamento</h1>
+        <p class="sub">Controle de orçamento, boleto, demonstrativo, pagamento e faturamento por cliente/evento.</p>
+      </div>
+
+      <div class="actions">
+        <button class="btn secondary" id="btnAtualizar">Atualizar lista</button>
+        <button class="btn secondary" id="btnSincronizar">Sincronizar servidor</button>
+        <button class="btn" id="btnNovo">Novo controle</button>
+      </div>
+    </section>
+
+    <section class="grid-cards" id="cards"></section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Controle financeiro</h2>
+        <input class="search" id="busca" placeholder="Buscar cliente, evento, boleto, demonstrativo...">
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Cliente / Evento</th>
+              <th>Orçamentos</th>
+              <th>Boleto</th>
+              <th>Demonstrativo</th>
+              <th>Pagamento</th>
+              <th>Faturamento</th>
+              <th>Arquivos</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="empty" id="vazio" style="display:none;">Nenhum controle financeiro encontrado ainda.</div>
+    </section>
+  </main>
+
+  <div class="modal" id="modal">
+    <div class="modal-card">
+      <h3>Novo controle financeiro</h3>
+
+      <div class="field">
+        <label>Cliente / Evento</label>
+        <input id="novoClienteEvento" placeholder="Ex: Zanotti 26.10">
+      </div>
+
+      <div class="field">
+        <label>Data do evento</label>
+        <input id="novoDataEvento" placeholder="Ex: 26/10">
+      </div>
+
+      <div class="field">
+        <label>Observações</label>
+        <textarea id="novoObs" rows="3" placeholder="Observações internas"></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn secondary" id="btnFechar">Cancelar</button>
+        <button class="btn" id="btnSalvarNovo">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/cejas-menu-fixo.js"></script>
+
+<script id="financeiro-inline-cejas">
+(function () {
+  const $ = (id) => document.getElementById(id);
+
+  let estado = {
+    itens: [],
+    resumo: {},
+    permissoes: {}
+  };
+
+  function textoStatus(status) {
+    const mapa = {
+      nao_emitido: "Não emitido",
+      emitido: "Emitido",
+      enviado: "Enviado",
+      precisa_vincular: "Precisa vincular",
+      pendente: "Pendente",
+      pago: "Pago",
+      vencido: "Vencido",
+      parcial: "Parcial",
+      cancelado: "Cancelado",
+      em_aberto: "Em aberto",
+      faturado: "Faturado",
+      gerado: "Gerado"
+    };
+
+    return mapa[status] || status || "Pendente";
+  }
+
+  function classeStatus(status) {
+    if (["emitido", "enviado", "pago", "faturado", "gerado"].includes(status)) return "ok";
+    if (["precisa_vincular", "vencido", "parcial"].includes(status)) return "warn";
+    if (["cancelado"].includes(status)) return "bad";
+    return "info";
+  }
+
+  function pill(status) {
+    return `<span class="pill ${classeStatus(status)}">${textoStatus(status)}</span>`;
+  }
+
+  function card(titulo, valor) {
+    return `
+      <div class="card">
+        <small>${titulo}</small>
+        <strong>${valor ?? 0}</strong>
+      </div>
+    `;
+  }
+
+  function renderCards() {
+    const cards = $("cards");
+    if (!cards) return;
+
+    const r = estado.resumo || {};
+
+    cards.innerHTML = [
+      card("Eventos", r.totalEventos || 0),
+      card("Orçamentos", r.orcamentosGerados || 0),
+      card("Boletos emitidos", r.boletosEmitidos || 0),
+      card("Boletos pendentes", r.boletosPendentes || 0),
+      card("Faturados", r.faturados || 0),
+      card("Em aberto", r.emAberto || 0)
+    ].join("");
+  }
+
+  function podeEditar(campo) {
+    const p = estado.permissoes || {};
+
+    if (p.admin) return true;
+    if (campo === "boleto" || campo === "demonstrativo") return Boolean(p.editarStatus);
+    if (campo === "pagamento" || campo === "faturamento") return Boolean(p.editarValores || p.editarStatus);
+
+    return false;
+  }
+
+  function selectStatus(itemId, campo, valorAtual) {
+    const listas = {
+      boleto: [
+        ["nao_emitido", "Não emitido"],
+        ["emitido", "Emitido"],
+        ["enviado", "Enviado"],
+        ["precisa_vincular", "Precisa vincular"]
+      ],
+      demonstrativo: [
+        ["nao_emitido", "Não emitido"],
+        ["emitido", "Emitido"],
+        ["enviado", "Enviado"],
+        ["precisa_vincular", "Precisa vincular"]
+      ],
+      pagamento: [
+        ["pendente", "Pendente"],
+        ["pago", "Pago"],
+        ["vencido", "Vencido"],
+        ["parcial", "Parcial"],
+        ["cancelado", "Cancelado"]
+      ],
+      faturamento: [
+        ["em_aberto", "Em aberto"],
+        ["faturado", "Faturado"],
+        ["cancelado", "Cancelado"]
+      ]
+    };
+
+    return `
+      <select data-id="${itemId}" data-campo="${campo}" ${podeEditar(campo) ? "" : "disabled"}>
+        ${(listas[campo] || []).map(([value, label]) => `
+          <option value="${value}" ${value === valorAtual ? "selected" : ""}>${label}</option>
+        `).join("")}
+      </select>
+    `;
+  }
+
+  function linkArquivo(arquivo) {
+    const caminho = String(arquivo.caminho || "").replace(/^\/+/, "");
+    return `<a href="/${caminho}" target="_blank" style="color:white;">${arquivo.nomeArquivo || caminho}</a>`;
+  }
+
+  function arquivos(campo) {
+    const lista = campo?.arquivos || [];
+    if (!lista.length) return `<span class="muted">Nenhum arquivo</span>`;
+    return lista.map((arquivo) => `<div>${linkArquivo(arquivo)}</div>`).join("");
+  }
+
+  function orcamentos(item) {
+    const lista = item.orcamentos || [];
+
+    if (!lista.length) {
+      return `<span class="muted">Nenhum orçamento localizado</span>`;
+    }
+
+    return `
+      <div class="orc-list">
+        ${lista.map((orc, index) => {
+          const caminho = String(orc.caminho || "").replace(/^\/+/, "");
+          return `
+            <div class="orc-item">
+              <strong>${index + 1}. ${orc.nome || orc.nomeArquivo || "Orçamento"}</strong><br>
+              ${caminho ? `<a href="/${caminho}" target="_blank" style="color:white;">Abrir PDF</a>` : ""}
+            </div>
+          `;
+        }).join("")}
+      </div>
+    `;
+  }
+
+  function passaFiltro(item) {
+    const q = String($("busca")?.value || "").trim().toLowerCase();
+    if (!q) return true;
+    return JSON.stringify(item).toLowerCase().includes(q);
+  }
+
+  function renderTabela() {
+    const tbody = $("tbody");
+    const vazio = $("vazio");
+
+    if (!tbody) return;
+
+    const itens = (estado.itens || []).filter(passaFiltro);
+
+    tbody.innerHTML = itens.map((item) => {
+      const boleto = item.boleto?.status || "nao_emitido";
+      const demonstrativo = item.demonstrativo?.status || "nao_emitido";
+      const pagamento = item.pagamento?.status || "pendente";
+      const faturamento = item.faturamento?.status || "em_aberto";
+
+      return `
+        <tr>
+          <td>
+            <span class="evento">${item.clienteEvento || "Sem nome"}</span>
+            <span class="muted">Data: ${item.dataEvento || "não informada"}</span>
+            ${item.observacoes ? `<div class="muted">${item.observacoes}</div>` : ""}
+          </td>
+
+          <td>${orcamentos(item)}</td>
+
+          <td>
+            ${pill(boleto)}
+            <div style="height:8px;"></div>
+            ${selectStatus(item.id, "boleto", boleto)}
+            <div class="muted" style="margin-top:8px;">${arquivos(item.boleto)}</div>
+          </td>
+
+          <td>
+            ${pill(demonstrativo)}
+            <div style="height:8px;"></div>
+            ${selectStatus(item.id, "demonstrativo", demonstrativo)}
+            <div class="muted" style="margin-top:8px;">${arquivos(item.demonstrativo)}</div>
+          </td>
+
+          <td>
+            ${pill(pagamento)}
+            <div style="height:8px;"></div>
+            ${selectStatus(item.id, "pagamento", pagamento)}
+          </td>
+
+          <td>
+            ${pill(faturamento)}
+            <div style="height:8px;"></div>
+            ${selectStatus(item.id, "faturamento", faturamento)}
+          </td>
+
+          <td>
+            <div class="muted">
+              Orçamentos: ${(item.orcamentos || []).length}<br>
+              Boletos: ${(item.boleto?.arquivos || []).length}<br>
+              Demonstrativos: ${(item.demonstrativo?.arquivos || []).length}
+            </div>
+          </td>
+
+          <td>
+            ${podeEditar("boleto") ? `<button class="btn mini danger" data-apagar-financeiro="${item.id}" data-nome="${String(item.clienteEvento || "").replace(/"/g, "&quot;")}">Apagar</button>` : `<span class="muted">Sem permissão</span>`}
+          </td>
+        </tr>
+      `;
+    }).join("");
+
+    if (vazio) {
+      vazio.style.display = itens.length ? "none" : "block";
+      vazio.textContent = itens.length
+        ? ""
+        : "Nenhum arquivo financeiro encontrado ainda. Clique em Sincronizar servidor ou confira se existem PDFs dentro de uploads.";
+    }
+  }
+
+  async function chamarApi(url, options = {}) {
+    const resposta = await fetch(url, {
+      cache: "no-store",
+      credentials: "same-origin",
+      ...options
+    });
+
+    const texto = await resposta.text();
+
+    let dados;
+
+    try {
+      dados = JSON.parse(texto);
+    } catch {
+      throw new Error("A API do financeiro não respondeu JSON. O módulo pode não estar ligado no server.js.");
+    }
+
+    if (!resposta.ok || !dados.ok) {
+      throw new Error(dados.message || "Erro ao carregar financeiro.");
+    }
+
+    estado = dados;
+    renderCards();
+    renderTabela();
+
+    return dados;
+  }
+
+  async function sincronizar() {
+    const btn = $("btnSincronizar");
+
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "Sincronizando...";
+    }
+
+    try {
+      await chamarApi("/api/financeiro/sincronizar", {
+        method: "POST"
+      });
+    } catch (error) {
+      const vazio = $("vazio");
+      if (vazio) {
+        vazio.style.display = "block";
+        vazio.textContent = error.message || "Erro ao sincronizar.";
+      }
+      console.error(error);
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = "Sincronizar servidor";
+      }
+    }
+  }
+
+  async function apagarControleFinanceiro(id, nome) {
+    if (!confirm(`Apagar o controle financeiro "${nome || "sem nome"}"?\n\nOs PDFs não serão excluídos do servidor, apenas ignorados pelo Financeiro.`)) {
+      return;
+    }
+
+    const resposta = await fetch("/api/financeiro/item/" + encodeURIComponent(id), {
+      method: "DELETE",
+      credentials: "same-origin"
+    });
+
+    const dados = await resposta.json();
+
+    if (!resposta.ok || !dados.ok) {
+      throw new Error(dados.message || "Erro ao apagar controle.");
+    }
+
+    await sincronizar();
+  }
+
+  async function atualizarStatus(id, campo, status) {
+    await chamarApi("/api/financeiro/item/" + encodeURIComponent(id), {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ campo, status })
+    });
+
+    await sincronizar();
+  }
+
+  async function criarNovoControle() {
+    const clienteEvento = String($("novoClienteEvento")?.value || "").trim();
+    const dataEvento = String($("novoDataEvento")?.value || "").trim();
+    const observacoes = String($("novoObs")?.value || "").trim();
+
+    if (!clienteEvento) {
+      alert("Informe o cliente/evento.");
+      return;
+    }
+
+    await chamarApi("/api/financeiro/item", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ clienteEvento, dataEvento, observacoes })
+    });
+
+    $("modal")?.classList.remove("open");
+
+    if ($("novoClienteEvento")) $("novoClienteEvento").value = "";
+    if ($("novoDataEvento")) $("novoDataEvento").value = "";
+    if ($("novoObs")) $("novoObs").value = "";
+
+    await sincronizar();
+  }
+
+  function iniciar() {
+    const btnSincronizar = $("btnSincronizar");
+    const btnAtualizar = $("btnAtualizar");
+    const btnNovo = $("btnNovo");
+    const btnFechar = $("btnFechar");
+    const btnSalvarNovo = $("btnSalvarNovo");
+    const modal = $("modal");
+    const busca = $("busca");
+    const tbody = $("tbody");
+
+    if (btnSincronizar) btnSincronizar.onclick = sincronizar;
+    if (btnAtualizar) btnAtualizar.onclick = sincronizar;
+    if (btnNovo) btnNovo.onclick = () => modal?.classList.add("open");
+    if (btnFechar) btnFechar.onclick = () => modal?.classList.remove("open");
+
+    if (btnSalvarNovo) {
+      btnSalvarNovo.onclick = () => {
+        criarNovoControle().catch((error) => alert(error.message || "Erro ao criar controle."));
+      };
+    }
+
+    if (busca) busca.oninput = renderTabela;
+
+    if (tbody) {
+      tbody.onclick = (event) => {
+        const btn = event.target.closest("[data-apagar-financeiro]");
+        if (!btn) return;
+
+        apagarControleFinanceiro(btn.dataset.apagarFinanceiro, btn.dataset.nome).catch((error) => {
+          alert(error.message || "Erro ao apagar controle.");
+          sincronizar();
+        });
+      };
+
+      tbody.onchange = (event) => {
+        const el = event.target;
+        if (!el.matches("select[data-id][data-campo]")) return;
+
+        atualizarStatus(el.dataset.id, el.dataset.campo, el.value).catch((error) => {
+          alert(error.message || "Erro ao atualizar status.");
+          sincronizar();
+        });
+      };
+    }
+
+    sincronizar();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", iniciar);
+  } else {
+    iniciar();
+  }
+})();
+</script>
+
+</body>
+</html>

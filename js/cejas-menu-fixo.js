@@ -8,6 +8,7 @@
     { href: "/painel-dia.html", texto: "▣ Painel do Dia" },
     { href: "/chat.html", texto: "💬 Chat Interno" },
     { href: "/orcamentos.html", texto: "◉ Orçamentos" },
+    { href: "/financeiro.html", texto: "💰 Financeiro" },
     { href: "/tarefas.html", texto: "☑ Tarefas Pendentes" },
     { href: "/servidor.html", texto: "▣ Servidor" },
     { href: "/contratos.html", texto: "Contratos" }
@@ -34,24 +35,14 @@
   function limparAdministrativo(usuario) {
     if (usuario && usuario.superadmin) return;
 
-    document.querySelectorAll("aside a, nav a, main a").forEach((a) => {
+    document.querySelectorAll("aside a, nav a").forEach((a) => {
       const href = String(a.getAttribute("href") || "").toLowerCase();
       const texto = String(a.textContent || "").toLowerCase();
 
       const adminHref = ADMIN_HREFS.some((x) => href.includes(x));
       const adminTexto = ADMIN_TEXTOS.some((x) => texto.includes(x));
 
-      if (adminHref || adminTexto) {
-        const dentroMenu = Boolean(a.closest("aside") || a.closest("nav"));
-
-        if (dentroMenu) {
-          a.remove();
-        } else {
-          const card = a.closest(".card, article, section, div");
-          if (card && !card.closest("aside")) card.remove();
-          else a.remove();
-        }
-      }
+      if (adminHref || adminTexto) a.remove();
     });
   }
 
@@ -139,4 +130,78 @@
       limparAdministrativo(ultimoUsuario);
     }, 1500);
   });
+})();
+
+/* CEJAS_FIX_FINANCEIRO_CLICAVEL */
+(function () {
+  if (window.__CEJAS_FINANCEIRO_CLICAVEL__) return;
+  window.__CEJAS_FINANCEIRO_CLICAVEL__ = true;
+
+  function criarLinkFinanceiro() {
+    const a = document.createElement("a");
+    a.href = "/financeiro.html";
+    a.textContent = "💰 Financeiro";
+    a.style.pointerEvents = "auto";
+    a.style.cursor = "pointer";
+    a.addEventListener("click", function (event) {
+      event.preventDefault();
+      window.location.href = "/financeiro.html";
+    });
+    return a;
+  }
+
+  function corrigirFinanceiro() {
+    const aside = document.querySelector("aside");
+    if (!aside) return;
+
+    let nav = aside.querySelector("nav");
+
+    if (!nav) {
+      nav = document.createElement("nav");
+      aside.appendChild(nav);
+    }
+
+    const itens = Array.from(nav.children);
+    const itemFinanceiro = itens.find((el) => {
+      return String(el.textContent || "").toLowerCase().includes("financeiro");
+    });
+
+    if (itemFinanceiro) {
+      if (itemFinanceiro.tagName.toLowerCase() === "a") {
+        itemFinanceiro.setAttribute("href", "/financeiro.html");
+        itemFinanceiro.style.pointerEvents = "auto";
+        itemFinanceiro.style.cursor = "pointer";
+        itemFinanceiro.onclick = function (event) {
+          event.preventDefault();
+          window.location.href = "/financeiro.html";
+        };
+      } else {
+        itemFinanceiro.replaceWith(criarLinkFinanceiro());
+      }
+
+      return;
+    }
+
+    const link = criarLinkFinanceiro();
+
+    const itemOrcamentos = itens.find((el) => {
+      return String(el.textContent || "").toLowerCase().includes("orçamento") ||
+             String(el.textContent || "").toLowerCase().includes("orcamento");
+    });
+
+    if (itemOrcamentos && itemOrcamentos.parentNode) {
+      itemOrcamentos.insertAdjacentElement("afterend", link);
+    } else {
+      nav.appendChild(link);
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    corrigirFinanceiro();
+    setTimeout(corrigirFinanceiro, 300);
+    setTimeout(corrigirFinanceiro, 900);
+    setTimeout(corrigirFinanceiro, 1800);
+  });
+
+  setInterval(corrigirFinanceiro, 1500);
 })();

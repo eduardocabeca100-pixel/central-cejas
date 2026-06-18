@@ -8,3 +8,15 @@ uploads/
 data/usuarios.json
 data/relatorio-supera.json
 data/ultimo-relatorio-texto-extraido.txt
+
+# Arquivos de backup local
+*.backup-*.html
+*.backup-*.js
+.env.backup-*
+diagnostico-*.zip
+
+# Arquivos de sistema
+.DS_Store
+*.swp
+*.swo
+*~

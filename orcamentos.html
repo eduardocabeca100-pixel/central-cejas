@@ -687,6 +687,86 @@
       }
     }
   </style>
+
+<style id="cejas-ajuste-largura-orcamento">
+  /* CEJAS: ajuste fino somente da tela de orçamento */
+  @media (min-width: 1200px) {
+    .content-scroll,
+    .main-content,
+    main {
+      overflow-x: auto !important;
+    }
+
+    .orcamento-layout,
+    .orcamentos-layout,
+    .orcamento-grid,
+    .budget-layout,
+    .budget-grid,
+    .workspace,
+    .workspace-grid,
+    .orcamento-workspace,
+    .budget-workspace,
+    .editor-preview,
+    .form-preview-layout,
+    .conteudo-orcamento {
+      grid-template-columns: minmax(560px, 620px) minmax(650px, 1fr) !important;
+      column-gap: 28px !important;
+      gap: 28px !important;
+      max-width: none !important;
+    }
+
+    .form-panel,
+    .form-card,
+    .orcamento-form,
+    .budget-form,
+    .editor-panel,
+    .left-panel,
+    .painel-formulario,
+    .painel-orcamento,
+    .controls-panel {
+      width: 560px !important;
+      min-width: 560px !important;
+      max-width: 620px !important;
+      overflow: visible !important;
+    }
+
+    .preview-panel,
+    .pdf-preview,
+    .document-preview,
+    .right-panel {
+      min-width: 650px !important;
+    }
+
+    .cronograma-row,
+    .item-row,
+    .linha-item,
+    .linha-cronograma {
+      grid-template-columns: minmax(130px, 1fr) 72px minmax(150px, 1fr) 100px auto !important;
+      gap: 10px !important;
+    }
+  }
+
+  @media (max-width: 1199px) {
+    .form-panel,
+    .form-card,
+    .orcamento-form,
+    .budget-form,
+    .editor-panel,
+    .left-panel,
+    .painel-formulario,
+    .painel-orcamento,
+    .controls-panel {
+      min-width: 500px !important;
+    }
+
+    .content-scroll,
+    .main-content,
+    main {
+      overflow-x: auto !important;
+    }
+  }
+</style>
+
 </head>
 
 <body>

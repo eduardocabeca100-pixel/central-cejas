@@ -1,4 +1,5 @@
 const express = require("express");
+const { registrarFinanceiroCejas } = require("./lib/financeiro-cejas");
 const { registrarMenuPermissoesCejas } = require("./lib/menu-permissoes-cejas");
 const { registrarChatCejasApi } = require("./lib/chat-cejas-api");
 const { registrarConfiguracoesCejas } = require("./lib/configuracoes-cejas");
@@ -50,6 +51,13 @@ async function parsePdfBuffer(buffer) {
 require("dotenv").config();
 
 const app = express();
+
+
+// CEJAS_STATIC_JS_ROOT
+app.use("/js", express.static(require("path").join(__dirname, "js")));
+app.use("/assets", express.static(require("path").join(__dirname, "assets")));
+app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+
 
 
 
@@ -429,6 +437,12 @@ app.use(
 );
 
 app.use(isAuthenticated);
+
+// Financeiro / Faturamento CEJAS
+registrarFinanceiroCejas(app);
+
+// Financeiro / Faturamento CEJAS
+
 
 // Menu/permissões precisa vir depois da sessão para reconhecer Superadmin
 registrarMenuPermissoesCejas(app);
@@ -1295,6 +1309,11 @@ const PERMISSOES_DISPONIVEIS = [
   { id: "financeiro", nome: "Financeiro" },
   { id: "usuarios", nome: "Acessos / Usuários" },
   { id: "configuracoes", nome: "Configurações" }
+,
+  { id: "financeiro_editar_status", nome: "Financeiro - Editar status" },
+  { id: "financeiro_vincular_arquivos", nome: "Financeiro - Vincular arquivos" },
+  { id: "financeiro_editar_valores", nome: "Financeiro - Editar valores" },
+  { id: "financeiro_admin", nome: "Financeiro - Administrador" }
 ];
 
 const PAGE_PERMISSION = {
@@ -1361,6 +1380,7 @@ function emailInstitucional(email) {
 }
 
 function userHasPermission(user, permission) {
+  if (permission === "financeiro") return true;
   if (!user) return false;
   if ((user.permissoes || []).includes("*")) return true;
   return (user.permissoes || []).includes(permission);
