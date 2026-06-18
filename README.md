@@ -52,6 +52,8 @@ Este projeto é um backend Node.js/Express que usa `app.listen`, sessões, uploa
 
 Para a Agenda e o Painel do Dia carregarem dados do banco no Render, a variável essencial é `SUPABASE_SERVICE_ROLE_KEY`. Use a chave `service_role` do projeto Supabase, não a chave anon/publishable.
 
+O `render.yaml` também ativa `CEJAS_PERSISTENT_DATA_DIR=/opt/render/project/src/uploads/.data`, para que relatórios importados, usuários locais, financeiro e agenda manual local sobrevivam aos redeploys.
+
 ### Opção 2: Hospedar frontend estático + proxy Cloudflare Worker
 - O backend continua rodando no Render/Railway.
 - O Cloudflare Worker proxy envia `/api/*` para o backend.

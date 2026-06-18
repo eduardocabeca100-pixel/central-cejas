@@ -15,6 +15,7 @@ const bcrypt = require("bcryptjs");
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
+const { prepararDadosPersistentes } = require("./lib/render-persistent-data");
 
 async function parsePdfBuffer(buffer) {
   const pdfModule = require("pdf-parse");
@@ -49,6 +50,7 @@ async function parsePdfBuffer(buffer) {
 
 
 require("dotenv").config();
+prepararDadosPersistentes(__dirname);
 
 const app = express();
 

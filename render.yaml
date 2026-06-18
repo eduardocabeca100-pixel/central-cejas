@@ -16,6 +16,8 @@ services:
         value: production
       - key: SESSION_SECRET
         generateValue: true
+      - key: CEJAS_PERSISTENT_DATA_DIR
+        value: /opt/render/project/src/uploads/.data
       - key: ADMIN_EMAIL
         sync: false
       - key: ADMIN_PASSWORD_HASH

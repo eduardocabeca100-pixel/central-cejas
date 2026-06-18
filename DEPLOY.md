@@ -72,12 +72,14 @@ SUPABASE_SERVICE_ROLE_KEY=sua_chave_service_role
 SUPABASE_ANON_KEY=sua_chave_anon_ou_publishable
 SUPABASE_STORAGE_BUCKET=servidor-cejas
 SESSION_SECRET=uma_chave_muito_segura_e_longa_aqui
+CEJAS_PERSISTENT_DATA_DIR=/opt/render/project/src/uploads/.data
 NODE_ENV=production
 ADMIN_EMAIL=seu@email.com
 ADMIN_PASSWORD_HASH=bcrypt_hash_da_senha_admin
 ```
 
 No Render, nao defina `PORT` manualmente; a plataforma injeta essa variavel automaticamente. Use `PORT=5500` apenas no `.env` local.
+O `CEJAS_PERSISTENT_DATA_DIR` usa o disco persistente montado em `uploads/` para manter os JSONs dinamicos entre redeploys.
 
 ### 1.3 Deploy
 
