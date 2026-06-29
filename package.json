@@ -7,7 +7,10 @@
     "dev": "node server.js",
     "start": "node server.js",
     "backup:dados": "bash scripts/backup-dados-cejas.sh",
-    "audit:dados": "node scripts/auditoria-dados-cejas.js"
+    "audit:dados": "node scripts/auditoria-dados-cejas.js",
+    "servidor:sync-supabase": "node scripts/sync-servidor-supabase.js",
+    "servidor:restore-supabase": "node scripts/restaurar-servidor-supabase.js",
+    "servidor:check-storage": "node scripts/check-servidor-storage.js"
   },
   "keywords": [],
   "author": "",

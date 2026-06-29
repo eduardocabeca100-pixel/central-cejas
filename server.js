@@ -10,6 +10,7 @@ const { registrarAgendaDiaLivre } = require("./lib/agenda-dia-livre");
 const { registrarAgendaDiaApi } = require("./lib/agenda-dia-api");
 const { registrarRotasCejasFase2 } = require("./lib/cejas-fase2");
 const { syncRelatorioAtualComSupabase } = require("./lib/sync-relatorio-supabase");
+const { iniciarProtecaoServidorSupabase, uploadBufferSupabaseServidor, uploadLocalFileSupabaseServidor, downloadBufferSupabaseServidor, moverSupabaseServidor, listarStorageServidor } = require("./lib/servidor-storage-persistente");
 const session = require("express-session");
 const bcrypt = require("bcryptjs");
 const path = require("path");
@@ -2070,6 +2071,30 @@ app.use(requirePagePermission);
 
 const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
 fs.mkdirSync(SERVIDOR_DIR, { recursive: true });
+iniciarProtecaoServidorSupabase(SERVIDOR_DIR);
+
+// CEJAS_SYNC_SERVIDOR_STORAGE_AFTER_MUTATION
+app.use((req, res, next) => {
+  if (req.path.startsWith("/api/servidor") && ["POST", "DELETE", "PUT", "PATCH"].includes(req.method)) {
+    res.on("finish", () => {
+      if (res.statusCode < 400) {
+        setTimeout(() => {
+          try {
+            const { enviarDiretorioParaSupabaseServidor } = require("./lib/servidor-storage-persistente");
+            enviarDiretorioParaSupabaseServidor(SERVIDOR_DIR).catch((error) => {
+              console.warn("⚠️ Sync pós-alteração do servidor falhou:", error.message);
+            });
+          } catch (error) {
+            console.warn("⚠️ Sync pós-alteração do servidor não iniciou:", error.message);
+          }
+        }, 800);
+      }
+    });
+  }
+
+  next();
+});
+
 
 // CEJAS_PROTECAO_DADOS_START
 function cejasTimestampSeguro() {
@@ -2220,19 +2245,39 @@ function buildServidorTree(dirPath, relative = "") {
     });
 }
 
-app.get("/api/servidor/tree", (_req, res) => {
+app.get("/api/servidor/tree", async (_req, res) => {
   try {
+    const cloudTree = await listarStorageServidor();
+
+    if (Array.isArray(cloudTree) && cloudTree.length) {
+      return res.json({
+        ok: true,
+        origem: "supabase-storage",
+        root: cloudTree
+      });
+    }
+
     fs.mkdirSync(SERVIDOR_DIR, { recursive: true });
 
     res.json({
       ok: true,
+      origem: "local-fallback",
       root: buildServidorTree(SERVIDOR_DIR)
     });
   } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: "Erro ao carregar servidor: " + error.message
-    });
+    try {
+      return res.json({
+        ok: true,
+        origem: "local-fallback-erro-storage",
+        aviso: error.message,
+        root: buildServidorTree(SERVIDOR_DIR)
+      });
+    } catch (localError) {
+      res.status(500).json({
+        ok: false,
+        message: "Erro ao carregar servidor: " + localError.message
+      });
+    }
   }
 });
 
@@ -2944,46 +2989,57 @@ app.post("/api/servidor/reorganizar-eventos", express.json({ limit: "2mb" }), (r
   }
 });
 
-app.get("/api/servidor/arquivo", (req, res) => {
+app.get("/api/servidor/arquivo", async (req, res) => {
   try {
     const relativePath = req.query.path || "";
     const filePath = safeServidorPath(relativePath);
 
-    if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
+    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+      return res.sendFile(filePath);
+    }
+
+    const buffer = await downloadBufferSupabaseServidor(relativePath);
+
+    if (!buffer) {
       return res.status(404).send("Arquivo não encontrado.");
     }
 
+    fs.mkdirSync(path.dirname(filePath), { recursive: true });
+    fs.writeFileSync(filePath, buffer);
+
     res.sendFile(filePath);
   } catch (error) {
-    res.status(500).send("Erro ao abrir arquivo.");
+    res.status(500).send("Erro ao abrir arquivo: " + error.message);
   }
 });
 
-app.delete("/api/servidor/item", (req, res) => {
+app.delete("/api/servidor/item", async (req, res) => {
   try {
     const relativePath = String(req.query.path || "").trim();
     const itemPath = safeServidorPath(relativePath);
 
-    if (!fs.existsSync(itemPath)) {
-      return res.status(404).json({
-        ok: false,
-        message: "Item não encontrado."
-      });
-    }
-
     if (relativePath.startsWith("_LIXEIRA/")) {
       return res.status(400).json({
         ok: false,
-        message: "Este item já está na lixeira. Exclusão definitiva bloqueada para proteger os documentos."
+        message: "Exclusão definitiva bloqueada. Este item já está na lixeira de segurança."
       });
     }
 
-    const destinoLixeira = moverParaLixeiraServidorCejas(itemPath, relativePath);
+    const hoje = new Date().toISOString().slice(0, 10);
+    const destinoRelativo = path.join("_LIXEIRA", hoje, relativePath).replace(/\\/g, "/");
+    const destinoPath = safeServidorPath(destinoRelativo);
+
+    if (fs.existsSync(itemPath)) {
+      fs.mkdirSync(path.dirname(destinoPath), { recursive: true });
+      fs.renameSync(itemPath, destinoPath);
+    }
+
+    await moverSupabaseServidor(relativePath, destinoRelativo);
 
     res.json({
       ok: true,
-      destino: destinoLixeira,
-      message: "Item movido para a lixeira de segurança. Nada foi apagado definitivamente."
+      destino: destinoRelativo,
+      message: "Item movido para _LIXEIRA. Nada foi apagado definitivamente."
     });
   } catch (error) {
     res.status(500).json({
