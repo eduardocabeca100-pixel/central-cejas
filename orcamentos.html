@@ -1761,6 +1761,290 @@
 
     /* CEJAS_ORCAMENTO_PDF_DEFINITIVO_END */
 
+  
+    /* CEJAS_ORCAMENTO_PDF_A4_COMPLETO_START */
+
+    .cronometro,
+    .countdown,
+    .countdown-card,
+    .timer-card,
+    .timer-box,
+    .budget-timer,
+    .orcamento-timer,
+    .validade-timer,
+    #cronometro,
+    #countdown,
+    #budgetTimer,
+    #orcamentoTimer {
+      display: none !important;
+      visibility: hidden !important;
+    }
+
+    .cejas-pdf-a4-root {
+      position: fixed !important;
+      left: -100000px !important;
+      top: 0 !important;
+      width: 210mm !important;
+      background: #ffffff !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      z-index: -1 !important;
+      pointer-events: none !important;
+      overflow: visible !important;
+    }
+
+    .cejas-pdf-a4-page {
+      width: 210mm !important;
+      min-height: 297mm !important;
+      background: #ffffff !important;
+      color: #111827 !important;
+      padding: 14mm 12mm 12mm !important;
+      margin: 0 !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      transform: none !important;
+      display: flex !important;
+      flex-direction: column !important;
+      font-family: Arial, Helvetica, sans-serif !important;
+      font-size: 9.4px !important;
+      line-height: 1.28 !important;
+      box-sizing: border-box !important;
+    }
+
+    .cejas-pdf-a4-page * {
+      box-sizing: border-box !important;
+    }
+
+    .cejas-pdf-a4-page .doc-header {
+      display: grid !important;
+      grid-template-columns: 35mm 1fr !important;
+      align-items: start !important;
+      gap: 8mm !important;
+      padding-bottom: 8mm !important;
+      border-bottom: 1.4px solid #111827 !important;
+      margin-bottom: 4mm !important;
+    }
+
+    .cejas-pdf-a4-page .cejas-logo img {
+      width: 24mm !important;
+      height: auto !important;
+    }
+
+    .cejas-pdf-a4-page .doc-company {
+      text-align: right !important;
+      font-size: 8.5px !important;
+      line-height: 1.23 !important;
+      color: #374151 !important;
+    }
+
+    .cejas-pdf-a4-page .doc-company h1 {
+      font-size: 10.8px !important;
+      line-height: 1.1 !important;
+      margin: 0 0 4px !important;
+      color: #111827 !important;
+      font-weight: 900 !important;
+      text-transform: uppercase !important;
+    }
+
+    .cejas-pdf-a4-page .doc-meta {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      gap: 8px !important;
+      margin: 0 0 4mm !important;
+      font-size: 9px !important;
+      color: #374151 !important;
+    }
+
+    .cejas-pdf-a4-page .doc-title {
+      background: #f3f4f6 !important;
+      border: 1px solid #d1d5db !important;
+      padding: 2.8mm 4mm !important;
+      margin: 0 0 4.5mm !important;
+      text-align: center !important;
+      text-transform: uppercase !important;
+      letter-spacing: .28em !important;
+      font-size: 10px !important;
+      font-weight: 900 !important;
+      color: #111827 !important;
+    }
+
+    .cejas-pdf-a4-page .doc-fields {
+      border: 1px solid #d1d5db !important;
+      padding: 4mm !important;
+      margin: 0 0 4.5mm !important;
+      font-size: 9.3px !important;
+      line-height: 1.65 !important;
+    }
+
+    .cejas-pdf-a4-page .doc-fields p {
+      display: grid !important;
+      grid-template-columns: 25mm 1fr !important;
+      gap: 4mm !important;
+      margin: 0 !important;
+    }
+
+    .cejas-pdf-a4-page .doc-period-title {
+      border-left: 4px solid #64748b !important;
+      padding-left: 8px !important;
+      margin: 0 0 2.7mm !important;
+      font-size: 9px !important;
+      font-weight: 900 !important;
+      text-transform: uppercase !important;
+      color: #111827 !important;
+    }
+
+    .cejas-pdf-a4-page .period {
+      margin: 0 0 4mm !important;
+    }
+
+    .cejas-pdf-a4-page table {
+      width: 100% !important;
+      border-collapse: collapse !important;
+      table-layout: fixed !important;
+      font-size: 8px !important;
+      margin: 0 !important;
+    }
+
+    .cejas-pdf-a4-page th,
+    .cejas-pdf-a4-page td {
+      border: 1px solid #d1d5db !important;
+      padding: 3.5px 4px !important;
+      color: #111827 !important;
+      line-height: 1.16 !important;
+      vertical-align: top !important;
+      overflow-wrap: break-word !important;
+      word-break: normal !important;
+    }
+
+    .cejas-pdf-a4-page th {
+      background: #f3f4f6 !important;
+      font-weight: 900 !important;
+    }
+
+    .cejas-pdf-a4-page th:nth-child(1),
+    .cejas-pdf-a4-page td:nth-child(1) {
+      width: 8mm !important;
+      text-align: center !important;
+    }
+
+    .cejas-pdf-a4-page th:nth-child(2),
+    .cejas-pdf-a4-page td:nth-child(2) {
+      width: 32mm !important;
+    }
+
+    .cejas-pdf-a4-page th:nth-child(3),
+    .cejas-pdf-a4-page td:nth-child(3) {
+      width: 10mm !important;
+      text-align: center !important;
+    }
+
+    .cejas-pdf-a4-page th:nth-child(5),
+    .cejas-pdf-a4-page td:nth-child(5),
+    .cejas-pdf-a4-page th:nth-child(6),
+    .cejas-pdf-a4-page td:nth-child(6) {
+      width: 23mm !important;
+      text-align: right !important;
+      white-space: nowrap !important;
+    }
+
+    .cejas-pdf-a4-page .subtotal td {
+      background: #f8fafc !important;
+      font-weight: 900 !important;
+      font-style: italic !important;
+    }
+
+    .cejas-pdf-a4-page .total-general {
+      width: 66mm !important;
+      margin: 3mm 0 5mm auto !important;
+      border: 1.4px solid #111827 !important;
+      padding: 3mm 4mm !important;
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      font-size: 9.5px !important;
+      font-weight: 900 !important;
+      color: #111827 !important;
+    }
+
+    .cejas-pdf-a4-page .total-general strong {
+      font-size: 13px !important;
+      color: #111827 !important;
+      white-space: nowrap !important;
+    }
+
+    .cejas-pdf-a4-page .conditions {
+      margin-top: auto !important;
+      margin-bottom: 5mm !important;
+      border: 1px solid #d1d5db !important;
+      background: #f8fafc !important;
+    }
+
+    .cejas-pdf-a4-page .conditions h4 {
+      background: #e5e7eb !important;
+      padding: 2.7mm 4mm !important;
+      font-size: 7.5px !important;
+      letter-spacing: .18em !important;
+      color: #111827 !important;
+      text-transform: uppercase !important;
+      font-weight: 900 !important;
+    }
+
+    .cejas-pdf-a4-page .conditions div {
+      padding: 3.5mm 4mm !important;
+      font-size: 8.2px !important;
+      line-height: 1.38 !important;
+      color: #374151 !important;
+    }
+
+    .cejas-pdf-a4-page .conditions p {
+      margin: 0 0 2mm !important;
+    }
+
+    .cejas-pdf-a4-page .warning {
+      font-weight: 900 !important;
+      color: #111827 !important;
+      border-top: 1px solid #e5e7eb !important;
+      border-bottom: 1px solid #e5e7eb !important;
+      padding: 4px 0 !important;
+      margin: 4px 0 !important;
+      text-transform: uppercase !important;
+    }
+
+    .cejas-pdf-a4-page .signature {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: flex-end !important;
+      gap: 18px !important;
+      font-size: 8.6px !important;
+      line-height: 1.28 !important;
+      color: #374151 !important;
+      margin-top: 0 !important;
+    }
+
+    .cejas-pdf-a4-page .signature strong {
+      display: block !important;
+      color: #111827 !important;
+      font-size: 9.5px !important;
+      margin: 4px 0 1px !important;
+    }
+
+    .cejas-pdf-a4-page .system-mark {
+      font-size: 6.7px !important;
+      color: #9ca3af !important;
+      text-transform: uppercase !important;
+      white-space: nowrap !important;
+    }
+
+    @media print {
+      @page {
+        size: A4;
+        margin: 0;
+      }
+    }
+
+    /* CEJAS_ORCAMENTO_PDF_A4_COMPLETO_END */
+
   </style>
   <link rel="stylesheet" href="/css/cejas-interface-compacta.css?v=3">
   <link rel="stylesheet" href="/css/cejas-mobile-fix.css?v=1">
@@ -3373,6 +3657,230 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("✅ CEJAS: exportação definitiva de orçamento A4 ativa.");
 })();
 // CEJAS_ORCAMENTO_PDF_DEFINITIVO_JS_END
+</script>
+
+
+<script>
+// CEJAS_ORCAMENTO_PDF_A4_COMPLETO_JS_START
+(function () {
+  if (window.__CEJAS_ORCAMENTO_PDF_A4_COMPLETO__) return;
+  window.__CEJAS_ORCAMENTO_PDF_A4_COMPLETO__ = true;
+
+  function carregarScript(src) {
+    return new Promise((resolve, reject) => {
+      const existente = [...document.scripts].find((script) => script.src && script.src.includes(src));
+      if (existente) return resolve();
+
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = () => reject(new Error("Não foi possível carregar " + src));
+      document.head.appendChild(script);
+    });
+  }
+
+  async function garantirPDFLibs() {
+    if (!window.html2canvas) {
+      await carregarScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
+    }
+
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      await carregarScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+    }
+  }
+
+  function isDocument(el) {
+    const text = String(el && el.innerText || "").toUpperCase();
+
+    return text.includes("DOCUMENTO AUXILIAR DE VENDA") ||
+      text.includes("ORÇAMENTO LOCAÇÃO") ||
+      text.includes("ORCAMENTO LOCACAO") ||
+      text.includes("SOLICITANTE:");
+  }
+
+  function findDocument() {
+    const selectors = [
+      ".cejas-orcamento-folha",
+      ".document",
+      "#orcamentoDocumento",
+      "#document",
+      "#orcamentoPreview",
+      "[data-orcamento-documento]"
+    ];
+
+    for (const selector of selectors) {
+      for (const el of [...document.querySelectorAll(selector)]) {
+        if (isDocument(el)) return el;
+      }
+    }
+
+    const candidates = [...document.querySelectorAll("body *")]
+      .filter(el => el.children.length > 0 && isDocument(el))
+      .sort((a, b) => a.getBoundingClientRect().width - b.getBoundingClientRect().width);
+
+    if (candidates[0]) return candidates[0];
+
+    throw new Error("Não encontrei a folha do orçamento.");
+  }
+
+  function removeControls(clone) {
+    [...clone.querySelectorAll("*")].forEach((el) => {
+      const idClass = `${el.id || ""} ${el.className || ""}`.toLowerCase();
+      const text = String(el.textContent || "").trim();
+
+      const remove =
+        el.tagName === "BUTTON" ||
+        idClass.includes("timer") ||
+        idClass.includes("countdown") ||
+        idClass.includes("cronometro") ||
+        idClass.includes("toolbar") ||
+        idClass.includes("actions") ||
+        idClass.includes("modal") ||
+        idClass.includes("btn") ||
+        /conectado\s+\d/i.test(text) ||
+        /voltar ao painel/i.test(text) ||
+        /cadastro de itens/i.test(text) ||
+        /salvar pdf/i.test(text) ||
+        /imprimir/i.test(text);
+
+      if (remove) el.remove();
+    });
+  }
+
+  function splitLongContentIntoPages(baseClone) {
+    const root = document.createElement("div");
+    root.className = "cejas-pdf-a4-root";
+
+    const page = baseClone.cloneNode(true);
+    page.classList.add("cejas-pdf-a4-page");
+    page.style.width = "210mm";
+    page.style.minHeight = "297mm";
+    page.style.height = "auto";
+    page.style.transform = "none";
+    page.style.margin = "0";
+    page.style.boxShadow = "none";
+
+    root.appendChild(page);
+    return root;
+  }
+
+  async function gerarPdfBlobA4Completo() {
+    await garantirPDFLibs();
+
+    if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready;
+    }
+
+    const original = findDocument();
+    const clone = original.cloneNode(true);
+
+    removeControls(clone);
+
+    const root = splitLongContentIntoPages(clone);
+    document.body.appendChild(root);
+
+    await new Promise(resolve => setTimeout(resolve, 280));
+
+    await Promise.all(
+      [...root.querySelectorAll("img")].map(img => {
+        if (img.complete) return Promise.resolve();
+
+        return new Promise(resolve => {
+          img.onload = resolve;
+          img.onerror = resolve;
+        });
+      })
+    );
+
+    const pages = [...root.querySelectorAll(".cejas-pdf-a4-page")];
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF("p", "mm", "a4", true);
+
+    for (let i = 0; i < pages.length; i++) {
+      const page = pages[i];
+
+      const canvas = await window.html2canvas(page, {
+        scale: 2.45,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: "#ffffff",
+        scrollX: 0,
+        scrollY: 0,
+        width: page.scrollWidth,
+        height: page.scrollHeight,
+        windowWidth: page.scrollWidth,
+        windowHeight: page.scrollHeight
+      });
+
+      if (i > 0) pdf.addPage();
+
+      const img = canvas.toDataURL("image/jpeg", 0.98);
+      pdf.addImage(img, "JPEG", 0, 0, 210, 297, undefined, "FAST");
+    }
+
+    document.body.removeChild(root);
+
+    return pdf.output("blob");
+  }
+
+  function pdfName() {
+    const text = document.body.innerText || "";
+    const match = text.match(/Evento:\s*([^\n\r]+)/i);
+    const event = match && match[1]
+      ? match[1].replace(/[^\wÀ-ÿ]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "")
+      : "orcamento";
+
+    return `${event || "orcamento"}-${new Date().toISOString().slice(0, 10)}.pdf`;
+  }
+
+  async function baixarPDFA4Completo() {
+    try {
+      const blob = await gerarPdfBlobA4Completo();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+
+      a.href = url;
+      a.download = pdfName();
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (error) {
+      alert("Erro ao gerar PDF: " + error.message);
+      throw error;
+    }
+  }
+
+  window.gerarPdfBlob = gerarPdfBlobA4Completo;
+  window.gerarPDFBlob = gerarPdfBlobA4Completo;
+  window.gerarPdfBlobA4Completo = gerarPdfBlobA4Completo;
+
+  window.gerarPdf = baixarPDFA4Completo;
+  window.gerarPDF = baixarPDFA4Completo;
+  window.imprimirOrcamento = baixarPDFA4Completo;
+  window.baixarPdfOrcamento = baixarPDFA4Completo;
+
+  document.addEventListener("click", function (event) {
+    const btn = event.target.closest("button, a");
+    if (!btn) return;
+
+    const text = String(btn.textContent || "").toLowerCase();
+
+    const isPdf = text.includes("imprimir") || text.includes("pdf a4") || text.includes("gerar pdf");
+    const isSaveServer = text.includes("salvar pdf no servidor");
+
+    if (isPdf && !isSaveServer) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      baixarPDFA4Completo();
+    }
+  }, true);
+
+  console.log("✅ CEJAS: PDF A4 completo ativo.");
+})();
+// CEJAS_ORCAMENTO_PDF_A4_COMPLETO_JS_END
 </script>
 
 </body>
