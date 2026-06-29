@@ -58,6 +58,25 @@ prepararDadosPersistentes(__dirname);
 
 const app = express();
 
+// CEJAS_DEBUG_STORAGE_RUNTIME_START
+app.get("/api/debug/storage-runtime", (_req, res) => {
+  try {
+    const { getSupabaseRuntimeEnvServidor } = require("./lib/servidor-supabase-definitivo");
+
+    res.json({
+      ok: true,
+      storage: getSupabaseRuntimeEnvServidor()
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: error.message
+    });
+  }
+});
+// CEJAS_DEBUG_STORAGE_RUNTIME_END
+
+
 // CEJAS_SUPABASE_ENV_DEBUG_START
 app.get("/api/debug/supabase-env", (_req, res) => {
   try {

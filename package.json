@@ -16,7 +16,8 @@
     "persist:restore": "node scripts/persistencia-restore.js",
     "persist:check": "node scripts/persistencia-check.js",
     "servidor:check-definitivo": "node scripts/check-servidor-definitivo.js",
-    "env:check": "node scripts/check-env-render.js"
+    "env:check": "node scripts/check-env-render.js",
+    "storage:runtime": "node scripts/check-storage-runtime.js"
   },
   "keywords": [],
   "author": "",
