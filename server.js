@@ -14,6 +14,7 @@ const { iniciarProtecaoServidorSupabase, uploadBufferSupabaseServidor, uploadLoc
 const session = require("express-session");
 const bcrypt = require("bcryptjs");
 const path = require("path");
+const { getSupabaseEnvStatus } = require("./lib/supabase");
 const { registrarRotasServidorSupabaseDefinitivo } = require("./lib/servidor-supabase-definitivo");
 const persistenciaTotalCejas = require("./lib/persistencia-total-supabase");
 const fs = require("fs");
@@ -56,6 +57,23 @@ require("dotenv").config();
 prepararDadosPersistentes(__dirname);
 
 const app = express();
+
+// CEJAS_SUPABASE_ENV_DEBUG_START
+app.get("/api/debug/supabase-env", (_req, res) => {
+  try {
+    res.json({
+      ok: true,
+      supabase: getSupabaseEnvStatus()
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: error.message
+    });
+  }
+});
+// CEJAS_SUPABASE_ENV_DEBUG_END
+
 registrarRotasServidorSupabaseDefinitivo(app);
 
 
