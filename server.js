@@ -14,6 +14,7 @@ const { iniciarProtecaoServidorSupabase, uploadBufferSupabaseServidor, uploadLoc
 const session = require("express-session");
 const bcrypt = require("bcryptjs");
 const path = require("path");
+const persistenciaTotalCejas = require("./lib/persistencia-total-supabase");
 const fs = require("fs");
 const multer = require("multer");
 const { prepararDadosPersistentes } = require("./lib/render-persistent-data");
@@ -54,6 +55,79 @@ require("dotenv").config();
 prepararDadosPersistentes(__dirname);
 
 const app = express();
+
+// CEJAS_PERSISTENCIA_TOTAL_DEPLOY_START
+const CEJAS_ROTAS_QUE_SALVAM_DADOS = [
+  "/api/servidor",
+  "/api/gratuidades",
+  "/api/importar-relatorio",
+  "/api/relatorio",
+  "/api/agenda",
+  "/api/tarefas",
+  "/api/usuarios",
+  "/api/configuracoes",
+  "/api/chat",
+  "/api/orcamentos",
+  "/api/financeiro"
+];
+
+app.use((req, res, next) => {
+  const metodoMudaDados = ["POST", "PUT", "PATCH", "DELETE"].includes(req.method);
+  const rotaMudaDados = CEJAS_ROTAS_QUE_SALVAM_DADOS.some(prefix => req.path.startsWith(prefix));
+
+  if (metodoMudaDados && rotaMudaDados) {
+    res.on("finish", () => {
+      if (res.statusCode < 400) {
+        setTimeout(() => {
+          persistenciaTotalCejas.syncTudoCejas("auto").catch((error) => {
+            console.warn("⚠️ Sync automático pós-alteração falhou:", error.message);
+          });
+        }, 1200);
+      }
+    });
+  }
+
+  next();
+});
+
+app.get("/api/persistencia/status", async (_req, res) => {
+  try {
+    const status = await persistenciaTotalCejas.statusPersistenciaCejas();
+    res.json(status);
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: error.message
+    });
+  }
+});
+
+app.post("/api/persistencia/sync", async (_req, res) => {
+  try {
+    const result = await persistenciaTotalCejas.syncTudoCejas("api");
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: error.message
+    });
+  }
+});
+
+app.post("/api/persistencia/restore", async (_req, res) => {
+  try {
+    const result = await persistenciaTotalCejas.restoreTudoCejas("api");
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: error.message
+    });
+  }
+});
+// CEJAS_PERSISTENCIA_TOTAL_DEPLOY_END
+
+
 
 
 // CEJAS_STATIC_JS_ROOT

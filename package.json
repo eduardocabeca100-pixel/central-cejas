@@ -4,13 +4,17 @@
   "description": "Sistema interno de gestão da CEJAS.",
   "main": "index.js",
   "scripts": {
-    "dev": "node server.js",
-    "start": "node server.js",
+    "dev": "node scripts/start-seguro-cejas.js",
+    "start": "node scripts/start-seguro-cejas.js",
     "backup:dados": "bash scripts/backup-dados-cejas.sh",
     "audit:dados": "node scripts/auditoria-dados-cejas.js",
     "servidor:sync-supabase": "node scripts/sync-servidor-supabase.js",
     "servidor:restore-supabase": "node scripts/restaurar-servidor-supabase.js",
-    "servidor:check-storage": "node scripts/check-servidor-storage.js"
+    "servidor:check-storage": "node scripts/check-servidor-storage.js",
+    "dev:local": "node server.js",
+    "persist:sync": "node scripts/persistencia-sync.js",
+    "persist:restore": "node scripts/persistencia-restore.js",
+    "persist:check": "node scripts/persistencia-check.js"
   },
   "keywords": [],
   "author": "",

@@ -18,6 +18,7 @@ Thumbs.db
 *~
 
 uploads/
+backups-cejas/
 .cejas-local-backups/
 *.backup-*.html
 *.backup-*.js
@@ -33,3 +34,5 @@ data/relatorio-atual.json
 data/ultimo-relatorio-texto-extraido.txt
 data/agenda-manual-local.json
 data/gratuidades-manuais.json
+data/gratuidades-ocultas.json
+data/historico-relatorios/
