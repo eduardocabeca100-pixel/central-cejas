@@ -61,11 +61,11 @@ const app = express();
 // CEJAS_DEBUG_STORAGE_RUNTIME_START
 app.get("/api/debug/storage-runtime", (_req, res) => {
   try {
-    const { getSupabaseRuntimeEnvServidor } = require("./lib/servidor-supabase-definitivo");
+    const { getSupabaseRuntimeStatus } = require("./lib/servidor-supabase-definitivo");
 
     res.json({
       ok: true,
-      storage: getSupabaseRuntimeEnvServidor()
+      storage: getSupabaseRuntimeStatus()
     });
   } catch (error) {
     res.status(500).json({
@@ -77,21 +77,9 @@ app.get("/api/debug/storage-runtime", (_req, res) => {
 // CEJAS_DEBUG_STORAGE_RUNTIME_END
 
 
-// CEJAS_SUPABASE_ENV_DEBUG_START
-app.get("/api/debug/supabase-env", (_req, res) => {
-  try {
-    res.json({
-      ok: true,
-      supabase: getSupabaseEnvStatus()
-    });
-  } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: error.message
-    });
-  }
-});
-// CEJAS_SUPABASE_ENV_DEBUG_END
+
+
+
 
 registrarRotasServidorSupabaseDefinitivo(app);
 
