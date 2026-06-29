@@ -1,10 +1,10 @@
 require("dotenv").config();
 
 const {
-  getSupabaseRuntimeEnvServidor
-} = require("../lib/servidor-supabase-definitivo");
+  getSupabaseRuntimeStatus
+} = require("../lib/supabase-runtime-cejas");
 
-const status = getSupabaseRuntimeEnvServidor();
+const status = getSupabaseRuntimeStatus();
 
 console.log("");
 console.log("🔎 Runtime Supabase Storage CEJAS");
