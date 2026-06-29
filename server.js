@@ -1410,13 +1410,14 @@ app.post("/api/importar-relatorio", (req, res, next) => {
 
 
 
+
 // CEJAS_GRATUIDADES_API_START
 const cryptoCejasGrat = require("crypto");
 
 const GRATUIDADES_FILE = path.join(__dirname, "data", "gratuidades-manuais.json");
 const GRATUIDADES_OCULTAS_FILE = path.join(__dirname, "data", "gratuidades-ocultas.json");
 
-function ensureGratuidadesFileCejas() {
+function garantirArquivosGratuidadesCejas() {
   fs.mkdirSync(path.join(__dirname, "data"), { recursive: true });
 
   if (!fs.existsSync(GRATUIDADES_FILE)) {
@@ -1428,8 +1429,8 @@ function ensureGratuidadesFileCejas() {
   }
 }
 
-function carregarJsonArrayCejas(file) {
-  ensureGratuidadesFileCejas();
+function carregarArrayJsonGratCejas(file) {
+  garantirArquivosGratuidadesCejas();
 
   try {
     const data = JSON.parse(fs.readFileSync(file, "utf8"));
@@ -1439,25 +1440,25 @@ function carregarJsonArrayCejas(file) {
   }
 }
 
-function salvarJsonArrayCejas(file, lista) {
-  ensureGratuidadesFileCejas();
+function salvarArrayJsonGratCejas(file, lista) {
+  garantirArquivosGratuidadesCejas();
   fs.writeFileSync(file, JSON.stringify(lista || [], null, 2), "utf8");
 }
 
 function carregarGratuidadesManuaisCejas() {
-  return carregarJsonArrayCejas(GRATUIDADES_FILE);
+  return carregarArrayJsonGratCejas(GRATUIDADES_FILE);
 }
 
 function salvarGratuidadesManuaisCejas(lista) {
-  salvarJsonArrayCejas(GRATUIDADES_FILE, lista);
+  salvarArrayJsonGratCejas(GRATUIDADES_FILE, lista);
 }
 
 function carregarGratuidadesOcultasCejas() {
-  return new Set(carregarJsonArrayCejas(GRATUIDADES_OCULTAS_FILE));
+  return new Set(carregarArrayJsonGratCejas(GRATUIDADES_OCULTAS_FILE));
 }
 
 function salvarGratuidadesOcultasCejas(setIds) {
-  salvarJsonArrayCejas(GRATUIDADES_OCULTAS_FILE, Array.from(setIds || []));
+  salvarArrayJsonGratCejas(GRATUIDADES_OCULTAS_FILE, Array.from(setIds || []));
 }
 
 function normalizarTextoGratCejas(texto) {
@@ -1467,11 +1468,11 @@ function normalizarTextoGratCejas(texto) {
     .toUpperCase();
 }
 
-function contemPalavraGratuidadeCejas(valor) {
+function contemGratuidadeCejas(valor) {
   return normalizarTextoGratCejas(valor).includes("GRATUIDADE");
 }
 
-function numeroFinanceiroGratCejas(valor) {
+function numeroGratCejas(valor) {
   if (typeof valor === "number") return Number.isFinite(valor) ? valor : 0;
 
   const texto = String(valor || "")
@@ -1482,6 +1483,26 @@ function numeroFinanceiroGratCejas(valor) {
 
   const numero = Number(texto);
   return Number.isFinite(numero) ? numero : 0;
+}
+
+function perdaNegativaGratCejas(valor) {
+  const numero = numeroGratCejas(valor);
+  if (!numero) return 0;
+  return numero > 0 ? -Math.abs(numero) : numero;
+}
+
+function calcularPerdaGratCejas(valorTotal, valorPago, valorInformado) {
+  const informado = numeroGratCejas(valorInformado);
+
+  if (informado !== 0) {
+    return perdaNegativaGratCejas(informado);
+  }
+
+  const total = numeroGratCejas(valorTotal);
+  const pago = numeroGratCejas(valorPago);
+  const diferenca = Math.max(total - pago, 0);
+
+  return diferenca > 0 ? -diferenca : 0;
 }
 
 function dataParaISOGratCejas(data) {
@@ -1526,7 +1547,7 @@ function nomeMesGratCejas(key) {
   return `${nomes[idx]} de ${ano}`;
 }
 
-function idHashGratCejas(obj) {
+function hashGratCejas(obj) {
   return cryptoCejasGrat
     .createHash("sha1")
     .update(JSON.stringify(obj || {}))
@@ -1541,7 +1562,7 @@ function dentroPeriodoGratCejas(iso, de, ate) {
   return true;
 }
 
-async function carregarRelatorioParaGratuidadesCejas() {
+async function carregarRelatorioParaGratCejas() {
   const relatorioPath = typeof RELATORIO_FILE !== "undefined"
     ? RELATORIO_FILE
     : path.join(__dirname, "data", "relatorio-atual.json");
@@ -1559,10 +1580,7 @@ async function carregarRelatorioParaGratuidadesCejas() {
   if ((!report || !Array.isArray(report.eventos)) && typeof carregarRelatorioAtualDoSupabaseServidor === "function") {
     try {
       const supabaseReport = await carregarRelatorioAtualDoSupabaseServidor();
-
-      if (supabaseReport) {
-        report = supabaseReport;
-      }
+      if (supabaseReport) report = supabaseReport;
     } catch {}
   }
 
@@ -1573,7 +1591,7 @@ async function carregarRelatorioParaGratuidadesCejas() {
   return report || { eventos: [] };
 }
 
-function extrairTextoObjetoGratCejas(obj) {
+function textoObjetoGratCejas(obj) {
   try {
     return JSON.stringify(obj || {});
   } catch {
@@ -1581,7 +1599,7 @@ function extrairTextoObjetoGratCejas(obj) {
   }
 }
 
-function descobrirDataObjetoGratCejas(obj) {
+function descobrirDataGratCejas(obj) {
   const campos = [
     obj?.dataISO,
     obj?.dataEvento,
@@ -1602,31 +1620,37 @@ function descobrirDataObjetoGratCejas(obj) {
   return "";
 }
 
-function descobrirTituloObjetoGratCejas(obj) {
+function descobrirEventoGratCejas(obj) {
   return String(
     obj?.evento ||
     obj?.nomeEvento ||
     obj?.titulo ||
     obj?.title ||
     obj?.nome ||
-    obj?.empresa ||
-    obj?.cliente ||
     obj?.descricao ||
-    "Gratuidade sem título"
-  ).trim();
-}
-
-function descobrirEmpresaObjetoGratCejas(obj) {
-  return String(
     obj?.empresa ||
     obj?.cliente ||
-    obj?.solicitante ||
-    obj?.responsavel ||
-    ""
+    "Gratuidade sem evento"
   ).trim();
 }
 
-function descobrirReferenciaObjetoGratCejas(obj, fonte) {
+function descobrirOrgaoGratCejas(obj) {
+  return String(
+    obj?.orgaoAssociado ||
+    obj?.orgao_associado ||
+    obj?.orgao ||
+    obj?.órgão ||
+    obj?.associado ||
+    obj?.solicitante ||
+    obj?.empresa ||
+    obj?.cliente ||
+    obj?.responsavel ||
+    obj?.referencia ||
+    "NÃO INFORMADO"
+  ).trim();
+}
+
+function descobrirReferenciaGratCejas(obj, fonte) {
   return String(
     obj?.referencia ||
     obj?.origem ||
@@ -1639,12 +1663,12 @@ function descobrirReferenciaObjetoGratCejas(obj, fonte) {
   ).trim();
 }
 
-function descobrirValorEventoGratCejas(obj) {
-  return numeroFinanceiroGratCejas(
-    obj?.valorEvento ??
-    obj?.valor_evento ??
+function descobrirValorTotalGratCejas(obj) {
+  return numeroGratCejas(
     obj?.valorTotal ??
     obj?.valor_total ??
+    obj?.valorEvento ??
+    obj?.valor_evento ??
     obj?.total ??
     obj?.valor ??
     0
@@ -1652,7 +1676,7 @@ function descobrirValorEventoGratCejas(obj) {
 }
 
 function descobrirValorPagoGratCejas(obj) {
-  return numeroFinanceiroGratCejas(
+  return numeroGratCejas(
     obj?.valorPago ??
     obj?.valor_pago ??
     obj?.pago ??
@@ -1662,59 +1686,59 @@ function descobrirValorPagoGratCejas(obj) {
 }
 
 function criarItemAutoGratCejas(obj, fonte, referenciaExtra = "") {
-  const texto = extrairTextoObjetoGratCejas(obj);
+  const texto = textoObjetoGratCejas(obj);
 
-  if (!contemPalavraGratuidadeCejas(texto)) return null;
+  if (!contemGratuidadeCejas(texto)) return null;
 
-  const dataISO = descobrirDataObjetoGratCejas(obj);
-  const valorEvento = descobrirValorEventoGratCejas(obj);
+  const dataISO = descobrirDataGratCejas(obj);
+  const valorTotal = descobrirValorTotalGratCejas(obj);
   const valorPago = descobrirValorPagoGratCejas(obj);
-  const valorGratuidade = numeroFinanceiroGratCejas(
+  const valorPerda = calcularPerdaGratCejas(
+    valorTotal,
+    valorPago,
+    obj?.valorPerda ??
+    obj?.valor_perda ??
+    obj?.perda ??
     obj?.valorGratuidade ??
-    obj?.valor_gratuidade ??
-    obj?.gratuidade ??
-    obj?.valorAbatido ??
-    obj?.valor_abatido ??
-    Math.max(valorEvento - valorPago, 0)
+    obj?.valor_gratuidade
   );
 
   const base = {
     fonte,
     referenciaExtra,
     dataISO,
-    evento: descobrirTituloObjetoGratCejas(obj),
-    empresa: descobrirEmpresaObjetoGratCejas(obj),
-    referencia: descobrirReferenciaObjetoGratCejas(obj, fonte),
-    valorEvento,
+    evento: descobrirEventoGratCejas(obj),
+    orgaoAssociado: descobrirOrgaoGratCejas(obj),
+    valorTotal,
     valorPago,
-    valorGratuidade,
+    valorPerda,
     trecho: texto.slice(0, 700)
   };
 
   return {
-    id: `auto-${fonte}-${idHashGratCejas(base)}`,
+    id: `auto-${fonte}-${hashGratCejas(base)}`,
     origem: fonte,
     tipo: "automatica",
     editavel: false,
     data: isoParaDataBRGratCejas(dataISO),
     dataISO,
     evento: base.evento,
-    empresa: base.empresa,
-    referencia: base.referencia || referenciaExtra || fonte,
-    valorEvento,
+    valorTotal,
     valorPago,
-    valorGratuidade,
+    valorPerda,
+    orgaoAssociado: base.orgaoAssociado,
+    referencia: descobrirReferenciaGratCejas(obj, fonte) || referenciaExtra || fonte,
     observacao: "Detectado automaticamente pela palavra GRATUIDADE.",
     trecho: base.trecho
   };
 }
 
-function coletarObjetosComGratuidadeCejas(node, fonte, referencia, resultado = [], depth = 0) {
+function coletarGratuidadesObjetoCejas(node, fonte, referencia, resultado = [], depth = 0) {
   if (!node || depth > 8) return resultado;
 
   if (Array.isArray(node)) {
     node.forEach((item, index) => {
-      coletarObjetosComGratuidadeCejas(item, fonte, `${referencia}[${index}]`, resultado, depth + 1);
+      coletarGratuidadesObjetoCejas(item, fonte, `${referencia}[${index}]`, resultado, depth + 1);
     });
 
     return resultado;
@@ -1730,7 +1754,7 @@ function coletarObjetosComGratuidadeCejas(node, fonte, referencia, resultado = [
 
     Object.entries(node).forEach(([key, value]) => {
       if (value && typeof value === "object") {
-        coletarObjetosComGratuidadeCejas(value, fonte, `${referencia}.${key}`, resultado, depth + 1);
+        coletarGratuidadesObjetoCejas(value, fonte, `${referencia}.${key}`, resultado, depth + 1);
       }
     });
   }
@@ -1741,7 +1765,7 @@ function coletarObjetosComGratuidadeCejas(node, fonte, referencia, resultado = [
 async function gratuidadesAutomaticasCejas() {
   const resultado = [];
 
-  const report = await carregarRelatorioParaGratuidadesCejas();
+  const report = await carregarRelatorioParaGratCejas();
   const eventosRelatorio = Array.isArray(report?.eventos) ? report.eventos : [];
 
   eventosRelatorio.forEach((evento, index) => {
@@ -1750,7 +1774,7 @@ async function gratuidadesAutomaticasCejas() {
   });
 
   const dataDir = path.join(__dirname, "data");
-  const arquivosAgenda = fs.existsSync(dataDir)
+  const arquivos = fs.existsSync(dataDir)
     ? fs.readdirSync(dataDir).filter(name => {
         const lower = name.toLowerCase();
 
@@ -1767,16 +1791,17 @@ async function gratuidadesAutomaticasCejas() {
       })
     : [];
 
-  for (const file of arquivosAgenda) {
+  for (const file of arquivos) {
     try {
       const full = path.join(dataDir, file);
       const json = JSON.parse(fs.readFileSync(full, "utf8"));
       const fonte = file.includes("agenda") ? "agenda" : "sistema";
-      coletarObjetosComGratuidadeCejas(json, fonte, file, resultado);
+      coletarGratuidadesObjetoCejas(json, fonte, file, resultado);
     } catch {}
   }
 
   const vistos = new Set();
+
   return resultado.filter(item => {
     if (!item || !item.id) return false;
     if (vistos.has(item.id)) return false;
@@ -1785,14 +1810,30 @@ async function gratuidadesAutomaticasCejas() {
   });
 }
 
-function normalizarGratuidadeManualCejas(item) {
+function normalizarManualGratCejas(item) {
   const dataISO = dataParaISOGratCejas(item?.dataISO || item?.data || item?.dataEvento || "");
-  const valorEvento = numeroFinanceiroGratCejas(item?.valorEvento);
-  const valorPago = numeroFinanceiroGratCejas(item?.valorPago);
-  const valorGratuidade = numeroFinanceiroGratCejas(
+
+  const valorTotal = numeroGratCejas(
+    item?.valorTotal ??
+    item?.valorEvento ??
+    item?.valor_evento ??
+    item?.total
+  );
+
+  const valorPago = numeroGratCejas(
+    item?.valorPago ??
+    item?.valor_pago ??
+    item?.pago
+  );
+
+  const valorPerda = calcularPerdaGratCejas(
+    valorTotal,
+    valorPago,
+    item?.valorPerda ??
+    item?.valor_perda ??
+    item?.perda ??
     item?.valorGratuidade ??
-    item?.valorAbatido ??
-    Math.max(valorEvento - valorPago, 0)
+    item?.valorAbatido
   );
 
   return {
@@ -1802,12 +1843,20 @@ function normalizarGratuidadeManualCejas(item) {
     editavel: true,
     data: isoParaDataBRGratCejas(dataISO),
     dataISO,
-    evento: String(item?.evento || "Gratuidade sem título").trim(),
-    empresa: String(item?.empresa || "").trim(),
-    referencia: String(item?.referencia || item?.origemReferencia || "Lançamento manual").trim(),
-    valorEvento,
+    evento: String(item?.evento || "Gratuidade sem evento").trim(),
+    valorTotal,
     valorPago,
-    valorGratuidade,
+    valorPerda,
+    orgaoAssociado: String(
+      item?.orgaoAssociado ||
+      item?.orgao_associado ||
+      item?.orgao ||
+      item?.associado ||
+      item?.empresa ||
+      item?.referencia ||
+      "NÃO INFORMADO"
+    ).trim(),
+    referencia: String(item?.referencia || item?.origemReferencia || "").trim(),
     observacao: String(item?.observacao || "").trim(),
     criadoEm: item?.criadoEm || new Date().toISOString(),
     atualizadoEm: new Date().toISOString(),
@@ -1818,17 +1867,17 @@ function normalizarGratuidadeManualCejas(item) {
 function resumirGratuidadesCejas(itens) {
   const resumo = {
     quantidade: itens.length,
-    valorEvento: 0,
+    valorTotal: 0,
     valorPago: 0,
-    valorGratuidade: 0,
+    valorPerda: 0,
     manual: 0,
     automatica: 0
   };
 
   for (const item of itens) {
-    resumo.valorEvento += numeroFinanceiroGratCejas(item.valorEvento);
-    resumo.valorPago += numeroFinanceiroGratCejas(item.valorPago);
-    resumo.valorGratuidade += numeroFinanceiroGratCejas(item.valorGratuidade);
+    resumo.valorTotal += numeroGratCejas(item.valorTotal);
+    resumo.valorPago += numeroGratCejas(item.valorPago);
+    resumo.valorPerda += perdaNegativaGratCejas(item.valorPerda);
 
     if (item.tipo === "manual") resumo.manual += 1;
     else resumo.automatica += 1;
@@ -1840,48 +1889,49 @@ function resumirGratuidadesCejas(itens) {
 function graficosGratuidadesCejas(itens) {
   const porMes = {};
   const porOrigem = {};
-  const porEmpresa = {};
+  const porOrgao = {};
 
   for (const item of itens) {
     const mesKey = item.dataISO ? item.dataISO.slice(0, 7) : "SEM DATA";
     const origem = item.origem || "manual";
-    const empresa = item.empresa || item.evento || "Sem empresa";
+    const orgao = item.orgaoAssociado || "NÃO INFORMADO";
+    const perda = perdaNegativaGratCejas(item.valorPerda);
 
     porMes[mesKey] = porMes[mesKey] || {
       key: mesKey,
       label: nomeMesGratCejas(mesKey),
       quantidade: 0,
-      valorGratuidade: 0
+      valorPerda: 0
     };
 
     porOrigem[origem] = porOrigem[origem] || {
       key: origem,
       label: origem === "agenda" ? "Agenda" : origem === "relatorio" ? "Relatório" : origem === "manual" ? "Manual" : "Sistema",
       quantidade: 0,
-      valorGratuidade: 0
+      valorPerda: 0
     };
 
-    porEmpresa[empresa] = porEmpresa[empresa] || {
-      key: empresa,
-      label: empresa,
+    porOrgao[orgao] = porOrgao[orgao] || {
+      key: orgao,
+      label: orgao,
       quantidade: 0,
-      valorGratuidade: 0
+      valorPerda: 0
     };
 
     porMes[mesKey].quantidade += 1;
-    porMes[mesKey].valorGratuidade += numeroFinanceiroGratCejas(item.valorGratuidade);
+    porMes[mesKey].valorPerda += perda;
 
     porOrigem[origem].quantidade += 1;
-    porOrigem[origem].valorGratuidade += numeroFinanceiroGratCejas(item.valorGratuidade);
+    porOrigem[origem].valorPerda += perda;
 
-    porEmpresa[empresa].quantidade += 1;
-    porEmpresa[empresa].valorGratuidade += numeroFinanceiroGratCejas(item.valorGratuidade);
+    porOrgao[orgao].quantidade += 1;
+    porOrgao[orgao].valorPerda += perda;
   }
 
   return {
     porMes: Object.values(porMes).sort((a, b) => String(a.key).localeCompare(String(b.key))),
-    porOrigem: Object.values(porOrigem).sort((a, b) => b.valorGratuidade - a.valorGratuidade),
-    porEmpresa: Object.values(porEmpresa).sort((a, b) => b.valorGratuidade - a.valorGratuidade).slice(0, 10)
+    porOrigem: Object.values(porOrigem).sort((a, b) => Math.abs(b.valorPerda) - Math.abs(a.valorPerda)),
+    porOrgao: Object.values(porOrgao).sort((a, b) => Math.abs(b.valorPerda) - Math.abs(a.valorPerda)).slice(0, 12)
   };
 }
 
@@ -1892,7 +1942,7 @@ async function montarGratuidadesCejas(query = {}) {
   const busca = normalizarTextoGratCejas(query.busca || "");
 
   const ocultas = carregarGratuidadesOcultasCejas();
-  const manuais = carregarGratuidadesManuaisCejas().map(normalizarGratuidadeManualCejas);
+  const manuais = carregarGratuidadesManuaisCejas().map(normalizarManualGratCejas);
   const automaticas = (await gratuidadesAutomaticasCejas()).filter(item => !ocultas.has(item.id));
 
   let itens = [...automaticas, ...manuais];
@@ -1911,7 +1961,7 @@ async function montarGratuidadesCejas(query = {}) {
 
   if (busca) {
     itens = itens.filter(item => {
-      const texto = normalizarTextoGratCejas(`${item.evento} ${item.empresa} ${item.referencia} ${item.observacao}`);
+      const texto = normalizarTextoGratCejas(`${item.evento} ${item.orgaoAssociado} ${item.referencia} ${item.observacao}`);
       return texto.includes(busca);
     });
   }
@@ -1927,7 +1977,7 @@ async function montarGratuidadesCejas(query = {}) {
 }
 
 async function montarDashboardFinanceiroCejas() {
-  const relatorio = await carregarRelatorioParaGratuidadesCejas();
+  const relatorio = await carregarRelatorioParaGratCejas();
   const eventos = Array.isArray(relatorio?.eventos) ? relatorio.eventos : [];
   const meses = {};
 
@@ -1943,7 +1993,7 @@ async function montarDashboardFinanceiroCejas() {
     if (!iso) continue;
 
     const key = iso.slice(0, 7);
-    const valor = numeroFinanceiroGratCejas(evento.valor || evento.valorPago || 0);
+    const valor = numeroGratCejas(evento.valor || evento.valorPago || 0);
 
     meses[key] = meses[key] || {
       key,
@@ -1990,13 +2040,13 @@ app.get("/api/gratuidades", async (req, res) => {
 app.post("/api/gratuidades", express.json({ limit: "2mb" }), (req, res) => {
   try {
     const lista = carregarGratuidadesManuaisCejas();
-    const novo = normalizarGratuidadeManualCejas(req.body || {});
+    const novo = normalizarManualGratCejas(req.body || {});
 
     if (!novo.dataISO) {
       return res.status(400).json({ ok: false, message: "Informe a data da gratuidade." });
     }
 
-    if (!novo.evento || novo.evento === "Gratuidade sem título") {
+    if (!novo.evento || novo.evento === "Gratuidade sem evento") {
       return res.status(400).json({ ok: false, message: "Informe o evento." });
     }
 
@@ -2023,7 +2073,7 @@ app.put("/api/gratuidades/:id", express.json({ limit: "2mb" }), (req, res) => {
     const index = lista.findIndex(item => item.id === id);
 
     if (index >= 0) {
-      lista[index] = normalizarGratuidadeManualCejas({
+      lista[index] = normalizarManualGratCejas({
         ...lista[index],
         ...req.body,
         id
@@ -2043,7 +2093,7 @@ app.put("/api/gratuidades/:id", express.json({ limit: "2mb" }), (req, res) => {
       ocultas.add(id);
       salvarGratuidadesOcultasCejas(ocultas);
 
-      const novo = normalizarGratuidadeManualCejas({
+      const novo = normalizarManualGratCejas({
         ...req.body,
         sourceId: id,
         referencia: req.body?.referencia || "Editado a partir de gratuidade automática"
@@ -2082,7 +2132,7 @@ app.delete("/api/gratuidades/:id", (req, res) => {
 
       return res.json({
         ok: true,
-        message: "Gratuidade automática ocultada da visão."
+        message: "Gratuidade automática ocultada."
       });
     }
 
@@ -2122,6 +2172,7 @@ app.get("/api/dashboard-financeiro", async (_req, res) => {
   }
 });
 // CEJAS_GRATUIDADES_API_END
+
 
 
 const USERS_FILE = path.join(__dirname, "data", "usuarios.json");

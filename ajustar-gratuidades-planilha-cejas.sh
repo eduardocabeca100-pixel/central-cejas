@@ -1,3 +1,805 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ ! -f "server.js" ]; then
+  echo "❌ Rode dentro da pasta raiz do projeto, onde fica server.js."
+  exit 1
+fi
+
+STAMP="$(date +%Y%m%d-%H%M%S)"
+BACKUP_DIR=".cejas-local-backups/gratuidades-planilha-$STAMP"
+mkdir -p "$BACKUP_DIR"
+cp server.js gratuidades.html dashboard.html "$BACKUP_DIR/" 2>/dev/null || true
+
+echo "✅ Backup criado em: $BACKUP_DIR"
+
+python3 <<'PY'
+from pathlib import Path
+
+p = Path("server.js")
+s = p.read_text()
+
+start_marker = "// CEJAS_GRATUIDADES_API_START"
+end_marker = "// CEJAS_GRATUIDADES_API_END"
+
+api_block = r'''
+// CEJAS_GRATUIDADES_API_START
+const cryptoCejasGrat = require("crypto");
+
+const GRATUIDADES_FILE = path.join(__dirname, "data", "gratuidades-manuais.json");
+const GRATUIDADES_OCULTAS_FILE = path.join(__dirname, "data", "gratuidades-ocultas.json");
+
+function garantirArquivosGratuidadesCejas() {
+  fs.mkdirSync(path.join(__dirname, "data"), { recursive: true });
+
+  if (!fs.existsSync(GRATUIDADES_FILE)) {
+    fs.writeFileSync(GRATUIDADES_FILE, "[]", "utf8");
+  }
+
+  if (!fs.existsSync(GRATUIDADES_OCULTAS_FILE)) {
+    fs.writeFileSync(GRATUIDADES_OCULTAS_FILE, "[]", "utf8");
+  }
+}
+
+function carregarArrayJsonGratCejas(file) {
+  garantirArquivosGratuidadesCejas();
+
+  try {
+    const data = JSON.parse(fs.readFileSync(file, "utf8"));
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+}
+
+function salvarArrayJsonGratCejas(file, lista) {
+  garantirArquivosGratuidadesCejas();
+  fs.writeFileSync(file, JSON.stringify(lista || [], null, 2), "utf8");
+}
+
+function carregarGratuidadesManuaisCejas() {
+  return carregarArrayJsonGratCejas(GRATUIDADES_FILE);
+}
+
+function salvarGratuidadesManuaisCejas(lista) {
+  salvarArrayJsonGratCejas(GRATUIDADES_FILE, lista);
+}
+
+function carregarGratuidadesOcultasCejas() {
+  return new Set(carregarArrayJsonGratCejas(GRATUIDADES_OCULTAS_FILE));
+}
+
+function salvarGratuidadesOcultasCejas(setIds) {
+  salvarArrayJsonGratCejas(GRATUIDADES_OCULTAS_FILE, Array.from(setIds || []));
+}
+
+function normalizarTextoGratCejas(texto) {
+  return String(texto || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase();
+}
+
+function contemGratuidadeCejas(valor) {
+  return normalizarTextoGratCejas(valor).includes("GRATUIDADE");
+}
+
+function numeroGratCejas(valor) {
+  if (typeof valor === "number") return Number.isFinite(valor) ? valor : 0;
+
+  const texto = String(valor || "")
+    .replace(/R\$/gi, "")
+    .replace(/\s/g, "")
+    .replace(/\./g, "")
+    .replace(",", ".");
+
+  const numero = Number(texto);
+  return Number.isFinite(numero) ? numero : 0;
+}
+
+function perdaNegativaGratCejas(valor) {
+  const numero = numeroGratCejas(valor);
+  if (!numero) return 0;
+  return numero > 0 ? -Math.abs(numero) : numero;
+}
+
+function calcularPerdaGratCejas(valorTotal, valorPago, valorInformado) {
+  const informado = numeroGratCejas(valorInformado);
+
+  if (informado !== 0) {
+    return perdaNegativaGratCejas(informado);
+  }
+
+  const total = numeroGratCejas(valorTotal);
+  const pago = numeroGratCejas(valorPago);
+  const diferenca = Math.max(total - pago, 0);
+
+  return diferenca > 0 ? -diferenca : 0;
+}
+
+function dataParaISOGratCejas(data) {
+  const texto = String(data || "").trim();
+
+  if (!texto) return "";
+
+  if (/^\d{4}-\d{2}-\d{2}/.test(texto)) {
+    return texto.slice(0, 10);
+  }
+
+  let match = texto.match(/\b(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})\b/);
+  if (match) {
+    return `${match[3]}-${String(match[2]).padStart(2, "0")}-${String(match[1]).padStart(2, "0")}`;
+  }
+
+  match = texto.match(/\b(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2})\b/);
+  if (match) {
+    return `20${match[3]}-${String(match[2]).padStart(2, "0")}-${String(match[1]).padStart(2, "0")}`;
+  }
+
+  return "";
+}
+
+function isoParaDataBRGratCejas(iso) {
+  if (!iso || !String(iso).includes("-")) return "";
+  const [ano, mes, dia] = String(iso).slice(0, 10).split("-");
+  if (!ano || !mes || !dia) return "";
+  return `${dia}/${mes}/${ano}`;
+}
+
+function nomeMesGratCejas(key) {
+  const nomes = [
+    "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+  ];
+
+  const [ano, mes] = String(key || "").split("-");
+  const idx = Number(mes) - 1;
+
+  if (!ano || idx < 0 || idx > 11) return key || "Sem mês";
+  return `${nomes[idx]} de ${ano}`;
+}
+
+function hashGratCejas(obj) {
+  return cryptoCejasGrat
+    .createHash("sha1")
+    .update(JSON.stringify(obj || {}))
+    .digest("hex")
+    .slice(0, 18);
+}
+
+function dentroPeriodoGratCejas(iso, de, ate) {
+  if (!iso) return false;
+  if (de && iso < de) return false;
+  if (ate && iso > ate) return false;
+  return true;
+}
+
+async function carregarRelatorioParaGratCejas() {
+  const relatorioPath = typeof RELATORIO_FILE !== "undefined"
+    ? RELATORIO_FILE
+    : path.join(__dirname, "data", "relatorio-atual.json");
+
+  let report = null;
+
+  if (fs.existsSync(relatorioPath)) {
+    try {
+      report = JSON.parse(fs.readFileSync(relatorioPath, "utf8"));
+    } catch {
+      report = null;
+    }
+  }
+
+  if ((!report || !Array.isArray(report.eventos)) && typeof carregarRelatorioAtualDoSupabaseServidor === "function") {
+    try {
+      const supabaseReport = await carregarRelatorioAtualDoSupabaseServidor();
+      if (supabaseReport) report = supabaseReport;
+    } catch {}
+  }
+
+  if (!report && typeof emptySuperaReport === "function") {
+    return emptySuperaReport();
+  }
+
+  return report || { eventos: [] };
+}
+
+function textoObjetoGratCejas(obj) {
+  try {
+    return JSON.stringify(obj || {});
+  } catch {
+    return "";
+  }
+}
+
+function descobrirDataGratCejas(obj) {
+  const campos = [
+    obj?.dataISO,
+    obj?.dataEvento,
+    obj?.data_evento,
+    obj?.data,
+    obj?.date,
+    obj?.start,
+    obj?.inicio,
+    obj?.created_at,
+    obj?.updated_at
+  ];
+
+  for (const campo of campos) {
+    const iso = dataParaISOGratCejas(campo);
+    if (iso) return iso;
+  }
+
+  return "";
+}
+
+function descobrirEventoGratCejas(obj) {
+  return String(
+    obj?.evento ||
+    obj?.nomeEvento ||
+    obj?.titulo ||
+    obj?.title ||
+    obj?.nome ||
+    obj?.descricao ||
+    obj?.empresa ||
+    obj?.cliente ||
+    "Gratuidade sem evento"
+  ).trim();
+}
+
+function descobrirOrgaoGratCejas(obj) {
+  return String(
+    obj?.orgaoAssociado ||
+    obj?.orgao_associado ||
+    obj?.orgao ||
+    obj?.órgão ||
+    obj?.associado ||
+    obj?.solicitante ||
+    obj?.empresa ||
+    obj?.cliente ||
+    obj?.responsavel ||
+    obj?.referencia ||
+    "NÃO INFORMADO"
+  ).trim();
+}
+
+function descobrirReferenciaGratCejas(obj, fonte) {
+  return String(
+    obj?.referencia ||
+    obj?.origem ||
+    obj?.sala ||
+    obj?.local ||
+    obj?.observacao ||
+    obj?.descricao ||
+    fonte ||
+    ""
+  ).trim();
+}
+
+function descobrirValorTotalGratCejas(obj) {
+  return numeroGratCejas(
+    obj?.valorTotal ??
+    obj?.valor_total ??
+    obj?.valorEvento ??
+    obj?.valor_evento ??
+    obj?.total ??
+    obj?.valor ??
+    0
+  );
+}
+
+function descobrirValorPagoGratCejas(obj) {
+  return numeroGratCejas(
+    obj?.valorPago ??
+    obj?.valor_pago ??
+    obj?.pago ??
+    obj?.recebido ??
+    0
+  );
+}
+
+function criarItemAutoGratCejas(obj, fonte, referenciaExtra = "") {
+  const texto = textoObjetoGratCejas(obj);
+
+  if (!contemGratuidadeCejas(texto)) return null;
+
+  const dataISO = descobrirDataGratCejas(obj);
+  const valorTotal = descobrirValorTotalGratCejas(obj);
+  const valorPago = descobrirValorPagoGratCejas(obj);
+  const valorPerda = calcularPerdaGratCejas(
+    valorTotal,
+    valorPago,
+    obj?.valorPerda ??
+    obj?.valor_perda ??
+    obj?.perda ??
+    obj?.valorGratuidade ??
+    obj?.valor_gratuidade
+  );
+
+  const base = {
+    fonte,
+    referenciaExtra,
+    dataISO,
+    evento: descobrirEventoGratCejas(obj),
+    orgaoAssociado: descobrirOrgaoGratCejas(obj),
+    valorTotal,
+    valorPago,
+    valorPerda,
+    trecho: texto.slice(0, 700)
+  };
+
+  return {
+    id: `auto-${fonte}-${hashGratCejas(base)}`,
+    origem: fonte,
+    tipo: "automatica",
+    editavel: false,
+    data: isoParaDataBRGratCejas(dataISO),
+    dataISO,
+    evento: base.evento,
+    valorTotal,
+    valorPago,
+    valorPerda,
+    orgaoAssociado: base.orgaoAssociado,
+    referencia: descobrirReferenciaGratCejas(obj, fonte) || referenciaExtra || fonte,
+    observacao: "Detectado automaticamente pela palavra GRATUIDADE.",
+    trecho: base.trecho
+  };
+}
+
+function coletarGratuidadesObjetoCejas(node, fonte, referencia, resultado = [], depth = 0) {
+  if (!node || depth > 8) return resultado;
+
+  if (Array.isArray(node)) {
+    node.forEach((item, index) => {
+      coletarGratuidadesObjetoCejas(item, fonte, `${referencia}[${index}]`, resultado, depth + 1);
+    });
+
+    return resultado;
+  }
+
+  if (typeof node === "object") {
+    const item = criarItemAutoGratCejas(node, fonte, referencia);
+
+    if (item) {
+      resultado.push(item);
+      return resultado;
+    }
+
+    Object.entries(node).forEach(([key, value]) => {
+      if (value && typeof value === "object") {
+        coletarGratuidadesObjetoCejas(value, fonte, `${referencia}.${key}`, resultado, depth + 1);
+      }
+    });
+  }
+
+  return resultado;
+}
+
+async function gratuidadesAutomaticasCejas() {
+  const resultado = [];
+
+  const report = await carregarRelatorioParaGratCejas();
+  const eventosRelatorio = Array.isArray(report?.eventos) ? report.eventos : [];
+
+  eventosRelatorio.forEach((evento, index) => {
+    const item = criarItemAutoGratCejas(evento, "relatorio", `relatorio.eventos[${index}]`);
+    if (item) resultado.push(item);
+  });
+
+  const dataDir = path.join(__dirname, "data");
+  const arquivos = fs.existsSync(dataDir)
+    ? fs.readdirSync(dataDir).filter(name => {
+        const lower = name.toLowerCase();
+
+        if (!lower.endsWith(".json")) return false;
+        if (lower.includes("gratuidades")) return false;
+        if (lower.includes("relatorio-atual")) return false;
+        if (lower.includes("relatorio-supera")) return false;
+
+        return lower.includes("agenda") ||
+          lower.includes("evento") ||
+          lower.includes("calendario") ||
+          lower.includes("painel") ||
+          lower.includes("tarefas");
+      })
+    : [];
+
+  for (const file of arquivos) {
+    try {
+      const full = path.join(dataDir, file);
+      const json = JSON.parse(fs.readFileSync(full, "utf8"));
+      const fonte = file.includes("agenda") ? "agenda" : "sistema";
+      coletarGratuidadesObjetoCejas(json, fonte, file, resultado);
+    } catch {}
+  }
+
+  const vistos = new Set();
+
+  return resultado.filter(item => {
+    if (!item || !item.id) return false;
+    if (vistos.has(item.id)) return false;
+    vistos.add(item.id);
+    return true;
+  });
+}
+
+function normalizarManualGratCejas(item) {
+  const dataISO = dataParaISOGratCejas(item?.dataISO || item?.data || item?.dataEvento || "");
+
+  const valorTotal = numeroGratCejas(
+    item?.valorTotal ??
+    item?.valorEvento ??
+    item?.valor_evento ??
+    item?.total
+  );
+
+  const valorPago = numeroGratCejas(
+    item?.valorPago ??
+    item?.valor_pago ??
+    item?.pago
+  );
+
+  const valorPerda = calcularPerdaGratCejas(
+    valorTotal,
+    valorPago,
+    item?.valorPerda ??
+    item?.valor_perda ??
+    item?.perda ??
+    item?.valorGratuidade ??
+    item?.valorAbatido
+  );
+
+  return {
+    id: item?.id || `manual-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    origem: "manual",
+    tipo: "manual",
+    editavel: true,
+    data: isoParaDataBRGratCejas(dataISO),
+    dataISO,
+    evento: String(item?.evento || "Gratuidade sem evento").trim(),
+    valorTotal,
+    valorPago,
+    valorPerda,
+    orgaoAssociado: String(
+      item?.orgaoAssociado ||
+      item?.orgao_associado ||
+      item?.orgao ||
+      item?.associado ||
+      item?.empresa ||
+      item?.referencia ||
+      "NÃO INFORMADO"
+    ).trim(),
+    referencia: String(item?.referencia || item?.origemReferencia || "").trim(),
+    observacao: String(item?.observacao || "").trim(),
+    criadoEm: item?.criadoEm || new Date().toISOString(),
+    atualizadoEm: new Date().toISOString(),
+    sourceId: item?.sourceId || ""
+  };
+}
+
+function resumirGratuidadesCejas(itens) {
+  const resumo = {
+    quantidade: itens.length,
+    valorTotal: 0,
+    valorPago: 0,
+    valorPerda: 0,
+    manual: 0,
+    automatica: 0
+  };
+
+  for (const item of itens) {
+    resumo.valorTotal += numeroGratCejas(item.valorTotal);
+    resumo.valorPago += numeroGratCejas(item.valorPago);
+    resumo.valorPerda += perdaNegativaGratCejas(item.valorPerda);
+
+    if (item.tipo === "manual") resumo.manual += 1;
+    else resumo.automatica += 1;
+  }
+
+  return resumo;
+}
+
+function graficosGratuidadesCejas(itens) {
+  const porMes = {};
+  const porOrigem = {};
+  const porOrgao = {};
+
+  for (const item of itens) {
+    const mesKey = item.dataISO ? item.dataISO.slice(0, 7) : "SEM DATA";
+    const origem = item.origem || "manual";
+    const orgao = item.orgaoAssociado || "NÃO INFORMADO";
+    const perda = perdaNegativaGratCejas(item.valorPerda);
+
+    porMes[mesKey] = porMes[mesKey] || {
+      key: mesKey,
+      label: nomeMesGratCejas(mesKey),
+      quantidade: 0,
+      valorPerda: 0
+    };
+
+    porOrigem[origem] = porOrigem[origem] || {
+      key: origem,
+      label: origem === "agenda" ? "Agenda" : origem === "relatorio" ? "Relatório" : origem === "manual" ? "Manual" : "Sistema",
+      quantidade: 0,
+      valorPerda: 0
+    };
+
+    porOrgao[orgao] = porOrgao[orgao] || {
+      key: orgao,
+      label: orgao,
+      quantidade: 0,
+      valorPerda: 0
+    };
+
+    porMes[mesKey].quantidade += 1;
+    porMes[mesKey].valorPerda += perda;
+
+    porOrigem[origem].quantidade += 1;
+    porOrigem[origem].valorPerda += perda;
+
+    porOrgao[orgao].quantidade += 1;
+    porOrgao[orgao].valorPerda += perda;
+  }
+
+  return {
+    porMes: Object.values(porMes).sort((a, b) => String(a.key).localeCompare(String(b.key))),
+    porOrigem: Object.values(porOrigem).sort((a, b) => Math.abs(b.valorPerda) - Math.abs(a.valorPerda)),
+    porOrgao: Object.values(porOrgao).sort((a, b) => Math.abs(b.valorPerda) - Math.abs(a.valorPerda)).slice(0, 12)
+  };
+}
+
+async function montarGratuidadesCejas(query = {}) {
+  const de = String(query.de || query.inicio || "").slice(0, 10);
+  const ate = String(query.ate || query.fim || "").slice(0, 10);
+  const origemFiltro = String(query.origem || "todas");
+  const busca = normalizarTextoGratCejas(query.busca || "");
+
+  const ocultas = carregarGratuidadesOcultasCejas();
+  const manuais = carregarGratuidadesManuaisCejas().map(normalizarManualGratCejas);
+  const automaticas = (await gratuidadesAutomaticasCejas()).filter(item => !ocultas.has(item.id));
+
+  let itens = [...automaticas, ...manuais];
+
+  if (origemFiltro !== "todas") {
+    if (origemFiltro === "automatica") {
+      itens = itens.filter(item => item.tipo !== "manual");
+    } else {
+      itens = itens.filter(item => item.origem === origemFiltro || item.tipo === origemFiltro);
+    }
+  }
+
+  if (de || ate) {
+    itens = itens.filter(item => dentroPeriodoGratCejas(item.dataISO, de, ate));
+  }
+
+  if (busca) {
+    itens = itens.filter(item => {
+      const texto = normalizarTextoGratCejas(`${item.evento} ${item.orgaoAssociado} ${item.referencia} ${item.observacao}`);
+      return texto.includes(busca);
+    });
+  }
+
+  itens.sort((a, b) => String(b.dataISO || "").localeCompare(String(a.dataISO || "")) || String(a.evento).localeCompare(String(b.evento)));
+
+  return {
+    itens,
+    resumo: resumirGratuidadesCejas(itens),
+    graficos: graficosGratuidadesCejas(itens),
+    atualizadoEm: new Date().toISOString()
+  };
+}
+
+async function montarDashboardFinanceiroCejas() {
+  const relatorio = await carregarRelatorioParaGratCejas();
+  const eventos = Array.isArray(relatorio?.eventos) ? relatorio.eventos : [];
+  const meses = {};
+
+  let totalReceitaConfirmada = 0;
+  let totalEventosConfirmados = 0;
+
+  for (const evento of eventos) {
+    const status = normalizarTextoGratCejas(evento.status || "");
+
+    if (!status.includes("CONFIRMADO") && status !== "CONFIRMADA") continue;
+
+    const iso = dataParaISOGratCejas(evento.data || evento.dataEvento || "");
+    if (!iso) continue;
+
+    const key = iso.slice(0, 7);
+    const valor = numeroGratCejas(evento.valor || evento.valorPago || 0);
+
+    meses[key] = meses[key] || {
+      key,
+      mes: nomeMesGratCejas(key),
+      receitaConfirmada: 0,
+      eventosConfirmados: 0
+    };
+
+    meses[key].receitaConfirmada += valor;
+    meses[key].eventosConfirmados += 1;
+
+    totalReceitaConfirmada += valor;
+    totalEventosConfirmados += 1;
+  }
+
+  const gratuidades = await montarGratuidadesCejas({});
+
+  return {
+    ok: true,
+    receitaMensal: Object.values(meses).sort((a, b) => String(a.key).localeCompare(String(b.key))),
+    resumo: {
+      totalReceitaConfirmada,
+      totalEventosConfirmados,
+      mesesComReceita: Object.keys(meses).length,
+      gratuidades: gratuidades.resumo
+    },
+    graficosGratuidades: gratuidades.graficos,
+    atualizadoEm: relatorio?.atualizadoEm || new Date().toISOString()
+  };
+}
+
+app.get("/api/gratuidades", async (req, res) => {
+  try {
+    const dados = await montarGratuidadesCejas(req.query || {});
+    res.json({ ok: true, ...dados });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: "Erro ao carregar gratuidades: " + error.message
+    });
+  }
+});
+
+app.post("/api/gratuidades", express.json({ limit: "2mb" }), (req, res) => {
+  try {
+    const lista = carregarGratuidadesManuaisCejas();
+    const novo = normalizarManualGratCejas(req.body || {});
+
+    if (!novo.dataISO) {
+      return res.status(400).json({ ok: false, message: "Informe a data da gratuidade." });
+    }
+
+    if (!novo.evento || novo.evento === "Gratuidade sem evento") {
+      return res.status(400).json({ ok: false, message: "Informe o evento." });
+    }
+
+    lista.push(novo);
+    salvarGratuidadesManuaisCejas(lista);
+
+    res.json({
+      ok: true,
+      item: novo,
+      message: "Gratuidade salva."
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: "Erro ao salvar gratuidade: " + error.message
+    });
+  }
+});
+
+app.put("/api/gratuidades/:id", express.json({ limit: "2mb" }), (req, res) => {
+  try {
+    const id = req.params.id;
+    const lista = carregarGratuidadesManuaisCejas();
+    const index = lista.findIndex(item => item.id === id);
+
+    if (index >= 0) {
+      lista[index] = normalizarManualGratCejas({
+        ...lista[index],
+        ...req.body,
+        id
+      });
+
+      salvarGratuidadesManuaisCejas(lista);
+
+      return res.json({
+        ok: true,
+        item: lista[index],
+        message: "Gratuidade atualizada."
+      });
+    }
+
+    if (String(id).startsWith("auto-")) {
+      const ocultas = carregarGratuidadesOcultasCejas();
+      ocultas.add(id);
+      salvarGratuidadesOcultasCejas(ocultas);
+
+      const novo = normalizarManualGratCejas({
+        ...req.body,
+        sourceId: id,
+        referencia: req.body?.referencia || "Editado a partir de gratuidade automática"
+      });
+
+      lista.push(novo);
+      salvarGratuidadesManuaisCejas(lista);
+
+      return res.json({
+        ok: true,
+        item: novo,
+        message: "Gratuidade automática editada como lançamento manual."
+      });
+    }
+
+    res.status(404).json({
+      ok: false,
+      message: "Gratuidade não encontrada."
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: "Erro ao editar gratuidade: " + error.message
+    });
+  }
+});
+
+app.delete("/api/gratuidades/:id", (req, res) => {
+  try {
+    const id = req.params.id;
+
+    if (String(id).startsWith("auto-")) {
+      const ocultas = carregarGratuidadesOcultasCejas();
+      ocultas.add(id);
+      salvarGratuidadesOcultasCejas(ocultas);
+
+      return res.json({
+        ok: true,
+        message: "Gratuidade automática ocultada."
+      });
+    }
+
+    const lista = carregarGratuidadesManuaisCejas();
+    const novaLista = lista.filter(item => item.id !== id);
+
+    if (novaLista.length === lista.length) {
+      return res.status(404).json({
+        ok: false,
+        message: "Gratuidade manual não encontrada."
+      });
+    }
+
+    salvarGratuidadesManuaisCejas(novaLista);
+
+    res.json({
+      ok: true,
+      message: "Gratuidade apagada."
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: "Erro ao apagar gratuidade: " + error.message
+    });
+  }
+});
+
+app.get("/api/dashboard-financeiro", async (_req, res) => {
+  try {
+    const dados = await montarDashboardFinanceiroCejas();
+    res.json(dados);
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: "Erro ao carregar dashboard financeiro: " + error.message
+    });
+  }
+});
+// CEJAS_GRATUIDADES_API_END
+'''
+
+if start_marker in s and end_marker in s:
+  start = s.index(start_marker)
+  end = s.index(end_marker, start) + len(end_marker)
+  s = s[:start] + api_block + s[end:]
+else:
+  insert_before = 'const USERS_FILE = path.join(__dirname, "data", "usuarios.json");'
+  if insert_before not in s:
+    raise SystemExit("❌ Não encontrei ponto seguro para inserir API de gratuidades.")
+  s = s.replace(insert_before, api_block + "\n\n" + insert_before, 1)
+
+p.write_text(s)
+PY
+
+cat > gratuidades.html <<'EOF'
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -983,3 +1785,71 @@
   <script src="/js/cejas-mobile-menu.js?v=1"></script>
 </body>
 </html>
+EOF
+
+python3 <<'PY'
+from pathlib import Path
+
+p = Path("dashboard.html")
+
+if p.exists():
+  s = p.read_text()
+
+  s = s.replace("Gratuidades e abatimentos", "Gratuidades")
+  s = s.replace("Total em gratuidades", "Déficit em gratuidades")
+  s = s.replace("cejasTotalGratuidades", "cejasTotalGratuidades")
+
+  s = s.replace(
+    'document.getElementById("cejasTotalGratuidades").textContent = money(grat.valorAbatido || 0);',
+    'document.getElementById("cejasTotalGratuidades").textContent = money(grat.valorPerda || grat.valorGratuidade || grat.valorAbatido || 0);'
+  )
+
+  s = s.replace(
+    'document.getElementById("cejasTotalGratuidades").textContent = money(grat.valorGratuidade || 0);',
+    'document.getElementById("cejasTotalGratuidades").textContent = money(grat.valorPerda || grat.valorGratuidade || 0);'
+  )
+
+  p.write_text(s)
+PY
+
+node --check server.js
+
+node <<'NODE'
+const fs = require("fs");
+
+for (const html of ["gratuidades.html", "dashboard.html"]) {
+  if (!fs.existsSync(html)) continue;
+
+  const content = fs.readFileSync(html, "utf8");
+  const scripts = [...content.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/gi)].map(match => match[1]);
+
+  fs.mkdirSync(".cejas-local-backups/check-gratuidades-planilha", { recursive: true });
+
+  scripts.forEach((code, index) => {
+    fs.writeFileSync(`.cejas-local-backups/check-gratuidades-planilha/${html}-${index + 1}.js`, code);
+  });
+}
+NODE
+
+for f in .cejas-local-backups/check-gratuidades-planilha/*.js; do
+  [ -f "$f" ] && node --check "$f"
+done
+
+rm -rf .cejas-local-backups/check-gratuidades-planilha
+
+echo ""
+echo "✅ Aba Gratuidades ajustada no modelo da planilha."
+echo ""
+echo "Campos agora:"
+echo "- Data"
+echo "- Evento"
+echo "- Valor total"
+echo "- Valor pago"
+echo "- Valor de perda sempre negativo"
+echo "- Órgão / associado / não associado"
+echo ""
+echo "Rode:"
+echo "npm run dev"
+echo ""
+echo "Abra:"
+echo "http://localhost:5500/gratuidades.html"

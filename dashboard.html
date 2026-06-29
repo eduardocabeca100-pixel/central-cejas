@@ -825,7 +825,7 @@
         `).join("") || `<div style="color:var(--muted);">Nenhuma receita confirmada encontrada no relatório atual.</div>`;
 
         const grat = data.resumo?.gratuidades || {};
-        document.getElementById("cejasTotalGratuidades").textContent = money(grat.valorAbatido || 0);
+        document.getElementById("cejasTotalGratuidades").textContent = money(grat.valorPerda || grat.valorGratuidade || grat.valorAbatido || 0);
       } catch (error) {
         const container = document.getElementById("cejasReceitaMensal");
 
