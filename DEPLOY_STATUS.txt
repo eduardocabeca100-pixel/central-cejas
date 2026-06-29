@@ -1,0 +1,173 @@
+✅ DEPLOY PREPARATION COMPLETE
+
+Project: central-cejas
+Date: 2026-06-18
+Status: Ready for production
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📋 COMPLETED TASKS:
+
+1. ✅ Backend Configuration
+   - Updated package.json: "npm start" runs node server.js
+   - Added Node.js version requirement: >=18
+   - Server verified working locally on http://localhost:5500
+
+2. ✅ Cloudflare Worker Proxy
+   - Created workers/proxy/index.js
+   - Configured to route /api/* requests to backend
+   - wrangler.toml updated to use worker proxy
+
+3. ✅ Documentation
+   - README.md: Updated with Render/Railway recommendations
+   - README.md: Explains why Vercel doesn't work
+   - DEPLOY.md: Full step-by-step deployment guide
+   - .env.example: Template for environment variables
+   - .gitignore: Protects credentials (verified ✅)
+
+4. ✅ Git Repository
+   - All changes committed locally
+   - Commit message: "Deploy: adjust backend hosting strategy..."
+   - Commit includes: workers/, DEPLOY.md, updated configs
+
+5. ✅ Cleanup
+   - Removed unnecessary backup package files
+   - No HTML backups in git (covered by .gitignore)
+   - Ready for production
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📍 CURRENT STATUS:
+
+✓ Local commit: Done
+✓ Git history: Clean, organized
+⚠ Git push: Network/proxy issue (CONNECT tunnel failed, response 403)
+
+ACTION REQUIRED:
+- Retry: git push origin main
+  (May need to check internet/proxy settings, or use GitHub SSH key if available)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🚀 NEXT STEPS TO GO LIVE:
+
+1. Resolve Git Push
+   cd ~/Desktop/central-cejas
+   git push origin main
+
+2. Deploy Backend on Render (or Railway/Fly.io)
+   - Go to render.com
+   - New Web Service → Connect GitHub → Select central-cejas
+   - Build: npm install
+   - Start: npm start
+   - Env vars: Copy from .env (SUPABASE_URL, SUPABASE_KEY, SESSION_SECRET, etc)
+   - Note public URL: https://central-cejas-backend.onrender.com
+
+3. Deploy Cloudflare Worker Proxy
+   wrangler login
+   wrangler secret put BACKEND_URL
+   (Paste the Render URL from step 2)
+   wrangler deploy
+
+4. Deploy Frontend (Cloudflare Pages)
+   - dashboard.cloudflare.com → Pages
+   - Connect Git → Select central-cejas
+   - Build output directory: /
+   - Deploy
+
+5. Verify Everything Works
+   - Visit frontend URL
+   - Login with credentials
+   - Test API calls (Agenda, Chat, Orçamentos)
+   - Check browser DevTools Console (no CORS errors)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🔐 SECURITY CHECKLIST:
+
+✓ .env is in .gitignore (no credentials exposed)
+✓ .env.example has placeholder values only
+✓ SESSION_SECRET is configured (random string, 32+ chars)
+✓ Supabase keys are in environment variables only
+✓ No sensitive data in version control
+✓ Password hashes stored as bcrypt (ADMIN_PASSWORD_HASH)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📁 FINAL PROJECT STRUCTURE:
+
+central-cejas/
+├── server.js                    ← Express backend (main)
+├── package.json                 ← Scripts + dependencies
+├── wrangler.toml                ← Cloudflare config
+├── workers/
+│   └── proxy/
+│       └── index.js             ← /api/* proxy to backend
+├── README.md                    ← Basic usage
+├── DEPLOY.md                    ← Deployment guide (NEW)
+├── .env                         ← Credentials (NOT in git)
+├── .env.example                 ← Template
+├── .gitignore                   ← Ignore credentials ✓
+├── lib/                         ← API modules
+├── js/                          ← Frontend JavaScript
+├── assets/                      ← Images
+├── *.html                       ← Pages (Dashboard, Agenda, Chat, etc)
+├── css/                         ← Styles
+├── data/                        ← Local data (financeiro.json, etc)
+└── uploads/                     ← User uploads
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📞 DEPLOYMENT ARCHITECTURE:
+
+                   Frontend (Cloudflare Pages)
+                   │
+           ┌───────┴────────┐
+           │                │
+      Static Files    Cloudflare Worker Proxy
+           │                │
+                         /api/* → BACKEND_URL
+                            │
+                      Backend (Render)
+                      ├─ Express server
+                      ├─ Sessions
+                      ├─ PDF parsing
+                      ├─ File uploads
+                      └─ Supabase sync
+
+═══════════════════════════════════════════════════════════════════════════════
+
+❓ TROUBLESHOOTING:
+
+Q: Git push says "CONNECT tunnel failed"?
+A: Check internet connection. Try:
+   - git push origin main --verbose
+   - Or use SSH: git remote set-url origin git@github.com:eduardocabeca100-pixel/central-cejas.git
+
+Q: Backend not responding after deploy?
+A: Check Render logs and env variables (SUPABASE_URL, SESSION_SECRET, etc)
+
+Q: CORS errors in frontend?
+A: Verify BACKEND_URL in Cloudflare Worker is correct (no trailing slash)
+
+Q: Uploads not working?
+A: Backend needs /uploads folder (auto-created). Check Render file system permissions.
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✨ SUMMARY:
+
+Everything is prepared. The only blocking issue is the git push network error.
+Once that's resolved, follow the 5 steps above to go live.
+
+Backend: Ready to deploy on persistent Node.js host (Render/Railway)
+Frontend: Ready to deploy on Cloudflare Pages
+Worker: Ready to publish (will route /api/*)
+Security: Credentials protected ✓
+Documentation: Complete ✓
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Generated: 2026-06-18
+System: Central CEJAS - Gestão Interna
+Owner: Eduardo Cabeca
