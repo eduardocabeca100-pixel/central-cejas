@@ -499,6 +499,63 @@
       border-radius: 16px;
     }
 
+
+
+    .upload-tools {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr;
+    }
+
+    .file-label.secondary {
+      background: #1f2937;
+      border-color: rgba(255,255,255,.18);
+      box-shadow: none;
+    }
+
+    .drop-zone-servidor {
+      margin-top: 12px;
+      border: 1px dashed rgba(255,255,255,.2);
+      background: rgba(255,255,255,.035);
+      color: var(--muted);
+      border-radius: 16px;
+      padding: 14px;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .drop-zone-servidor.dragover {
+      border-color: rgba(255,97,210,.85);
+      background: rgba(255,97,210,.09);
+      color: #fff;
+    }
+
+    .upload-preview {
+      max-height: 150px;
+      overflow: auto;
+      margin-top: 12px;
+      padding: 10px;
+      background: #0b0b10;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      text-align: left;
+      font-size: 12px;
+      color: var(--muted);
+      display: none;
+    }
+
+    .upload-preview div {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding: 3px 0;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+
+    .upload-preview div:last-child {
+      border-bottom: 0;
+    }
+
     @media (max-width: 1200px) {
       body {
         overflow: auto;
@@ -531,6 +588,7 @@
     }
   </style>
   <link rel="stylesheet" href="/css/cejas-interface-compacta.css?v=3">
+  <link rel="stylesheet" href="/css/cejas-mobile-fix.css?v=1">
 </head>
 
 <body>
@@ -553,6 +611,7 @@
         <a href="dashboard.html">▦ Painel Geral</a>
         <a href="agenda.html">▣ Agenda Dinâmica</a>
         <a href="orcamentos.html">◉ Orçamentos</a>
+        <a href="gratuidades.html">🏷 Gratuidades</a>
         <a href="importar-relatorio.html">▤ Importar Relatório (PDF)</a>
         <a href="tarefas.html">☑ Tarefas Pendentes</a>
         <a class="active" href="servidor.html">▣ Servidor</a>
@@ -585,37 +644,51 @@
 
       <section class="layout">
         <aside class="upload-panel">
-          <div class="upload-box">
-            <h3>Subir pasta completa</h3>
+          <div class="upload-box" id="dropZoneServidor">
+            <h3>Subir arquivos e pastas</h3>
             <p>
-              Selecione uma pasta do computador. O sistema vai manter a estrutura com subpastas e arquivos.
+              Envie vários arquivos soltos, uma pasta completa ou arraste várias pastas/arquivos ao mesmo tempo. No modo inteligente, cada arquivo vira uma pasta própria. O que o sistema não entender cai em VERIFICAR para você mover depois.
             </p>
 
-            <input id="folderInput" class="file-input" type="file" webkitdirectory directory multiple>
-            <label class="file-label" for="folderInput">📁 Selecionar pasta</label>
+            <div class="upload-tools">
+              <input id="folderInput" class="file-input" type="file" webkitdirectory directory multiple>
+              <label class="file-label" for="folderInput">📁 Selecionar pasta</label>
 
-            <div id="uploadStatus" class="upload-status">Nenhuma pasta selecionada.</div>
+              <input id="fileInput" class="file-input" type="file" multiple>
+              <label class="file-label secondary" for="fileInput">📄 Selecionar arquivos soltos</label>
+            </div>
+
+            <div class="drop-zone-servidor">
+              Ou arraste aqui várias pastas e arquivos juntos. Essa é a melhor opção para enviar mais de uma pasta ao mesmo tempo.
+            </div>
+
+            <div id="uploadStatus" class="upload-status">Nenhum arquivo selecionado.</div>
+            <div id="uploadPreview" class="upload-preview"></div>
           </div>
-
           <div class="server-options">
             <div>
-              <label>Forma de envio</label>
+              <label>Forma de organização</label>
 
               <div class="radio-row">
                 <label class="radio-card">
-                  <input type="radio" name="uploadMode" value="direct" checked onchange="toggleUploadDestination()">
-                  Enviar direto mantendo a pasta original
+                  <input id="uploadModeAuto" type="radio" name="uploadMode" value="auto" checked onchange="toggleUploadDestination()">
+                  Organizar automaticamente por entidade, mês, tipo e data
+                </label>
+
+                <label class="radio-card">
+                  <input type="radio" name="uploadMode" value="direct" onchange="toggleUploadDestination()">
+                  Enviar mantendo a pasta original
                 </label>
 
                 <label class="radio-card">
                   <input id="uploadModeMonth" type="radio" name="uploadMode" value="month" onchange="toggleUploadDestination()">
-                  Enviar dentro de Ano / Mês
+                  Enviar manualmente dentro de Ano / Mês
                 </label>
               </div>
             </div>
 
-            <div id="autoDestinationBox" style="display:none;">
-              <label>Ano padrão para arquivos soltos</label>
+            <div id="autoDestinationBox">
+              <label>Ano padrão quando o nome do arquivo não trouxer ano</label>
 
               <select id="autoYear">
                 <option value="2025">2025</option>
@@ -627,13 +700,12 @@
               </select>
 
               <div class="upload-status">
-                O sistema vai tentar detectar mês e evento pelo nome da pasta/arquivo.
-                O que não for identificado irá para _A_ORGANIZAR.
+                Regras do modo inteligente: arquivos soltos nunca ficam soltos; cada um ganha uma pasta. Entidades como PEV, CDL, Sindicatos e Assis são destrinchadas uma a uma. Boleto sem entidade clara e arquivo sem data vão para VERIFICAR.
               </div>
             </div>
 
             <div id="monthDestinationBox" style="display:none;">
-              <label>Destino do envio</label>
+              <label>Destino manual do envio</label>
 
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                 <select id="uploadYear">
@@ -645,18 +717,18 @@
                 </select>
 
                 <select id="uploadMonth">
-                  <option value="Janeiro">Janeiro</option>
-                  <option value="Fevereiro">Fevereiro</option>
-                  <option value="Março">Março</option>
-                  <option value="Abril">Abril</option>
-                  <option value="Maio">Maio</option>
-                  <option value="Junho">Junho</option>
-                  <option value="Julho">Julho</option>
-                  <option value="Agosto">Agosto</option>
-                  <option value="Setembro">Setembro</option>
-                  <option value="Outubro">Outubro</option>
-                  <option value="Novembro">Novembro</option>
-                  <option value="Dezembro">Dezembro</option>
+                  <option value="01 JANEIRO">01 JANEIRO</option>
+                  <option value="02 FEVEREIRO">02 FEVEREIRO</option>
+                  <option value="03 MARÇO">03 MARÇO</option>
+                  <option value="04 ABRIL">04 ABRIL</option>
+                  <option value="05 MAIO">05 MAIO</option>
+                  <option value="06 JUNHO">06 JUNHO</option>
+                  <option value="07 JULHO">07 JULHO</option>
+                  <option value="08 AGOSTO">08 AGOSTO</option>
+                  <option value="09 SETEMBRO">09 SETEMBRO</option>
+                  <option value="10 OUTUBRO">10 OUTUBRO</option>
+                  <option value="11 NOVEMBRO">11 NOVEMBRO</option>
+                  <option value="12 DEZEMBRO">12 DEZEMBRO</option>
                 </select>
               </div>
             </div>
@@ -672,12 +744,16 @@
           </div>
 
           <button class="btn gradient" style="width:100%;justify-content:center;" onclick="uploadFolder()">
-            Enviar pasta para o servidor
+            Enviar para o servidor
+          </button>
+
+          <button class="btn" style="width:100%;justify-content:center;margin-top:10px;" onclick="clearSelectedFiles()">
+            Limpar seleção
           </button>
 
           <div class="info-card">
-            <strong>Como organizar</strong>
-            Exemplo: 2026 / Junho / Evento X / orçamento.pdf, boleto.pdf e demonstrativo.pdf. Você também pode criar 2027, 2028 e anos posteriores.
+            <strong>Como o modo inteligente organiza</strong>
+            Exemplo de entidade: 2026 / 01 JANEIRO / ENTIDADES / CDL / 02 BOLETOS ENTIDADES / 15.01 - CAFÉ / boleto.pdf. Exemplo de evento solto: 2027 / 01 JANEIRO / EVENTOS / 15.01 - NOME DO EVENTO / arquivo.pdf. O que não for entendido entra em VERIFICAR.
           </div>
 
           <div class="info-card">
@@ -786,6 +862,32 @@
       a.href = `/api/servidor/arquivo?path=${encodeURIComponent(path)}`;
       a.download = path.split("/").pop();
       a.click();
+    }
+
+    async function moveItemServidor(path) {
+      const sugestao = path.includes("VERIFICAR") ? "2026/01 JANEIRO/EVENTOS" : "2026/VERIFICAR";
+      const destino = prompt(
+        "Digite a pasta de destino. Exemplo: 2026/01 JANEIRO/EVENTOS ou 2026/01 JANEIRO/ENTIDADES/CDL/02 BOLETOS ENTIDADES",
+        sugestao
+      );
+
+      if (!destino) return;
+
+      const response = await fetch("/api/servidor/mover", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ origem: path, destinoPasta: destino })
+      });
+
+      const data = await response.json();
+
+      if (!data.ok) {
+        alert(data.message || "Erro ao mover item.");
+        return;
+      }
+
+      alert("Movido com sucesso.");
+      await loadTree();
     }
 
     async function deleteItem(path, type) {
@@ -899,26 +1001,152 @@
       }
     }
 
+    let selectedServidorFiles = [];
+
+    function mergeSelectedFiles(filesWithPaths) {
+      const map = new Map(selectedServidorFiles.map(item => [item.path + "::" + item.file.size, item]));
+
+      filesWithPaths.forEach(item => {
+        if (!item || !item.file) return;
+        const key = `${item.path || item.file.name}::${item.file.size}`;
+        map.set(key, {
+          file: item.file,
+          path: item.path || item.file.webkitRelativePath || item.file.name
+        });
+      });
+
+      selectedServidorFiles = [...map.values()];
+      updateSelectedFilesUI();
+    }
+
+    function updateSelectedFilesUI() {
+      const status = document.getElementById("uploadStatus");
+      const preview = document.getElementById("uploadPreview");
+      const totalSize = selectedServidorFiles.reduce((acc, item) => acc + Number(item.file.size || 0), 0);
+
+      status.textContent = selectedServidorFiles.length
+        ? `${selectedServidorFiles.length} arquivo(s) selecionado(s) • ${formatBytes(totalSize)}`
+        : "Nenhum arquivo selecionado.";
+
+      if (!selectedServidorFiles.length) {
+        preview.style.display = "none";
+        preview.innerHTML = "";
+        return;
+      }
+
+      preview.style.display = "block";
+      preview.innerHTML = selectedServidorFiles
+        .slice(0, 40)
+        .map(item => `<div>• ${item.path}</div>`)
+        .join("") + (selectedServidorFiles.length > 40 ? `<div>+ ${selectedServidorFiles.length - 40} arquivo(s)...</div>` : "");
+    }
+
+    function clearSelectedFiles() {
+      selectedServidorFiles = [];
+      document.getElementById("folderInput").value = "";
+      document.getElementById("fileInput").value = "";
+      updateSelectedFilesUI();
+    }
+
     document.getElementById("folderInput").addEventListener("change", () => {
-      const files = [...document.getElementById("folderInput").files];
+      const files = [...document.getElementById("folderInput").files].map(file => ({
+        file,
+        path: file.webkitRelativePath || file.name
+      }));
 
-      const totalSize = files.reduce((acc, file) => acc + file.size, 0);
-
-      document.getElementById("uploadStatus").textContent =
-        files.length
-          ? `${files.length} arquivo(s) selecionado(s) • ${formatBytes(totalSize)}`
-          : "Nenhuma pasta selecionada.";
+      mergeSelectedFiles(files);
     });
 
-    
+    document.getElementById("fileInput").addEventListener("change", () => {
+      const files = [...document.getElementById("fileInput").files].map(file => ({
+        file,
+        path: file.name
+      }));
+
+      mergeSelectedFiles(files);
+    });
+
+    function readEntryAsFile(entry, basePath = "") {
+      return new Promise((resolve, reject) => {
+        if (entry.isFile) {
+          entry.file(file => {
+            resolve([{ file, path: `${basePath}${file.name}` }]);
+          }, reject);
+          return;
+        }
+
+        if (!entry.isDirectory) {
+          resolve([]);
+          return;
+        }
+
+        const reader = entry.createReader();
+        const allEntries = [];
+
+        function readBatch() {
+          reader.readEntries(async entries => {
+            if (!entries.length) {
+              try {
+                const nested = await Promise.all(allEntries.map(child => readEntryAsFile(child, `${basePath}${entry.name}/`)));
+                resolve(nested.flat());
+              } catch (error) {
+                reject(error);
+              }
+              return;
+            }
+
+            allEntries.push(...entries);
+            readBatch();
+          }, reject);
+        }
+
+        readBatch();
+      });
+    }
+
+    async function handleServidorDrop(event) {
+      event.preventDefault();
+
+      const dropZone = document.getElementById("dropZoneServidor");
+      dropZone.classList.remove("dragover");
+
+      const items = [...(event.dataTransfer.items || [])];
+      const files = [];
+
+      if (items.length && items[0].webkitGetAsEntry) {
+        for (const item of items) {
+          const entry = item.webkitGetAsEntry();
+          if (!entry) continue;
+          files.push(...await readEntryAsFile(entry));
+        }
+      } else {
+        files.push(...[...(event.dataTransfer.files || [])].map(file => ({ file, path: file.name })));
+      }
+
+      mergeSelectedFiles(files);
+    }
+
+    const dropZoneServidor = document.getElementById("dropZoneServidor");
+
+    dropZoneServidor.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      dropZoneServidor.classList.add("dragover");
+    });
+
+    dropZoneServidor.addEventListener("dragleave", () => {
+      dropZoneServidor.classList.remove("dragover");
+    });
+
+    dropZoneServidor.addEventListener("drop", handleServidorDrop);
+
     function toggleUploadDestination() {
-      const mode = document.querySelector("input[name='uploadMode']:checked")?.value || "direct";
+      const mode = document.querySelector("input[name='uploadMode']:checked")?.value || "auto";
       document.getElementById("monthDestinationBox").style.display = mode === "month" ? "block" : "none";
       document.getElementById("autoDestinationBox").style.display = mode === "auto" ? "block" : "none";
     }
 
     function getUploadMode() {
-      return document.querySelector("input[name='uploadMode']:checked")?.value || "direct";
+      return document.querySelector("input[name='uploadMode']:checked")?.value || "auto";
     }
 
     async function createYearStructure() {
@@ -949,7 +1177,7 @@
     }
 
     function getUploadDestination() {
-      const mode = document.querySelector("input[name='uploadMode']:checked")?.value || "direct";
+      const mode = document.querySelector("input[name='uploadMode']:checked")?.value || "auto";
 
       if (mode !== "month") return "";
 
@@ -960,17 +1188,15 @@
     }
 
     async function uploadFolder() {
-      const input = document.getElementById("folderInput");
       const status = document.getElementById("uploadStatus");
-      const files = [...input.files];
+      const files = selectedServidorFiles;
 
       if (!files.length) {
-        alert("Selecione uma pasta primeiro.");
+        alert("Selecione arquivos, uma pasta ou arraste várias pastas primeiro.");
         return;
       }
 
       const formData = new FormData();
-
       const mode = getUploadMode();
       const endpoint = mode === "auto"
         ? "/api/servidor/upload-inteligente"
@@ -983,15 +1209,15 @@
         formData.append("anoPadrao", document.getElementById("autoYear")?.value || new Date().getFullYear());
       }
 
-      files.forEach(file => {
-        formData.append("arquivos", file);
-        formData.append("paths", file.webkitRelativePath || file.name);
+      files.forEach(item => {
+        formData.append("arquivos", item.file);
+        formData.append("paths", item.path || item.file.name);
       });
 
-      const destinoLabel = getUploadDestination();
+      const destinoLabel = mode === "auto" ? "organização inteligente" : getUploadDestination();
       status.textContent = destinoLabel
-        ? `Enviando pasta para ${destinoLabel}...`
-        : "Enviando pasta para o servidor...";
+        ? `Enviando para ${destinoLabel}...`
+        : "Enviando para o servidor...";
 
       try {
         const response = await fetch(endpoint, {
@@ -1005,7 +1231,7 @@
           : {
               ok: false,
               message: response.redirected
-                ? "Sua sessão expirou. Faça login novamente e tente enviar a pasta."
+                ? "Sua sessão expirou. Faça login novamente e tente enviar os arquivos."
                 : `Resposta inesperada do servidor (${response.status}).`
             };
 
@@ -1013,15 +1239,21 @@
           throw new Error(data.message || "Erro ao enviar.");
         }
 
-        status.textContent = data.message;
-        input.value = "";
+        const exemplos = Array.isArray(data.exemplos) && data.exemplos.length
+          ? " Ex.: " + data.exemplos.slice(0, 3).join(" | ")
+          : "";
+
+        status.textContent = (data.message || "Envio concluído.") + exemplos;
+        clearSelectedFiles();
 
         await loadTree();
       } catch (error) {
         status.textContent = "Erro: " + error.message;
-        alert("Erro ao enviar pasta: " + error.message);
+        alert("Erro ao enviar: " + error.message);
       }
     }
+
+    toggleUploadDestination();
 
     loadTree();
   </script>
@@ -1241,5 +1473,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 </script>
 
 <script src="/js/cejas-menu-fixo.js?v=3"></script>
+<script src="/js/cejas-mobile-menu.js?v=1"></script>
 </body>
 </html>

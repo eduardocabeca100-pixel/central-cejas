@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>CEJAS | Gratuidades</title>
+
+  <style>
+    :root {
+      --bg: #050505;
+      --sidebar: #0b0b10;
+      --panel: #111114;
+      --card: #17171c;
+      --border: rgba(255,255,255,.09);
+      --text: #fff;
+      --muted: #b3b3b3;
+      --purple: #a855f7;
+      --pink: #ff61d2;
+      --green: #22c55e;
+      --red: #ef4444;
+      --yellow: #facc15;
+      --gradient: linear-gradient(135deg, #7B61FF, #FF61D2);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body,
+    input,
+    button,
+    select,
+    textarea {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    .app { display: grid; grid-template-columns: 270px 1fr; min-height: 100vh; }
+    .sidebar { position: relative; background: var(--sidebar); border-right: 1px solid var(--border); padding: 24px 18px; }
+    .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 26px; }
+    .logo { width: 45px; height: 45px; border-radius: 12px; border: 1px solid #9b5cff; display: grid; place-items: center; color: #ff61d2; font-weight: 900; font-size: 28px; }
+    .brand h1 { font-size: 16px; line-height: 1.05; }
+    .brand p { color: var(--muted); font-size: 12px; margin-top: 5px; }
+
+    .user-card { background: #171717; border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 26px; display: flex; align-items: center; gap: 13px; }
+    .avatar { width: 44px; height: 44px; border-radius: 999px; background: var(--gradient); display: grid; place-items: center; font-weight: 900; }
+    .user-card strong { display: block; font-size: 15px; }
+    .user-card span { color: var(--muted); font-size: 13px; }
+
+    .nav { display: flex; flex-direction: column; gap: 10px; }
+    .nav a { color: #c7c7c7; text-decoration: none; padding: 13px 14px; border-radius: 13px; font-weight: 800; font-size: 14px; }
+    .nav a.active { color: #fff; background: var(--gradient); box-shadow: 0 16px 40px rgba(168,85,247,.22); }
+
+    .help { position: absolute; left: 18px; bottom: 18px; width: 235px; background: rgba(123,97,255,.13); border: 1px solid rgba(123,97,255,.28); border-radius: 16px; padding: 16px; color: #ddd; font-size: 13px; }
+    .help strong { display: block; color: #fff; margin-bottom: 6px; font-size: 15px; }
+
+    .main { height: 100vh; overflow-y: auto; padding: 32px; }
+
+    .topbar { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; margin-bottom: 24px; }
+    .eyebrow { color: #aaa; letter-spacing: .45em; font-size: 12px; font-weight: 900; text-transform: uppercase; margin-bottom: 8px; }
+    h2 { font-size: 34px; line-height: 1; }
+    .subtitle { color: var(--muted); margin-top: 9px; }
+
+    .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 13px 17px;
+      color: #fff;
+      font-weight: 900;
+      cursor: pointer;
+      background: #1f2937;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn.gradient { background: var(--gradient); }
+    .btn.red { background: rgba(239,68,68,.18); color: #fecaca; border: 1px solid rgba(239,68,68,.28); }
+
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+
+    .kpi {
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+      min-height: 128px;
+    }
+
+    .kpi span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .13em;
+      font-weight: 900;
+      margin-bottom: 12px;
+    }
+
+    .kpi strong { display: block; font-size: 28px; line-height: 1.05; }
+    .kpi small { display: block; margin-top: 9px; color: var(--green); font-weight: 900; }
+    .kpi.danger small { color: var(--red); }
+    .kpi.warning small { color: var(--yellow); }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .panel h3 { font-size: 20px; margin-bottom: 16px; }
+
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      display: block;
+      margin-bottom: 7px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: #0d0d0f;
+      color: #fff;
+      border-radius: 12px;
+      padding: 13px;
+      outline: none;
+      font-weight: 700;
+    }
+
+    textarea { min-height: 82px; resize: vertical; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .form-grid .full { grid-column: 1 / -1; }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .monthly-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .month-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .month-card strong {
+      display: block;
+      font-size: 20px;
+      margin-top: 8px;
+      color: #fff;
+    }
+
+    .month-card span,
+    .month-card small {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+    }
+
+    th,
+    td {
+      padding: 13px 12px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      font-size: 13px;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: 11px;
+    }
+
+    td strong {
+      display: block;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 11px;
+      font-weight: 900;
+      background: rgba(123,97,255,.16);
+      color: #ddd;
+    }
+
+    .tag.manual { background: rgba(34,197,94,.13); color: #bbf7d0; }
+    .tag.relatorio { background: rgba(250,204,21,.13); color: #fef08a; }
+
+    .empty {
+      color: var(--muted);
+      padding: 24px;
+      text-align: center;
+    }
+
+    @media (max-width: 1300px) {
+      .kpis,
+      .monthly-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .filters,
+      .form-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      body { overflow: auto; }
+      .app { display: block; }
+      .sidebar { display: none; }
+      .main { height: auto; min-height: 100vh; padding: 76px 14px 24px; }
+      .topbar { display: grid; }
+      .actions { justify-content: stretch; }
+      .actions .btn,
+      .form-actions .btn { width: 100%; }
+      .kpis,
+      .monthly-grid,
+      .filters,
+      .form-grid { grid-template-columns: 1fr; }
+      h2 { font-size: 28px; }
+    }
+  </style>
+
+  <link rel="stylesheet" href="/css/cejas-mobile-fix.css?v=1">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">M</div>
+        <div>
+          <h1>SISTEMA DE GESTÃO CEJAS</h1>
+          <p>Painel Administrativo</p>
+        </div>
+      </div>
+
+      <div class="user-card">
+        <div class="avatar">E</div>
+        <div>
+          <strong>Eduardo</strong>
+          <span>Super Admin</span>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a href="dashboard.html">▦ Painel Geral</a>
+        <a href="agenda.html">▣ Agenda Dinâmica</a>
+        <a href="/chat.html">💬 Chat Interno</a>
+        <a href="orcamentos.html">◉ Orçamentos</a>
+        <a href="financeiro.html">💰 Financeiro</a>
+        <a class="active" href="gratuidades.html">🏷 Gratuidades</a>
+        <a href="importar-relatorio.html">▤ Importar Relatório (PDF)</a>
+        <a href="tarefas.html">☑ Tarefas Pendentes</a>
+        <a href="servidor.html">▣ Servidor</a>
+        <a href="usuarios.html">◌ Acessos / Usuários</a>
+        <a href="contratos.html">Contratos</a>
+        <a href="configuracoes.html">⚙ Configurações</a>
+      </nav>
+
+      <div class="help">
+        <strong>Controle de perdas</strong>
+        Acompanhe abatimentos, gratuidades e valores que deixaram de entrar no caixa.
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Controle financeiro</div>
+          <h2>Gratuidades e abatimentos</h2>
+          <p class="subtitle" id="statusText">Carregando dados do relatório e lançamentos manuais...</p>
+        </div>
+
+        <div class="actions">
+          <a class="btn" href="dashboard.html">Voltar ao painel</a>
+          <button class="btn gradient" onclick="carregarGratuidades()">Atualizar</button>
+        </div>
+      </header>
+
+      <section class="kpis">
+        <article class="kpi danger">
+          <span>Total abatido</span>
+          <strong id="kpiAbatido">R$ 0,00</strong>
+          <small id="kpiAbatidoInfo">0 gratuidades</small>
+        </article>
+
+        <article class="kpi">
+          <span>Valor cheio dos eventos</span>
+          <strong id="kpiValorEvento">R$ 0,00</strong>
+          <small>Antes da gratuidade</small>
+        </article>
+
+        <article class="kpi">
+          <span>Valor pago</span>
+          <strong id="kpiValorPago">R$ 0,00</strong>
+          <small>Depois da gratuidade</small>
+        </article>
+
+        <article class="kpi warning">
+          <span>Percentual perdido</span>
+          <strong id="kpiPercentual">0%</strong>
+          <small>Abatido sobre valor cheio</small>
+        </article>
+      </section>
+
+      <section class="panel">
+        <h3>Filtros</h3>
+
+        <div class="filters">
+          <div>
+            <label>De</label>
+            <input type="date" id="filterDe">
+          </div>
+
+          <div>
+            <label>Até</label>
+            <input type="date" id="filterAte">
+          </div>
+
+          <div>
+            <label>Origem</label>
+            <select id="filterOrigem">
+              <option value="todas">Todas</option>
+              <option value="relatorio">Relatório importado</option>
+              <option value="manual">Manual</option>
+            </select>
+          </div>
+
+          <button class="btn gradient" onclick="carregarGratuidades()">Filtrar</button>
+          <button class="btn" onclick="limparFiltros()">Limpar</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h3>Lançar gratuidade manual</h3>
+
+        <form id="formGratuidade">
+          <div class="form-grid">
+            <div>
+              <label>Data</label>
+              <input type="date" id="gratData" required>
+            </div>
+
+            <div>
+              <label>Evento</label>
+              <input id="gratEvento" placeholder="Ex: Café OAB" required>
+            </div>
+
+            <div>
+              <label>Empresa/cliente</label>
+              <input id="gratEmpresa" placeholder="Opcional">
+            </div>
+
+            <div>
+              <label>Valor do evento</label>
+              <input id="gratValorEvento" inputmode="decimal" placeholder="Ex: 2500,00" required>
+            </div>
+
+            <div>
+              <label>Valor pago</label>
+              <input id="gratValorPago" inputmode="decimal" placeholder="Ex: 1500,00" required>
+            </div>
+
+            <div>
+              <label>Valor abatido</label>
+              <input id="gratValorAbatido" inputmode="decimal" placeholder="Ex: 1000,00" required>
+            </div>
+
+            <div class="full">
+              <label>Observação</label>
+              <textarea id="gratObs" placeholder="Motivo da gratuidade, autorização, condição comercial..."></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn" type="button" onclick="calcularAbatidoAutomatico()">Calcular abatido</button>
+            <button class="btn gradient" type="submit">Salvar gratuidade</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h3>Resumo mensal</h3>
+        <div class="monthly-grid" id="monthlyGrid"></div>
+      </section>
+
+      <section class="panel">
+        <h3>Lista de gratuidades</h3>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Evento</th>
+                <th>Origem</th>
+                <th>Valor evento</th>
+                <th>Valor pago</th>
+                <th>Valor abatido</th>
+                <th>Observação</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+
+            <tbody id="gratuidadesBody">
+              <tr>
+                <td colspan="8" class="empty">Carregando...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const money = (value) => Number(value || 0).toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
+
+    const numberBR = (value) => {
+      if (typeof value === "number") return value;
+
+      const text = String(value || "")
+        .replace(/R\$/gi, "")
+        .replace(/\s/g, "")
+        .replace(/\./g, "")
+        .replace(",", ".");
+
+      const n = Number(text);
+      return Number.isFinite(n) ? n : 0;
+    };
+
+    function escapeHTML(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function calcularAbatidoAutomatico() {
+      const valorEvento = numberBR(document.getElementById("gratValorEvento").value);
+      const valorPago = numberBR(document.getElementById("gratValorPago").value);
+      const abatido = Math.max(valorEvento - valorPago, 0);
+
+      document.getElementById("gratValorAbatido").value = abatido.toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function limparFiltros() {
+      document.getElementById("filterDe").value = "";
+      document.getElementById("filterAte").value = "";
+      document.getElementById("filterOrigem").value = "todas";
+      carregarGratuidades();
+    }
+
+    async function carregarGratuidades() {
+      const params = new URLSearchParams();
+      const de = document.getElementById("filterDe").value;
+      const ate = document.getElementById("filterAte").value;
+      const origem = document.getElementById("filterOrigem").value;
+
+      if (de) params.set("de", de);
+      if (ate) params.set("ate", ate);
+      if (origem) params.set("origem", origem);
+
+      const response = await fetch(`/api/gratuidades?${params.toString()}`, {
+        cache: "no-store"
+      });
+
+      const data = await response.json();
+
+      if (!data.ok) {
+        alert(data.message || "Erro ao carregar gratuidades.");
+        return;
+      }
+
+      renderResumo(data.resumo || {});
+      renderMensal(data.porMes || []);
+      renderTabela(data.itens || []);
+
+      const atualizado = data.atualizadoEm
+        ? new Date(data.atualizadoEm).toLocaleString("pt-BR")
+        : "agora";
+
+      document.getElementById("statusText").textContent =
+        `Dados atualizados em ${atualizado}. Inclui descontos do relatório e lançamentos manuais.`;
+    }
+
+    function renderResumo(resumo) {
+      document.getElementById("kpiAbatido").textContent = money(resumo.valorAbatido || 0);
+      document.getElementById("kpiValorEvento").textContent = money(resumo.valorEvento || 0);
+      document.getElementById("kpiValorPago").textContent = money(resumo.valorPago || 0);
+      document.getElementById("kpiPercentual").textContent = `${Number(resumo.percentualPerda || 0).toFixed(1).replace(".", ",")}%`;
+      document.getElementById("kpiAbatidoInfo").textContent = `${resumo.quantidade || 0} registro(s)`;
+    }
+
+    function renderMensal(meses) {
+      const container = document.getElementById("monthlyGrid");
+
+      container.innerHTML = meses.map((mes) => `
+        <article class="month-card">
+          <span>${escapeHTML(mes.mes)}</span>
+          <strong>${money(mes.valorAbatido)}</strong>
+          <small>${mes.quantidade} registro(s) • pago ${money(mes.valorPago)}</small>
+        </article>
+      `).join("") || `<div class="empty">Nenhuma gratuidade no período selecionado.</div>`;
+    }
+
+    function renderTabela(itens) {
+      const body = document.getElementById("gratuidadesBody");
+
+      body.innerHTML = itens.map((item) => {
+        const manual = item.origem === "manual";
+        const obs = item.observacao || (manual ? "Lançamento manual" : "Detectado pelo relatório");
+
+        return `
+          <tr>
+            <td>${escapeHTML(item.data || "")}</td>
+            <td>
+              <strong>${escapeHTML(item.evento || "Evento")}</strong>
+              <span>${escapeHTML(item.empresa || item.status || "")}</span>
+            </td>
+            <td>
+              <span class="tag ${manual ? "manual" : "relatorio"}">${manual ? "Manual" : "Relatório"}</span>
+            </td>
+            <td>${money(item.valorEvento)}</td>
+            <td>${money(item.valorPago)}</td>
+            <td><strong>${money(item.valorAbatido)}</strong></td>
+            <td>${escapeHTML(obs)}</td>
+            <td>
+              ${manual ? `<button class="btn red" onclick="excluirGratuidade('${item.id}')">Excluir</button>` : `<span class="tag relatorio">Automático</span>`}
+            </td>
+          </tr>
+        `;
+      }).join("") || `<tr><td colspan="8" class="empty">Nenhuma gratuidade encontrada.</td></tr>`;
+    }
+
+    async function excluirGratuidade(id) {
+      if (!confirm("Excluir esta gratuidade manual?")) return;
+
+      const response = await fetch(`/api/gratuidades/${encodeURIComponent(id)}`, {
+        method: "DELETE"
+      });
+
+      const data = await response.json();
+
+      if (!data.ok) {
+        alert(data.message || "Erro ao excluir.");
+        return;
+      }
+
+      await carregarGratuidades();
+    }
+
+    document.getElementById("formGratuidade").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const payload = {
+        data: document.getElementById("gratData").value,
+        evento: document.getElementById("gratEvento").value,
+        empresa: document.getElementById("gratEmpresa").value,
+        valorEvento: document.getElementById("gratValorEvento").value,
+        valorPago: document.getElementById("gratValorPago").value,
+        valorAbatido: document.getElementById("gratValorAbatido").value,
+        observacao: document.getElementById("gratObs").value
+      };
+
+      const response = await fetch("/api/gratuidades", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (!data.ok) {
+        alert(data.message || "Erro ao salvar gratuidade.");
+        return;
+      }
+
+      event.target.reset();
+      await carregarGratuidades();
+      alert("Gratuidade salva.");
+    });
+
+    carregarGratuidades();
+  </script>
+
+  <script>
+    (function () {
+      const PAGE_PERMS = {
+        "dashboard.html": "painel",
+        "agenda.html": "agenda",
+        "orcamentos.html": "orcamentos",
+        "importar-relatorio.html": "relatorios",
+        "tarefas.html": "tarefas",
+        "servidor.html": "servidor",
+        "financeiro.html": "financeiro",
+        "gratuidades.html": "gratuidades",
+        "usuarios.html": "usuarios",
+        "configuracoes.html": "configuracoes"
+      };
+
+      async function aplicarPermissoesMenu() {
+        try {
+          const response = await fetch("/api/me", {
+            cache: "no-store"
+          });
+
+          const data = await response.json();
+
+          if (!data.ok || !data.user) return;
+
+          const permissoes = data.user.permissoes || [];
+          const admin = permissoes.includes("*");
+
+          document.querySelectorAll("a[href$='.html']").forEach(link => {
+            const href = link.getAttribute("href");
+            const page = href.split("/").pop();
+            const required = PAGE_PERMS[page];
+
+            if (required && !admin && !permissoes.includes(required)) {
+              link.remove();
+            }
+          });
+        } catch {}
+      }
+
+      aplicarPermissoesMenu();
+    })();
+  </script>
+
+  <script src="/js/cejas-mobile-menu.js?v=1"></script>
+</body>
+</html>

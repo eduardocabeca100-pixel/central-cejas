@@ -89,33 +89,8 @@ app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
 
 
 // CEJAS_FIX_RELATORIO_DELETE_START
-// Relatório atual: quando apagar, remove dados locais e limpa Supabase.
-app.get("/api/relatorio-atual", (req, res, next) => {
-  const fs = require("fs");
-  const path = require("path");
-
-  const arquivo = path.join(__dirname, "data", "relatorio-supera.json");
-
-  if (!fs.existsSync(arquivo)) {
-    return res.json({
-      ok: false,
-      vazio: true,
-      message: "Nenhum relatório atual carregado.",
-      resumo: {
-        faturamentoPrevisto: 0,
-        receitaConfirmada: 0,
-        descontos: 0,
-        totalEventos: 0,
-        confirmados: 0,
-        emEspera: 0,
-        cancelados: 0
-      },
-      eventos: []
-    });
-  }
-
-  next();
-});
+// Não responder vazio aqui: deixa a rota principal tentar carregar local ou Supabase.
+app.get("/api/relatorio-atual", (_req, _res, next) => next());
 
 app.delete("/api/relatorio-atual", async (_req, res) => {
   const fs = require("fs");
@@ -772,6 +747,88 @@ const relatorioUpload = multer({
   }
 });
 
+
+function isoParaDataBRServidor(iso) {
+  if (!iso || !String(iso).includes("-")) return "";
+  const [ano, mes, dia] = String(iso).slice(0, 10).split("-");
+  if (!ano || !mes || !dia) return "";
+  return `${dia}/${mes}/${ano}`;
+}
+
+function relatorioCejasVazioServidor(report) {
+  const eventos = Array.isArray(report?.eventos) ? report.eventos : [];
+  const resumo = report?.resumo || {};
+
+  return !eventos.length &&
+    !Number(resumo.totalEventos || 0) &&
+    !Number(resumo.faturamentoPrevisto || 0) &&
+    !Number(resumo.receitaConfirmada || 0);
+}
+
+async function carregarRelatorioAtualDoSupabaseServidor() {
+  try {
+    const { supabaseAdmin, isSupabaseConfigured } = require("./lib/supabase");
+
+    if (!isSupabaseConfigured || !isSupabaseConfigured() || !supabaseAdmin) return null;
+
+    const relatorios = await supabaseAdmin
+      .from("cejas_relatorios")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(1);
+
+    if (relatorios.error || !relatorios.data || !relatorios.data.length) return null;
+
+    const relatorio = relatorios.data[0];
+
+    const eventosQuery = await supabaseAdmin
+      .from("cejas_eventos")
+      .select("*")
+      .eq("relatorio_id", relatorio.id)
+      .order("data_evento", { ascending: true });
+
+    if (eventosQuery.error) return null;
+
+    const eventos = (eventosQuery.data || []).map((evento) => ({
+      data: isoParaDataBRServidor(evento.data_evento),
+      horaInicial: evento.hora_inicial || "",
+      horaFinal: evento.hora_final || "",
+      sala: evento.sala || "",
+      empresa: evento.empresa || "",
+      evento: evento.evento || "",
+      status: evento.status || "em_espera",
+      participantes: Number(evento.participantes || 0),
+      valor: Number(evento.valor || 0),
+      desconto: Number(evento.desconto || 0),
+      produtos: evento.produtos || [],
+      blocoOriginal: evento.bloco_original || ""
+    }));
+
+    const report = {
+      atualizadoEm: relatorio.created_at || new Date().toISOString(),
+      arquivo: relatorio.nome_arquivo || "relatorio-supabase.pdf",
+      origem: "supabase",
+      resumo: {
+        faturamentoPrevisto: Number(relatorio.faturamento_previsto || 0),
+        receitaConfirmada: Number(relatorio.receita_confirmada || 0),
+        descontosAplicados: Number(relatorio.descontos_aplicados || 0),
+        eventosConfirmados: Number(relatorio.eventos_confirmados || 0),
+        eventosPendentes: Number(relatorio.eventos_em_espera || 0),
+        eventosCancelados: Number(relatorio.eventos_cancelados || 0),
+        totalEventos: Number(relatorio.total_eventos || eventos.length)
+      },
+      eventos,
+      salas: [],
+      produtos: []
+    };
+
+    return report;
+  } catch (error) {
+    console.warn("⚠️ Não foi possível carregar relatório do Supabase:", error.message);
+    return null;
+  }
+}
+
 function emptySuperaReport() {
   return {
     atualizadoEm: null,
@@ -1220,13 +1277,31 @@ function analisarTextoSupera(texto, arquivo) {
 }
 
 
-app.get("/api/relatorio-atual", (_req, res) => {
+app.get("/api/relatorio-atual", async (_req, res) => {
   try {
-    if (!fs.existsSync(RELATORIO_FILE)) {
-      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+    let report = null;
+
+    if (fs.existsSync(RELATORIO_FILE)) {
+      try {
+        report = JSON.parse(fs.readFileSync(RELATORIO_FILE, "utf8"));
+      } catch {
+        report = null;
+      }
     }
 
-    const report = JSON.parse(fs.readFileSync(RELATORIO_FILE, "utf8"));
+    if (!report || relatorioCejasVazioServidor(report)) {
+      const supabaseReport = await carregarRelatorioAtualDoSupabaseServidor();
+
+      if (supabaseReport && !relatorioCejasVazioServidor(supabaseReport)) {
+        fs.writeFileSync(RELATORIO_FILE, JSON.stringify(supabaseReport, null, 2), "utf8");
+        report = supabaseReport;
+      }
+    }
+
+    if (!report) {
+      report = emptySuperaReport();
+      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+    }
 
     res.json({
       ok: true,
@@ -1277,6 +1352,15 @@ app.post("/api/importar-relatorio", (req, res, next) => {
 
     fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
 
+    let syncSupabase = null;
+    try {
+      syncSupabase = await syncRelatorioAtualComSupabase({ reportPath: RELATORIO_FILE });
+      console.log("✅ Relatório sincronizado com Supabase:", syncSupabase);
+    } catch (syncError) {
+      syncSupabase = { ok: false, message: syncError.message };
+      console.warn("⚠️ Relatório salvo localmente, mas não sincronizou com Supabase:", syncError.message);
+    }
+
     console.log("✅ Relatório processado:", report.resumo);
     console.log("📌 Eventos detectados:", report.eventos.length);
     console.log("📌 Eventos detectados:", report.eventos.length);
@@ -1284,8 +1368,11 @@ app.post("/api/importar-relatorio", (req, res, next) => {
 
     res.json({
       ok: true,
-      message: "Relatório importado com sucesso.",
-      report
+      message: syncSupabase && syncSupabase.ok
+        ? "Relatório importado e sincronizado para todos os dispositivos."
+        : "Relatório importado localmente. Verifique a configuração do Supabase para aparecer em celular/tablet.",
+      report,
+      syncSupabase
     });
   } catch (error) {
     console.error("❌ ERRO AO IMPORTAR PDF:", error);
@@ -1299,6 +1386,363 @@ app.post("/api/importar-relatorio", (req, res, next) => {
 
 
 
+
+// CEJAS_GRATUIDADES_API_START
+const GRATUIDADES_FILE = path.join(__dirname, "data", "gratuidades-manuais.json");
+
+function ensureGratuidadesFile() {
+  fs.mkdirSync(path.join(__dirname, "data"), { recursive: true });
+
+  if (!fs.existsSync(GRATUIDADES_FILE)) {
+    fs.writeFileSync(GRATUIDADES_FILE, "[]", "utf8");
+  }
+}
+
+function carregarGratuidadesManuais() {
+  ensureGratuidadesFile();
+
+  try {
+    const lista = JSON.parse(fs.readFileSync(GRATUIDADES_FILE, "utf8"));
+    return Array.isArray(lista) ? lista : [];
+  } catch {
+    return [];
+  }
+}
+
+function salvarGratuidadesManuais(lista) {
+  ensureGratuidadesFile();
+  fs.writeFileSync(GRATUIDADES_FILE, JSON.stringify(lista, null, 2), "utf8");
+}
+
+function numeroFinanceiroCejas(valor) {
+  if (typeof valor === "number") return Number.isFinite(valor) ? valor : 0;
+
+  const texto = String(valor || "")
+    .replace(/R\$/gi, "")
+    .replace(/\s/g, "")
+    .replace(/\./g, "")
+    .replace(",", ".");
+
+  const numero = Number(texto);
+  return Number.isFinite(numero) ? numero : 0;
+}
+
+function statusConfirmadoCejas(status) {
+  const texto = String(status || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+
+  return texto.includes("confirmado") || texto === "confirmada";
+}
+
+function dataEventoParaISOCejas(data) {
+  const texto = String(data || "").trim();
+
+  if (!texto) return "";
+
+  if (/^\d{4}-\d{2}-\d{2}/.test(texto)) {
+    return texto.slice(0, 10);
+  }
+
+  let match = texto.match(/\b(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})\b/);
+  if (match) {
+    const dia = String(match[1]).padStart(2, "0");
+    const mes = String(match[2]).padStart(2, "0");
+    const ano = match[3];
+    return `${ano}-${mes}-${dia}`;
+  }
+
+  match = texto.match(/\b(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2})\b/);
+  if (match) {
+    const dia = String(match[1]).padStart(2, "0");
+    const mes = String(match[2]).padStart(2, "0");
+    const ano = `20${match[3]}`;
+    return `${ano}-${mes}-${dia}`;
+  }
+
+  return "";
+}
+
+function isoParaDataBRCejas(iso) {
+  if (!iso || !String(iso).includes("-")) return "";
+  const [ano, mes, dia] = String(iso).slice(0, 10).split("-");
+  if (!ano || !mes || !dia) return "";
+  return `${dia}/${mes}/${ano}`;
+}
+
+function nomeMesCejas(key) {
+  const nomes = [
+    "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+  ];
+
+  const [ano, mes] = String(key || "").split("-");
+  const idx = Number(mes) - 1;
+
+  if (!ano || idx < 0 || idx > 11) return key || "Sem mês";
+  return `${nomes[idx]} de ${ano}`;
+}
+
+function dentroPeriodoCejas(iso, de, ate) {
+  if (!iso) return false;
+  if (de && iso < de) return false;
+  if (ate && iso > ate) return false;
+  return true;
+}
+
+async function carregarRelatorioParaAnaliseCejas() {
+  let report = null;
+
+  if (fs.existsSync(RELATORIO_FILE)) {
+    try {
+      report = JSON.parse(fs.readFileSync(RELATORIO_FILE, "utf8"));
+    } catch {
+      report = null;
+    }
+  }
+
+  if ((!report || relatorioCejasVazioServidor(report)) && typeof carregarRelatorioAtualDoSupabaseServidor === "function") {
+    const supabaseReport = await carregarRelatorioAtualDoSupabaseServidor();
+    if (supabaseReport && !relatorioCejasVazioServidor(supabaseReport)) {
+      report = supabaseReport;
+    }
+  }
+
+  return report || emptySuperaReport();
+}
+
+function gratuidadesDoRelatorioCejas(report) {
+  const eventos = Array.isArray(report?.eventos) ? report.eventos : [];
+
+  return eventos
+    .map((evento, index) => {
+      const desconto = numeroFinanceiroCejas(evento.desconto || evento.valorAbatido || 0);
+      const pago = numeroFinanceiroCejas(evento.valorPago || evento.valor || 0);
+      const valorEvento = numeroFinanceiroCejas(evento.valorEvento || (pago + desconto));
+      const iso = dataEventoParaISOCejas(evento.data || evento.dataEvento || "");
+
+      return {
+        id: `relatorio-${index}-${iso || "sem-data"}`,
+        origem: "relatorio",
+        data: isoParaDataBRCejas(iso),
+        dataISO: iso,
+        evento: evento.evento || evento.nome || evento.empresa || "Evento do relatório",
+        empresa: evento.empresa || "",
+        status: evento.status || "",
+        valorEvento,
+        valorPago: pago,
+        valorAbatido: desconto,
+        observacao: "Detectado automaticamente pelo desconto do relatório importado."
+      };
+    })
+    .filter(item => item.valorAbatido > 0);
+}
+
+function normalizarGratuidadeManualCejas(item) {
+  const iso = dataEventoParaISOCejas(item.dataISO || item.data || item.dataEvento || "");
+  const valorEvento = numeroFinanceiroCejas(item.valorEvento);
+  const valorPago = numeroFinanceiroCejas(item.valorPago);
+  const valorAbatido = numeroFinanceiroCejas(item.valorAbatido || Math.max(valorEvento - valorPago, 0));
+
+  return {
+    id: item.id || `grat-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    origem: "manual",
+    data: isoParaDataBRCejas(iso),
+    dataISO: iso,
+    evento: String(item.evento || "Evento sem nome").trim(),
+    empresa: String(item.empresa || "").trim(),
+    status: String(item.status || "manual").trim(),
+    valorEvento,
+    valorPago,
+    valorAbatido,
+    observacao: String(item.observacao || "").trim(),
+    criadoEm: item.criadoEm || new Date().toISOString(),
+    atualizadoEm: new Date().toISOString()
+  };
+}
+
+async function montarGratuidadesCejas(query = {}) {
+  const de = String(query.de || query.inicio || "").slice(0, 10);
+  const ate = String(query.ate || query.fim || "").slice(0, 10);
+  const origem = String(query.origem || "todas");
+
+  const report = await carregarRelatorioParaAnaliseCejas();
+  const manuais = carregarGratuidadesManuais().map(normalizarGratuidadeManualCejas);
+  const relatorio = gratuidadesDoRelatorioCejas(report);
+
+  let itens = [...relatorio, ...manuais];
+
+  if (origem === "manual") itens = manuais;
+  if (origem === "relatorio") itens = relatorio;
+
+  if (de || ate) {
+    itens = itens.filter(item => dentroPeriodoCejas(item.dataISO, de, ate));
+  }
+
+  itens.sort((a, b) => String(b.dataISO || "").localeCompare(String(a.dataISO || "")) || String(a.evento).localeCompare(String(b.evento)));
+
+  const porMesMap = {};
+  let totalValorEvento = 0;
+  let totalPago = 0;
+  let totalAbatido = 0;
+
+  for (const item of itens) {
+    totalValorEvento += numeroFinanceiroCejas(item.valorEvento);
+    totalPago += numeroFinanceiroCejas(item.valorPago);
+    totalAbatido += numeroFinanceiroCejas(item.valorAbatido);
+
+    const key = item.dataISO ? item.dataISO.slice(0, 7) : "SEM DATA";
+    porMesMap[key] = porMesMap[key] || {
+      key,
+      mes: nomeMesCejas(key),
+      quantidade: 0,
+      valorEvento: 0,
+      valorPago: 0,
+      valorAbatido: 0
+    };
+
+    porMesMap[key].quantidade += 1;
+    porMesMap[key].valorEvento += numeroFinanceiroCejas(item.valorEvento);
+    porMesMap[key].valorPago += numeroFinanceiroCejas(item.valorPago);
+    porMesMap[key].valorAbatido += numeroFinanceiroCejas(item.valorAbatido);
+  }
+
+  const porMes = Object.values(porMesMap).sort((a, b) => String(a.key).localeCompare(String(b.key)));
+
+  return {
+    itens,
+    porMes,
+    resumo: {
+      quantidade: itens.length,
+      valorEvento: totalValorEvento,
+      valorPago: totalPago,
+      valorAbatido: totalAbatido,
+      percentualPerda: totalValorEvento > 0 ? (totalAbatido / totalValorEvento) * 100 : 0
+    },
+    atualizadoEm: new Date().toISOString()
+  };
+}
+
+async function montarDashboardFinanceiroCejas() {
+  const report = await carregarRelatorioParaAnaliseCejas();
+  const eventos = Array.isArray(report.eventos) ? report.eventos : [];
+  const meses = {};
+
+  let totalReceitaConfirmada = 0;
+  let totalEventosConfirmados = 0;
+
+  for (const evento of eventos) {
+    if (!statusConfirmadoCejas(evento.status)) continue;
+
+    const iso = dataEventoParaISOCejas(evento.data || "");
+    if (!iso) continue;
+
+    const key = iso.slice(0, 7);
+    const valor = numeroFinanceiroCejas(evento.valor || evento.valorPago || 0);
+
+    meses[key] = meses[key] || {
+      key,
+      mes: nomeMesCejas(key),
+      receitaConfirmada: 0,
+      eventosConfirmados: 0
+    };
+
+    meses[key].receitaConfirmada += valor;
+    meses[key].eventosConfirmados += 1;
+    totalReceitaConfirmada += valor;
+    totalEventosConfirmados += 1;
+  }
+
+  const receitaMensal = Object.values(meses).sort((a, b) => String(a.key).localeCompare(String(b.key)));
+  const gratuidades = await montarGratuidadesCejas({});
+
+  return {
+    ok: true,
+    receitaMensal,
+    resumo: {
+      totalReceitaConfirmada,
+      totalEventosConfirmados,
+      mesesComReceita: receitaMensal.length,
+      gratuidades: gratuidades.resumo
+    },
+    atualizadoEm: report.atualizadoEm || new Date().toISOString()
+  };
+}
+
+app.get("/api/gratuidades", async (req, res) => {
+  try {
+    const dados = await montarGratuidadesCejas(req.query || {});
+    res.json({ ok: true, ...dados });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: "Erro ao carregar gratuidades: " + error.message
+    });
+  }
+});
+
+app.post("/api/gratuidades", express.json({ limit: "2mb" }), (req, res) => {
+  try {
+    const atual = carregarGratuidadesManuais();
+    const novo = normalizarGratuidadeManualCejas(req.body || {});
+
+    if (!novo.dataISO) {
+      return res.status(400).json({ ok: false, message: "Informe a data da gratuidade." });
+    }
+
+    if (!novo.evento || novo.evento === "Evento sem nome") {
+      return res.status(400).json({ ok: false, message: "Informe o nome do evento." });
+    }
+
+    if (novo.valorAbatido <= 0) {
+      return res.status(400).json({ ok: false, message: "Informe o valor abatido/gratuidade." });
+    }
+
+    atual.push(novo);
+    salvarGratuidadesManuais(atual);
+
+    res.json({ ok: true, item: novo, message: "Gratuidade registrada com sucesso." });
+  } catch (error) {
+    res.status(500).json({ ok: false, message: "Erro ao salvar gratuidade: " + error.message });
+  }
+});
+
+app.delete("/api/gratuidades/:id", (req, res) => {
+  try {
+    const id = req.params.id;
+
+    if (String(id || "").startsWith("relatorio-")) {
+      return res.status(400).json({
+        ok: false,
+        message: "Esta gratuidade vem do relatório. Para remover, importe um relatório corrigido."
+      });
+    }
+
+    const atual = carregarGratuidadesManuais();
+    const novaLista = atual.filter(item => item.id !== id);
+
+    if (novaLista.length === atual.length) {
+      return res.status(404).json({ ok: false, message: "Gratuidade manual não encontrada." });
+    }
+
+    salvarGratuidadesManuais(novaLista);
+    res.json({ ok: true, message: "Gratuidade excluída." });
+  } catch (error) {
+    res.status(500).json({ ok: false, message: "Erro ao excluir gratuidade: " + error.message });
+  }
+});
+
+app.get("/api/dashboard-financeiro", async (_req, res) => {
+  try {
+    const dados = await montarDashboardFinanceiroCejas();
+    res.json(dados);
+  } catch (error) {
+    res.status(500).json({ ok: false, message: "Erro ao carregar dashboard financeiro: " + error.message });
+  }
+});
+// CEJAS_GRATUIDADES_API_END
+
 const USERS_FILE = path.join(__dirname, "data", "usuarios.json");
 
 const PERMISSOES_DISPONIVEIS = [
@@ -1309,6 +1753,7 @@ const PERMISSOES_DISPONIVEIS = [
   { id: "tarefas", nome: "Tarefas Pendentes" },
   { id: "servidor", nome: "Servidor de Arquivos" },
   { id: "financeiro", nome: "Financeiro" },
+  { id: "gratuidades", nome: "Gratuidades" },
   { id: "usuarios", nome: "Acessos / Usuários" },
   { id: "configuracoes", nome: "Configurações" }
 ,
@@ -1326,6 +1771,7 @@ const PAGE_PERMISSION = {
   "/tarefas.html": "tarefas",
   "/servidor.html": "servidor",
   "/financeiro.html": "financeiro",
+  "/gratuidades.html": "gratuidades",
   "/usuarios.html": "usuarios",
   "/configuracoes.html": "configuracoes"
 };
@@ -1797,10 +2243,14 @@ app.post("/api/servidor/mover", (req, res) => {
       });
     }
 
-    if (!fs.existsSync(destinoDir) || !fs.statSync(destinoDir).isDirectory()) {
+    if (!fs.existsSync(destinoDir)) {
+      fs.mkdirSync(destinoDir, { recursive: true });
+    }
+
+    if (!fs.statSync(destinoDir).isDirectory()) {
       return res.status(400).json({
         ok: false,
-        message: "Destino precisa ser uma pasta existente."
+        message: "Destino precisa ser uma pasta."
       });
     }
 
@@ -1841,6 +2291,8 @@ app.post("/api/servidor/mover", (req, res) => {
 
 
 
+
+
 const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
 fs.mkdirSync(SERVIDOR_TMP_DIR, { recursive: true });
 
@@ -1854,7 +2306,7 @@ const servidorBulkUpload = multer({
   }),
   limits: {
     fileSize: 500 * 1024 * 1024,
-    files: 5000
+    files: 8000
   }
 });
 
@@ -1863,6 +2315,19 @@ function normalizarTextoServidor(texto) {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toUpperCase();
+}
+
+function slugPastaServidor(texto, fallback = "VERIFICAR") {
+  const limpo = String(texto || "")
+    .replace(/[\\/:*?"<>|]/g, "-")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return limpo || fallback;
+}
+
+function nomeArquivoSeguroServidor(texto, fallback = "arquivo") {
+  return slugPastaServidor(texto, fallback).replace(/^\.+/, fallback);
 }
 
 const MESES_SERVIDOR = [
@@ -1880,114 +2345,243 @@ const MESES_SERVIDOR = [
   { numero: "12", nome: "DEZEMBRO", aliases: ["DEZEMBRO", "DEZ"] }
 ];
 
+const ENTIDADES_SERVIDOR = [
+  { pasta: "PEV", aliases: ["PEV", "PROGRAMA EMPRESA VIVA", "EMPRESA VIVA"] },
+  { pasta: "CDL", aliases: ["CDL", "CAMARA DE DIRIGENTES LOJISTAS", "CÂMARA DE DIRIGENTES LOJISTAS"] },
+  { pasta: "SINDICATOS", aliases: ["SINDICATO", "SINDICATOS", "SINDICAL", "SIND"] },
+  { pasta: "ASSIS", aliases: ["ASSIS"] }
+];
+
+const TIPOS_DOCUMENTO_SERVIDOR = [
+  { id: "boleto", pasta: "02 BOLETOS ENTIDADES", geral: "BOLETOS", aliases: ["BOLETO", "BOLETOS", "FATURA", "FATURAS", "COBRANCA", "COBRANÇA", "PAGAMENTO", "PARCELA"] },
+  { id: "evento", pasta: "01 EVENTOS ENTIDADES", geral: "EVENTOS", aliases: ["EVENTO", "EVENTOS", "ORCAMENTO", "ORÇAMENTO", "PROPOSTA", "BRIEFING", "PROJETO", "CONTRATACAO", "CONTRATAÇÃO"] },
+  { id: "demonstrativo", pasta: "03 DEMONSTRATIVOS ENTIDADES", geral: "DEMONSTRATIVOS", aliases: ["DEMONSTRATIVO", "DEMONSTRATIVOS", "RELATORIO", "RELATÓRIO", "EXTRATO", "PRESTACAO", "PRESTAÇÃO"] },
+  { id: "nota", pasta: "04 NOTAS E RECIBOS", geral: "NOTAS E RECIBOS", aliases: ["NOTA FISCAL", "NOTAS FISCAIS", "NFS", "NF", "RECIBO", "COMPROVANTE"] },
+  { id: "contrato", pasta: "05 CONTRATOS", geral: "CONTRATOS", aliases: ["CONTRATO", "CONTRATOS", "TERMO", "ADITIVO"] }
+];
+
 function pastaMesServidor(numeroMes) {
   const mes = MESES_SERVIDOR.find(item => item.numero === String(numeroMes).padStart(2, "0"));
-  return mes ? `${mes.numero} ${mes.nome}` : "_MES_NAO_IDENTIFICADO";
+  return mes ? `${mes.numero} ${mes.nome}` : "VERIFICAR MES";
 }
 
-function detectarAnoServidor(texto, anoPadrao) {
-  const match = String(texto || "").match(/\b(20\d{2})\b/);
-  return match ? match[1] : String(anoPadrao || new Date().getFullYear());
+function regexPalavraServidor(alias) {
+  const aliasNormal = normalizarTextoServidor(alias).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(^|[^A-Z0-9])${aliasNormal}([^A-Z0-9]|$)`);
 }
 
-function detectarMesServidor(texto) {
-  const original = String(texto || "");
-  const normalizado = normalizarTextoServidor(original);
+function detectarMesPorNomeServidor(texto) {
+  const normalizado = normalizarTextoServidor(texto);
 
   for (const mes of MESES_SERVIDOR) {
-    if (normalizado.includes(`${mes.numero} ${normalizarTextoServidor(mes.nome)}`)) return mes.numero;
-    if (normalizado.includes(`${mes.numero}-${normalizarTextoServidor(mes.nome)}`)) return mes.numero;
-    if (normalizado.includes(`${mes.numero}_${normalizarTextoServidor(mes.nome)}`)) return mes.numero;
-
     for (const alias of mes.aliases) {
-      if (normalizado.includes(normalizarTextoServidor(alias))) return mes.numero;
+      if (regexPalavraServidor(alias).test(normalizado)) return mes.numero;
     }
   }
-
-  const dataCompleta = original.match(/\b(\d{1,2})[.\-_/](\d{1,2})[.\-_/](20\d{2}|\d{2})\b/);
-  if (dataCompleta) return String(dataCompleta[2]).padStart(2, "0");
-
-  const diaMes = original.match(/\b(\d{1,2})[.\-_/](\d{1,2})\b/);
-  if (diaMes) return String(diaMes[2]).padStart(2, "0");
-
-  const mesInicio = normalizado.match(/(?:^|\/|\s)(0?[1-9]|1[0-2])(?:\s|_|-|$)/);
-  if (mesInicio) return String(mesInicio[1]).padStart(2, "0");
 
   return "";
 }
 
-function limparNomeEventoServidor(nome) {
-  let base = String(nome || "")
-    .replace(/\.[a-zA-Z0-9]{2,8}$/g, "")
-    .replace(/\\/g, "/")
-    .split("/")
-    .pop();
+function detectarDataServidor(texto, anoPadrao) {
+  const original = String(texto || "");
+  const anoDefault = String(anoPadrao || new Date().getFullYear());
 
-  base = base
-    .replace(/\b(20\d{2})\b/g, "")
-    .replace(/\b\d{1,2}[.\-_/]\d{1,2}([.\-_/](20\d{2}|\d{2}))?\b/g, "")
-    .replace(/\b(ORCAMENTO|ORÇAMENTO|BOLETO|DEMONSTRATIVO|RECIBO|COMPROVANTE|NF|NFS|NOTA|FISCAL|CONTRATO|PDF|DOC|DOCUMENTO)\b/gi, "")
-    .replace(/[_\-]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  let match = original.match(/\b(20\d{2})[.\-_/](0?[1-9]|1[0-2])[.\-_/](\d{1,2})\b/);
+  if (match) {
+    return {
+      ano: match[1],
+      mes: String(match[2]).padStart(2, "0"),
+      dia: String(match[3]).padStart(2, "0"),
+      label: `${String(match[3]).padStart(2, "0")}.${String(match[2]).padStart(2, "0")}`,
+      precisao: "dia"
+    };
+  }
 
-  if (!base || base.length < 3) return "_A_ORGANIZAR";
+  match = original.match(/\b(\d{1,2})[.\-_/](\d{1,2})[.\-_/](20\d{2}|\d{2})\b/);
+  if (match) {
+    const ano = String(match[3]).length === 2 ? `20${match[3]}` : match[3];
+    return {
+      ano,
+      mes: String(match[2]).padStart(2, "0"),
+      dia: String(match[1]).padStart(2, "0"),
+      label: `${String(match[1]).padStart(2, "0")}.${String(match[2]).padStart(2, "0")}`,
+      precisao: "dia"
+    };
+  }
 
-  return base.toUpperCase();
+  match = original.match(/(?:^|[^\d])(\d{1,2})\s*(?:do|de)?\s*(0?[1-9]|1[0-2])(?:\s*(?:de|do)?\s*(20\d{2}|\d{2}))?(?:[^\d]|$)/i);
+  if (match) {
+    const ano = match[3]
+      ? (String(match[3]).length === 2 ? `20${match[3]}` : match[3])
+      : anoDefault;
+
+    return {
+      ano,
+      mes: String(match[2]).padStart(2, "0"),
+      dia: String(match[1]).padStart(2, "0"),
+      label: `${String(match[1]).padStart(2, "0")}.${String(match[2]).padStart(2, "0")}`,
+      precisao: "dia"
+    };
+  }
+
+  match = original.match(/\b(0?[1-9]|1[0-2])[.\-_/](20\d{2}|\d{2})\b/);
+  if (match) {
+    const ano = String(match[2]).length === 2 ? `20${match[2]}` : match[2];
+    return {
+      ano,
+      mes: String(match[1]).padStart(2, "0"),
+      dia: "",
+      label: `${String(match[1]).padStart(2, "0")}.${ano}`,
+      precisao: "mes"
+    };
+  }
+
+  const mesPorNome = detectarMesPorNomeServidor(original);
+  const anoCompleto = original.match(/\b(20\d{2})\b/);
+
+  if (mesPorNome) {
+    const ano = anoCompleto ? anoCompleto[1] : anoDefault;
+    return {
+      ano,
+      mes: mesPorNome,
+      dia: "",
+      label: `${mesPorNome}.${ano}`,
+      precisao: "mes"
+    };
+  }
+
+  return {
+    ano: anoCompleto ? anoCompleto[1] : anoDefault,
+    mes: "",
+    dia: "",
+    label: "SEM DATA",
+    precisao: "nenhuma"
+  };
 }
 
-function segmentoEhAnoOuMesServidor(segmento) {
-  const n = normalizarTextoServidor(segmento);
+function detectarEntidadeServidor(texto) {
+  const normalizado = normalizarTextoServidor(texto);
 
-  if (/^20\d{2}$/.test(n)) return true;
-  if (detectarMesServidor(segmento)) return true;
-  if (["CEJAS", "AREA DE TRABALHO", "DESKTOP"].includes(n)) return true;
+  for (const entidade of ENTIDADES_SERVIDOR) {
+    for (const alias of entidade.aliases) {
+      if (regexPalavraServidor(alias).test(normalizado)) return entidade;
+    }
+  }
 
-  return false;
+  return null;
 }
 
-function detectarNomeEventoServidor(relativePath, fileName) {
-  const partes = String(relativePath || "")
+function detectarContextoEntidadeServidor(texto) {
+  const normalizado = normalizarTextoServidor(texto);
+  return Boolean(
+    detectarEntidadeServidor(texto) ||
+    regexPalavraServidor("ENTIDADE").test(normalizado) ||
+    regexPalavraServidor("ENTIDADES").test(normalizado) ||
+    normalizado.includes("EVENTOS ENTIDADES") ||
+    normalizado.includes("BOLETOS ENTIDADES")
+  );
+}
+
+function detectarTipoDocumentoServidor(texto) {
+  const normalizado = normalizarTextoServidor(texto);
+
+  for (const tipo of TIPOS_DOCUMENTO_SERVIDOR) {
+    for (const alias of tipo.aliases) {
+      if (regexPalavraServidor(alias).test(normalizado)) return tipo;
+    }
+  }
+
+  return null;
+}
+
+function removerDatasDoNomeServidor(texto) {
+  return String(texto || "")
+    .replace(/\b20\d{2}[.\-_/](0?[1-9]|1[0-2])[.\-_/]\d{1,2}\b/g, " ")
+    .replace(/\b\d{1,2}[.\-_/]\d{1,2}[.\-_/](20\d{2}|\d{2})\b/g, " ")
+    .replace(/\b\d{1,2}[.\-_/]\d{1,2}\b/g, " ")
+    .replace(/\b(0?[1-9]|1[0-2])[.\-_/](20\d{2}|\d{2})\b/g, " ")
+    .replace(/\b\d{1,2}\s*(do|de)?\s*(0?[1-9]|1[0-2])\s*((de|do)?\s*(20\d{2}|\d{2}))?\b/gi, " ");
+}
+
+function limparNomeDocumentoServidor(originalPath, fileName) {
+  const partes = String(originalPath || fileName || "")
     .replace(/\\/g, "/")
     .split("/")
     .filter(Boolean);
 
-  const filePart = partes[partes.length - 1] || fileName;
+  const baseArquivo = path.basename(String(fileName || partes[partes.length - 1] || "arquivo"), path.extname(String(fileName || "")));
+  const candidatos = [baseArquivo, ...partes.slice(0, -1).reverse()];
 
-  let indiceMes = -1;
+  for (const candidato of candidatos) {
+    let base = path.basename(String(candidato || ""), path.extname(String(candidato || "")));
 
-  for (let i = 0; i < partes.length; i++) {
-    if (detectarMesServidor(partes[i])) {
-      indiceMes = i;
-      break;
-    }
+    base = removerDatasDoNomeServidor(base)
+      .replace(/\b(BOLETO|BOLETOS|FATURA|FATURAS|EVENTO|EVENTOS|ENTIDADE|ENTIDADES|ORCAMENTO|ORÇAMENTO|DEMONSTRATIVO|RELATORIO|RELATÓRIO|RECIBO|COMPROVANTE|NOTA|FISCAL|CONTRATO|PDF|DOC|DOCX|XLS|XLSX)\b/gi, " ")
+      .replace(/[_\-.]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    if (base.length >= 3) return slugPastaServidor(base.toUpperCase());
   }
 
-  if (indiceMes >= 0 && partes[indiceMes + 1] && partes[indiceMes + 1] !== filePart) {
-    return limparNomeEventoServidor(partes[indiceMes + 1]);
-  }
+  return slugPastaServidor(baseArquivo.toUpperCase(), "VERIFICAR");
+}
 
-  const paisPossiveis = partes.slice(0, -1).filter(p => !segmentoEhAnoOuMesServidor(p));
+function montarPastaDocumentoServidor(data, titulo) {
+  const nome = slugPastaServidor(titulo, "VERIFICAR");
 
-  if (paisPossiveis.length) {
-    return limparNomeEventoServidor(paisPossiveis[paisPossiveis.length - 1]);
-  }
+  if (data.precisao === "dia") return `${data.label} - ${nome}`;
+  if (data.precisao === "mes") return `${data.label} - ${nome}`;
 
-  return limparNomeEventoServidor(fileName || filePart);
+  return nome;
 }
 
 function destinoInteligenteServidor(originalPath, fileName, anoPadrao) {
   const texto = `${originalPath || ""} ${fileName || ""}`;
+  const data = detectarDataServidor(texto, anoPadrao);
+  const mes = data.mes ? pastaMesServidor(data.mes) : "VERIFICAR";
+  const entidade = detectarEntidadeServidor(texto);
+  const contextoEntidade = detectarContextoEntidadeServidor(texto);
+  const tipo = detectarTipoDocumentoServidor(texto);
+  const nomeArquivo = nomeArquivoSeguroServidor(fileName || path.basename(originalPath || "arquivo"), "arquivo");
+  const titulo = limparNomeDocumentoServidor(originalPath, fileName);
+  const pastaDocumento = montarPastaDocumentoServidor(data, titulo);
 
-  const ano = detectarAnoServidor(texto, anoPadrao);
-  const mesNumero = detectarMesServidor(texto);
-  const mes = mesNumero ? pastaMesServidor(mesNumero) : "_A_ORGANIZAR";
-  const evento = mesNumero ? detectarNomeEventoServidor(originalPath, fileName) : "_A_ORGANIZAR";
-  const nomeArquivo = String(fileName || path.basename(originalPath || "arquivo"))
-    .replace(/[\\/:*?"<>|]/g, "-")
-    .trim();
+  if (contextoEntidade) {
+    if (!data.mes) {
+      const entidadePasta = entidade ? entidade.pasta : "ENTIDADE NAO IDENTIFICADA";
+      return `${data.ano}/VERIFICAR/ENTIDADES/${entidadePasta}/${pastaDocumento}/${nomeArquivo}`;
+    }
 
-  return `${ano}/${mes}/${evento}/${nomeArquivo}`;
+    if (!entidade) {
+      const tipoVerificacao = tipo ? tipo.geral : "TIPO NAO IDENTIFICADO";
+      return `${data.ano}/${mes}/VERIFICAR/ENTIDADES/${tipoVerificacao}/${pastaDocumento}/${nomeArquivo}`;
+    }
+
+    if (!tipo) {
+      return `${data.ano}/${mes}/ENTIDADES/${entidade.pasta}/VERIFICAR/${pastaDocumento}/${nomeArquivo}`;
+    }
+
+    return `${data.ano}/${mes}/ENTIDADES/${entidade.pasta}/${tipo.pasta}/${pastaDocumento}/${nomeArquivo}`;
+  }
+
+  if (tipo && tipo.id === "boleto") {
+    if (!data.mes) {
+      return `${data.ano}/VERIFICAR/BOLETOS/${pastaDocumento}/${nomeArquivo}`;
+    }
+
+    return `${data.ano}/${mes}/VERIFICAR/BOLETOS/${pastaDocumento}/${nomeArquivo}`;
+  }
+
+  if (!data.mes) {
+    return `${data.ano}/VERIFICAR/SEM DATA/${pastaDocumento}/${nomeArquivo}`;
+  }
+
+  if (tipo && tipo.id !== "evento") {
+    return `${data.ano}/${mes}/DOCUMENTOS/${tipo.geral}/${pastaDocumento}/${nomeArquivo}`;
+  }
+
+  return `${data.ano}/${mes}/EVENTOS/${pastaDocumento}/${nomeArquivo}`;
 }
 
 function caminhoUnicoServidor(target) {
@@ -2024,28 +2618,40 @@ app.post("/api/servidor/upload-inteligente", servidorBulkUpload.array("arquivos"
     }
 
     const salvos = [];
-    const organizar = [];
+    const verificar = [];
+    const entidades = {};
+    const tipos = {};
 
     files.forEach((file, index) => {
       const originalRelative = paths[index] || file.originalname;
       const destinoRelativo = destinoInteligenteServidor(originalRelative, file.originalname, anoPadrao);
       const target = caminhoUnicoServidor(safeServidorPath(destinoRelativo));
+      const destinoFinalRelativo = path.relative(SERVIDOR_DIR, target).replace(/\\/g, "/");
 
       fs.mkdirSync(path.dirname(target), { recursive: true });
       fs.renameSync(file.path, target);
 
-      salvos.push(destinoRelativo);
+      salvos.push(destinoFinalRelativo);
 
-      if (destinoRelativo.includes("_A_ORGANIZAR")) {
-        organizar.push(destinoRelativo);
+      if (destinoFinalRelativo.includes("/VERIFICAR/") || destinoFinalRelativo.includes("/VERIFICAR") || destinoFinalRelativo.includes("SEM DATA")) {
+        verificar.push(destinoFinalRelativo);
       }
+
+      const entidade = detectarEntidadeServidor(`${originalRelative} ${file.originalname}`);
+      const tipo = detectarTipoDocumentoServidor(`${originalRelative} ${file.originalname}`);
+      if (entidade) entidades[entidade.pasta] = (entidades[entidade.pasta] || 0) + 1;
+      if (tipo) tipos[tipo.geral] = (tipos[tipo.geral] || 0) + 1;
     });
 
     res.json({
       ok: true,
       saved: salvos.length,
-      organizar: organizar.length,
-      message: `${salvos.length} arquivo(s) organizados. ${organizar.length} foram para _A_ORGANIZAR.`
+      verificar: verificar.length,
+      organizar: verificar.length,
+      entidades,
+      tipos,
+      exemplos: salvos.slice(0, 10),
+      message: `${salvos.length} arquivo(s) organizados em pastas próprias. ${verificar.length} foram enviados para VERIFICAR.`
     });
   } catch (error) {
     res.status(500).json({
@@ -2054,7 +2660,6 @@ app.post("/api/servidor/upload-inteligente", servidorBulkUpload.array("arquivos"
     });
   }
 });
-
 
 app.get("/api/servidor/arquivo", (req, res) => {
   try {

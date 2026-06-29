@@ -1,0 +1,224 @@
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+img, svg, video, canvas, iframe {
+  max-width: 100%;
+}
+
+input, select, textarea, button {
+  font-size: 16px;
+}
+
+@media (max-width: 899px) {
+  body {
+    overflow: auto !important;
+    min-width: 0 !important;
+  }
+
+  .app,
+  .layout,
+  body:has(> aside) {
+    display: block !important;
+    min-width: 0 !important;
+  }
+
+  aside,
+  .sidebar,
+  .layout > aside {
+    display: none !important;
+  }
+
+  main,
+  .main,
+  .layout > main {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 100vh !important;
+    height: auto !important;
+    overflow: visible !important;
+    padding: 74px 14px 22px !important;
+  }
+
+  .topbar,
+  .top,
+  header {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    align-items: stretch !important;
+  }
+
+  .actions,
+  .filters,
+  .toolbar,
+  .server-actions,
+  .item-actions,
+  .year-actions,
+  .form-grid,
+  .grid,
+  .stats,
+  .kpis,
+  .module-grid,
+  .content-grid,
+  .recent-grid,
+  .calendar-layout,
+  .dashboard-grid,
+  .cards,
+  .summary-grid {
+    grid-template-columns: 1fr !important;
+    flex-wrap: wrap !important;
+    width: 100% !important;
+  }
+
+  .card,
+  .panel,
+  .stat-card,
+  .module-card,
+  .upload-card,
+  .upload-panel,
+  .calendar-panel,
+  .day-panel,
+  .list-panel,
+  .tree-panel,
+  .server-panel {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 14px !important;
+    border-radius: 16px !important;
+  }
+
+  button,
+  .btn,
+  .mini,
+  .file-label {
+    min-height: 42px !important;
+    justify-content: center !important;
+    white-space: normal !important;
+  }
+
+  .item-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+
+  .tree-row {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .item-main,
+  .item-name,
+  .item-meta {
+    min-width: 0 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  table {
+    display: block !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+  }
+
+  th,
+  td {
+    padding: 10px 8px !important;
+  }
+
+  .modal,
+  .modal-card,
+  .pdf-servidor-card {
+    width: 96vw !important;
+    max-width: 96vw !important;
+    height: 88vh !important;
+    max-height: 88vh !important;
+    border-radius: 18px !important;
+  }
+}
+
+.cejas-mobile-menu-btn {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 1000001;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, #7B61FF, #FF61D2);
+  color: #fff;
+  font-weight: 900;
+  box-shadow: 0 12px 35px rgba(0,0,0,.45);
+  cursor: pointer;
+  display: none;
+}
+
+.cejas-mobile-drawer {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: min(330px, 86vw);
+  transform: translateX(-105%);
+  transition: transform .22s ease;
+  z-index: 1000002;
+  background: #0b0b10;
+  color: #fff;
+  border-right: 1px solid rgba(255,255,255,.12);
+  padding: 18px;
+  overflow: auto;
+  box-shadow: 30px 0 80px rgba(0,0,0,.55);
+}
+
+.cejas-mobile-drawer.ativo {
+  transform: translateX(0);
+}
+
+.cejas-mobile-drawer strong {
+  display: block;
+  margin-bottom: 14px;
+  font-size: 15px;
+}
+
+.cejas-mobile-drawer nav,
+.cejas-mobile-drawer .nav {
+  display: grid;
+  gap: 9px;
+}
+
+.cejas-mobile-drawer a {
+  display: block;
+  color: #e5e7eb;
+  text-decoration: none;
+  padding: 12px 13px;
+  border-radius: 13px;
+  background: rgba(255,255,255,.055);
+  border: 1px solid rgba(255,255,255,.07);
+  font-weight: 800;
+}
+
+.cejas-mobile-drawer a.active {
+  background: linear-gradient(135deg, rgba(123,97,255,.35), rgba(255,97,210,.28));
+  color: #fff;
+}
+
+.cejas-mobile-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000000;
+  background: rgba(0,0,0,.58);
+  display: none;
+}
+
+.cejas-mobile-overlay.ativo {
+  display: block;
+}
+
+@media (max-width: 899px) {
+  .cejas-mobile-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+}

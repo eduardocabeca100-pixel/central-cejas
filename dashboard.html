@@ -469,6 +469,100 @@
       font-size: 12px;
     }
 
+
+    .cejas-financeiro-real {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .cejas-financeiro-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .cejas-financeiro-head h3 {
+      font-size: 20px;
+      margin-bottom: 7px;
+    }
+
+    .cejas-financeiro-head p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .cejas-monthly-revenue {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .cejas-month-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .cejas-month-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255,255,255,.18);
+    }
+
+    .cejas-month-card span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .cejas-month-card strong {
+      display: block;
+      font-size: 24px;
+      margin: 9px 0 7px;
+    }
+
+    .cejas-month-card small {
+      color: var(--green);
+      font-weight: 900;
+    }
+
+    .cejas-loss-card {
+      margin-top: 14px;
+      background: rgba(239,68,68,.08);
+      border: 1px solid rgba(239,68,68,.18);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .cejas-loss-card span {
+      color: var(--muted);
+      display: block;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 6px;
+    }
+
+    .cejas-loss-card strong {
+      font-size: 24px;
+      color: #fecaca;
+    }
+
     @media (max-width: 1300px) {
       body {
         overflow: auto;
@@ -495,6 +589,7 @@
     }
   </style>
   <link rel="stylesheet" href="/css/cejas-interface-compacta.css?v=3">
+  <link rel="stylesheet" href="/css/cejas-mobile-fix.css?v=1">
 </head>
 
 <body>
@@ -521,6 +616,7 @@
         <a href="agenda.html">▣ Agenda Dinâmica</a>
         <a href="/chat.html">💬 Chat Interno</a>
 <a href="orcamentos.html">◉ Orçamentos</a>
+        <a href="gratuidades.html">🏷 Gratuidades</a>
         <a href="importar-relatorio.html">▤ Importar Relatório (PDF)</a>
         <a href="tarefas.html">☑ Tarefas Pendentes</a>
         <a href="servidor.html">▣ Servidor</a>
@@ -576,6 +672,30 @@
         </article>
       </section>
 
+      <section class="cejas-financeiro-real">
+        <div class="cejas-financeiro-head">
+          <div>
+            <h3>Receita mensal confirmada</h3>
+            <p>Valores calculados somente com eventos confirmados do relatório importado. Ao trocar o PDF, este painel atualiza junto.</p>
+          </div>
+
+          <a class="btn gradient" href="gratuidades.html">Abrir gratuidades</a>
+        </div>
+
+        <div class="cejas-monthly-revenue" id="cejasReceitaMensal">
+          <div style="color:var(--muted);">Importe um relatório para carregar a receita mensal.</div>
+        </div>
+
+        <div class="cejas-loss-card" onclick="location.href='gratuidades.html'">
+          <div>
+            <span>Gratuidades e abatimentos</span>
+            <strong id="cejasTotalGratuidades">R$ 0,00</strong>
+          </div>
+
+          <button class="btn">Ver detalhes →</button>
+        </div>
+      </section>
+
       <section class="modules">
         <h3>Módulos e Ferramentas</h3>
 
@@ -592,6 +712,13 @@
             <h4>Orçamentos</h4>
             <p>Crie, acompanhe e gerencie propostas comerciais.</p>
             <a href="orcamentos.html">Ver orçamentos →</a>
+          </article>
+
+          <article class="module-card">
+            <div class="icon">🏷</div>
+            <h4>Gratuidades</h4>
+            <p>Controle valores abatidos, pagos e perdas por mês ou período.</p>
+            <a href="gratuidades.html">Abrir gratuidades →</a>
           </article>
 
           <article class="module-card">
@@ -619,7 +746,7 @@
 
       <section class="content-grid">
         <article class="panel">
-          <h3>Receitas vs. Despesas</h3>
+          <h3>Receita confirmada por mês</h3>
           <div class="bars" id="barChart"></div>
         </article>
 
@@ -663,6 +790,51 @@
       return status || "";
     }
 
+    function nomeMesDashboardCejas(key) {
+      const nomes = [
+        "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+        "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+      ];
+
+      const [ano, mes] = String(key || "").split("-");
+      const idx = Number(mes) - 1;
+
+      return nomes[idx] ? `${nomes[idx]} de ${ano}` : key;
+    }
+
+    async function atualizarFinanceiroDashboardCejas() {
+      try {
+        const response = await fetch("/api/dashboard-financeiro", {
+          cache: "no-store"
+        });
+
+        const data = await response.json();
+
+        if (!data.ok) return;
+
+        const container = document.getElementById("cejasReceitaMensal");
+        const meses = data.receitaMensal || [];
+        const recentes = meses.slice(-12);
+
+        container.innerHTML = recentes.map((mes) => `
+          <article class="cejas-month-card" onclick="location.href='gratuidades.html'" title="Clique para abrir o controle financeiro">
+            <span>${nomeMesDashboardCejas(mes.key)}</span>
+            <strong>${money(mes.receitaConfirmada || 0)}</strong>
+            <small>${mes.eventosConfirmados || 0} evento(s) confirmado(s)</small>
+          </article>
+        `).join("") || `<div style="color:var(--muted);">Nenhuma receita confirmada encontrada no relatório atual.</div>`;
+
+        const grat = data.resumo?.gratuidades || {};
+        document.getElementById("cejasTotalGratuidades").textContent = money(grat.valorAbatido || 0);
+      } catch (error) {
+        const container = document.getElementById("cejasReceitaMensal");
+
+        if (container) {
+          container.innerHTML = `<div style="color:var(--muted);">Não foi possível carregar a receita mensal.</div>`;
+        }
+      }
+    }
+
     function renderBars(eventos) {
       const container = document.getElementById("barChart");
 
@@ -680,9 +852,7 @@
           meses[key].receita += Number(evento.valor || 0);
         }
 
-        if (evento.status === "em_espera") {
-          meses[key].pendente += Number(evento.valor || 0);
-        }
+        // O dashboard financeiro mostra somente receita confirmada. Pendentes ficam fora deste gráfico.
       });
 
       const valores = Object.values(meses).slice(0, 6);
@@ -693,8 +863,7 @@
         const hPendente = Math.max(24, (v.pendente / maior) * 190);
 
         return [
-          `<div class="bar" style="height:${hReceita}px" title="Receita ${money(v.receita)}"></div>`,
-          `<div class="bar red" style="height:${hPendente}px" title="Em espera ${money(v.pendente)}"></div>`
+          `<div class="bar" style="height:${hReceita}px" title="Receita confirmada ${money(v.receita)}"></div>`
         ];
       }).join("") || `<div style="color:#777;">Importe um relatório para gerar o gráfico.</div>`;
     }
@@ -805,10 +974,17 @@
     }
 
     atualizarDashboardReal();
+    atualizarFinanceiroDashboardCejas();
 
     // Atualiza automaticamente quando você volta para a tela ou deixa ela aberta.
-    window.addEventListener("focus", atualizarDashboardReal);
-    setInterval(atualizarDashboardReal, 30000);
+    window.addEventListener("focus", () => {
+      atualizarDashboardReal();
+      atualizarFinanceiroDashboardCejas();
+    });
+    setInterval(() => {
+      atualizarDashboardReal();
+      atualizarFinanceiroDashboardCejas();
+    }, 30000);
   </script>
 
 <script>
@@ -821,6 +997,7 @@
     "tarefas.html": "tarefas",
     "servidor.html": "servidor",
     "financeiro.html": "financeiro",
+      "gratuidades.html": "gratuidades",
     "usuarios.html": "usuarios",
     "configuracoes.html": "configuracoes"
   };
@@ -988,5 +1165,6 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 <script src="/js/cejas-menu-fixo.js?v=3"></script>
+<script src="/js/cejas-mobile-menu.js?v=1"></script>
 </body>
 </html>
