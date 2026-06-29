@@ -10,7 +10,7 @@ const { registrarAgendaDiaLivre } = require("./lib/agenda-dia-livre");
 const { registrarAgendaDiaApi } = require("./lib/agenda-dia-api");
 const { registrarRotasCejasFase2 } = require("./lib/cejas-fase2");
 const { syncRelatorioAtualComSupabase } = require("./lib/sync-relatorio-supabase");
-const { iniciarProtecaoServidorSupabase, uploadBufferSupabaseServidor, uploadLocalFileSupabaseServidor, downloadBufferSupabaseServidor, moverSupabaseServidor, listarStorageServidor } = require("./lib/servidor-storage-persistente");
+const { iniciarProtecaoServidorSupabase, uploadBufferSupabaseServidor, uploadLocalFileSupabaseServidor, downloadBufferSupabaseServidor, moverSupabaseServidor, deletarSupabaseServidor, deletarPrefixoSupabaseServidor, listarStorageServidor } = require("./lib/servidor-storage-persistente");
 const session = require("express-session");
 const bcrypt = require("bcryptjs");
 const path = require("path");
@@ -3013,38 +3013,76 @@ app.get("/api/servidor/arquivo", async (req, res) => {
   }
 });
 
+
+function listarArquivosParaDeleteServidorCejas(absPath, relPath, resultado = []) {
+  if (!fs.existsSync(absPath)) return resultado;
+
+  const stat = fs.statSync(absPath);
+
+  if (stat.isFile()) {
+    resultado.push(String(relPath || "").replace(/\\/g, "/"));
+    return resultado;
+  }
+
+  if (stat.isDirectory()) {
+    for (const entry of fs.readdirSync(absPath, { withFileTypes: true })) {
+      const childAbs = path.join(absPath, entry.name);
+      const childRel = path.join(relPath, entry.name).replace(/\\/g, "/");
+      listarArquivosParaDeleteServidorCejas(childAbs, childRel, resultado);
+    }
+  }
+
+  return resultado;
+}
+
 app.delete("/api/servidor/item", async (req, res) => {
   try {
     const relativePath = String(req.query.path || "").trim();
-    const itemPath = safeServidorPath(relativePath);
 
-    if (relativePath.startsWith("_LIXEIRA/")) {
+    if (!relativePath) {
       return res.status(400).json({
         ok: false,
-        message: "Exclusão definitiva bloqueada. Este item já está na lixeira de segurança."
+        message: "Informe o caminho do item."
       });
     }
 
-    const hoje = new Date().toISOString().slice(0, 10);
-    const destinoRelativo = path.join("_LIXEIRA", hoje, relativePath).replace(/\\/g, "/");
-    const destinoPath = safeServidorPath(destinoRelativo);
+    const itemPath = safeServidorPath(relativePath);
+    const apagadosStorage = [];
+    let apagouLocal = false;
 
     if (fs.existsSync(itemPath)) {
-      fs.mkdirSync(path.dirname(destinoPath), { recursive: true });
-      fs.renameSync(itemPath, destinoPath);
+      const stat = fs.statSync(itemPath);
+
+      if (stat.isDirectory()) {
+        const arquivosLocais = listarArquivosParaDeleteServidorCejas(itemPath, relativePath);
+        apagadosStorage.push(...arquivosLocais);
+        fs.rmSync(itemPath, { recursive: true, force: true });
+        apagouLocal = true;
+      } else if (stat.isFile()) {
+        apagadosStorage.push(relativePath.replace(/\/g, "/"));
+        fs.rmSync(itemPath, { force: true });
+        apagouLocal = true;
+      }
     }
 
-    await moverSupabaseServidor(relativePath, destinoRelativo);
+    let storageResult = { ok: true, deleted: 0, paths: [] };
+
+    if (apagadosStorage.length) {
+      storageResult = await deletarSupabaseServidor(apagadosStorage);
+    } else {
+      storageResult = await deletarPrefixoSupabaseServidor(relativePath);
+    }
 
     res.json({
       ok: true,
-      destino: destinoRelativo,
-      message: "Item movido para _LIXEIRA. Nada foi apagado definitivamente."
+      apagouLocal,
+      apagadosStorage: storageResult.deleted || 0,
+      message: `Item apagado definitivamente. Local: ${apagouLocal ? "sim" : "não encontrado"} | Supabase: ${storageResult.deleted || 0} arquivo(s).`
     });
   } catch (error) {
     res.status(500).json({
       ok: false,
-      message: "Erro ao mover item para lixeira: " + error.message
+      message: "Erro ao apagar definitivamente: " + error.message
     });
   }
 });
