@@ -1485,68 +1485,37 @@ app.post("/api/importar-relatorio", (req, res, next) => {
 
 
 
+
 // CEJAS_GRATUIDADES_API_START
-const cryptoCejasGrat = require("crypto");
+const cryptoCejasGratManual = require("crypto");
 
 const GRATUIDADES_FILE = path.join(__dirname, "data", "gratuidades-manuais.json");
-const GRATUIDADES_OCULTAS_FILE = path.join(__dirname, "data", "gratuidades-ocultas.json");
 
-function garantirArquivosGratuidadesCejas() {
+function garantirArquivoGratuidadesManualCejas() {
   fs.mkdirSync(path.join(__dirname, "data"), { recursive: true });
 
   if (!fs.existsSync(GRATUIDADES_FILE)) {
     fs.writeFileSync(GRATUIDADES_FILE, "[]", "utf8");
   }
-
-  if (!fs.existsSync(GRATUIDADES_OCULTAS_FILE)) {
-    fs.writeFileSync(GRATUIDADES_OCULTAS_FILE, "[]", "utf8");
-  }
 }
 
-function carregarArrayJsonGratCejas(file) {
-  garantirArquivosGratuidadesCejas();
+function carregarGratuidadesManualCejas() {
+  garantirArquivoGratuidadesManualCejas();
 
   try {
-    const data = JSON.parse(fs.readFileSync(file, "utf8"));
+    const data = JSON.parse(fs.readFileSync(GRATUIDADES_FILE, "utf8"));
     return Array.isArray(data) ? data : [];
   } catch {
     return [];
   }
 }
 
-function salvarArrayJsonGratCejas(file, lista) {
-  garantirArquivosGratuidadesCejas();
-  fs.writeFileSync(file, JSON.stringify(lista || [], null, 2), "utf8");
+function salvarGratuidadesManualCejas(lista) {
+  garantirArquivoGratuidadesManualCejas();
+  fs.writeFileSync(GRATUIDADES_FILE, JSON.stringify(lista || [], null, 2), "utf8");
 }
 
-function carregarGratuidadesManuaisCejas() {
-  return carregarArrayJsonGratCejas(GRATUIDADES_FILE);
-}
-
-function salvarGratuidadesManuaisCejas(lista) {
-  salvarArrayJsonGratCejas(GRATUIDADES_FILE, lista);
-}
-
-function carregarGratuidadesOcultasCejas() {
-  return new Set(carregarArrayJsonGratCejas(GRATUIDADES_OCULTAS_FILE));
-}
-
-function salvarGratuidadesOcultasCejas(setIds) {
-  salvarArrayJsonGratCejas(GRATUIDADES_OCULTAS_FILE, Array.from(setIds || []));
-}
-
-function normalizarTextoGratCejas(texto) {
-  return String(texto || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toUpperCase();
-}
-
-function contemGratuidadeCejas(valor) {
-  return normalizarTextoGratCejas(valor).includes("GRATUIDADE");
-}
-
-function numeroGratCejas(valor) {
+function numeroGratManualCejas(valor) {
   if (typeof valor === "number") return Number.isFinite(valor) ? valor : 0;
 
   const texto = String(valor || "")
@@ -1559,27 +1528,27 @@ function numeroGratCejas(valor) {
   return Number.isFinite(numero) ? numero : 0;
 }
 
-function perdaNegativaGratCejas(valor) {
-  const numero = numeroGratCejas(valor);
+function perdaNegativaManualCejas(valor) {
+  const numero = numeroGratManualCejas(valor);
   if (!numero) return 0;
   return numero > 0 ? -Math.abs(numero) : numero;
 }
 
-function calcularPerdaGratCejas(valorTotal, valorPago, valorInformado) {
-  const informado = numeroGratCejas(valorInformado);
+function calcularPerdaManualCejas(valorTotal, valorPago, valorPerdaInformado) {
+  const informado = numeroGratManualCejas(valorPerdaInformado);
 
   if (informado !== 0) {
-    return perdaNegativaGratCejas(informado);
+    return perdaNegativaManualCejas(informado);
   }
 
-  const total = numeroGratCejas(valorTotal);
-  const pago = numeroGratCejas(valorPago);
-  const diferenca = Math.max(total - pago, 0);
+  const total = numeroGratManualCejas(valorTotal);
+  const pago = numeroGratManualCejas(valorPago);
+  const perda = Math.min(pago - total, 0);
 
-  return diferenca > 0 ? -diferenca : 0;
+  return perdaNegativaManualCejas(perda);
 }
 
-function dataParaISOGratCejas(data) {
+function dataParaISOManualCejas(data) {
   const texto = String(data || "").trim();
 
   if (!texto) return "";
@@ -1601,14 +1570,14 @@ function dataParaISOGratCejas(data) {
   return "";
 }
 
-function isoParaDataBRGratCejas(iso) {
+function isoParaDataBRManualCejas(iso) {
   if (!iso || !String(iso).includes("-")) return "";
   const [ano, mes, dia] = String(iso).slice(0, 10).split("-");
   if (!ano || !mes || !dia) return "";
   return `${dia}/${mes}/${ano}`;
 }
 
-function nomeMesGratCejas(key) {
+function nomeMesManualCejas(key) {
   const nomes = [
     "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
     "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
@@ -1621,301 +1590,44 @@ function nomeMesGratCejas(key) {
   return `${nomes[idx]} de ${ano}`;
 }
 
-function hashGratCejas(obj) {
-  return cryptoCejasGrat
-    .createHash("sha1")
-    .update(JSON.stringify(obj || {}))
-    .digest("hex")
-    .slice(0, 18);
+function normalizarBuscaManualCejas(texto) {
+  return String(texto || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase();
 }
 
-function dentroPeriodoGratCejas(iso, de, ate) {
-  if (!iso) return false;
-  if (de && iso < de) return false;
-  if (ate && iso > ate) return false;
-  return true;
-}
+function normalizarGratuidadeManualCejas(item) {
+  const dataISO = dataParaISOManualCejas(item?.dataISO || item?.data || "");
 
-async function carregarRelatorioParaGratCejas() {
-  const relatorioPath = typeof RELATORIO_FILE !== "undefined"
-    ? RELATORIO_FILE
-    : path.join(__dirname, "data", "relatorio-atual.json");
-
-  let report = null;
-
-  if (fs.existsSync(relatorioPath)) {
-    try {
-      report = JSON.parse(fs.readFileSync(relatorioPath, "utf8"));
-    } catch {
-      report = null;
-    }
-  }
-
-  if ((!report || !Array.isArray(report.eventos)) && typeof carregarRelatorioAtualDoSupabaseServidor === "function") {
-    try {
-      const supabaseReport = await carregarRelatorioAtualDoSupabaseServidor();
-      if (supabaseReport) report = supabaseReport;
-    } catch {}
-  }
-
-  if (!report && typeof emptySuperaReport === "function") {
-    return emptySuperaReport();
-  }
-
-  return report || { eventos: [] };
-}
-
-function textoObjetoGratCejas(obj) {
-  try {
-    return JSON.stringify(obj || {});
-  } catch {
-    return "";
-  }
-}
-
-function descobrirDataGratCejas(obj) {
-  const campos = [
-    obj?.dataISO,
-    obj?.dataEvento,
-    obj?.data_evento,
-    obj?.data,
-    obj?.date,
-    obj?.start,
-    obj?.inicio,
-    obj?.created_at,
-    obj?.updated_at
-  ];
-
-  for (const campo of campos) {
-    const iso = dataParaISOGratCejas(campo);
-    if (iso) return iso;
-  }
-
-  return "";
-}
-
-function descobrirEventoGratCejas(obj) {
-  return String(
-    obj?.evento ||
-    obj?.nomeEvento ||
-    obj?.titulo ||
-    obj?.title ||
-    obj?.nome ||
-    obj?.descricao ||
-    obj?.empresa ||
-    obj?.cliente ||
-    "Gratuidade sem evento"
-  ).trim();
-}
-
-function descobrirOrgaoGratCejas(obj) {
-  return String(
-    obj?.orgaoAssociado ||
-    obj?.orgao_associado ||
-    obj?.orgao ||
-    obj?.órgão ||
-    obj?.associado ||
-    obj?.solicitante ||
-    obj?.empresa ||
-    obj?.cliente ||
-    obj?.responsavel ||
-    obj?.referencia ||
-    "NÃO INFORMADO"
-  ).trim();
-}
-
-function descobrirReferenciaGratCejas(obj, fonte) {
-  return String(
-    obj?.referencia ||
-    obj?.origem ||
-    obj?.sala ||
-    obj?.local ||
-    obj?.observacao ||
-    obj?.descricao ||
-    fonte ||
-    ""
-  ).trim();
-}
-
-function descobrirValorTotalGratCejas(obj) {
-  return numeroGratCejas(
-    obj?.valorTotal ??
-    obj?.valor_total ??
-    obj?.valorEvento ??
-    obj?.valor_evento ??
-    obj?.total ??
-    obj?.valor ??
-    0
-  );
-}
-
-function descobrirValorPagoGratCejas(obj) {
-  return numeroGratCejas(
-    obj?.valorPago ??
-    obj?.valor_pago ??
-    obj?.pago ??
-    obj?.recebido ??
-    0
-  );
-}
-
-function criarItemAutoGratCejas(obj, fonte, referenciaExtra = "") {
-  const texto = textoObjetoGratCejas(obj);
-
-  if (!contemGratuidadeCejas(texto)) return null;
-
-  const dataISO = descobrirDataGratCejas(obj);
-  const valorTotal = descobrirValorTotalGratCejas(obj);
-  const valorPago = descobrirValorPagoGratCejas(obj);
-  const valorPerda = calcularPerdaGratCejas(
-    valorTotal,
-    valorPago,
-    obj?.valorPerda ??
-    obj?.valor_perda ??
-    obj?.perda ??
-    obj?.valorGratuidade ??
-    obj?.valor_gratuidade
-  );
-
-  const base = {
-    fonte,
-    referenciaExtra,
-    dataISO,
-    evento: descobrirEventoGratCejas(obj),
-    orgaoAssociado: descobrirOrgaoGratCejas(obj),
-    valorTotal,
-    valorPago,
-    valorPerda,
-    trecho: texto.slice(0, 700)
-  };
-
-  return {
-    id: `auto-${fonte}-${hashGratCejas(base)}`,
-    origem: fonte,
-    tipo: "automatica",
-    editavel: false,
-    data: isoParaDataBRGratCejas(dataISO),
-    dataISO,
-    evento: base.evento,
-    valorTotal,
-    valorPago,
-    valorPerda,
-    orgaoAssociado: base.orgaoAssociado,
-    referencia: descobrirReferenciaGratCejas(obj, fonte) || referenciaExtra || fonte,
-    observacao: "Detectado automaticamente pela palavra GRATUIDADE.",
-    trecho: base.trecho
-  };
-}
-
-function coletarGratuidadesObjetoCejas(node, fonte, referencia, resultado = [], depth = 0) {
-  if (!node || depth > 8) return resultado;
-
-  if (Array.isArray(node)) {
-    node.forEach((item, index) => {
-      coletarGratuidadesObjetoCejas(item, fonte, `${referencia}[${index}]`, resultado, depth + 1);
-    });
-
-    return resultado;
-  }
-
-  if (typeof node === "object") {
-    const item = criarItemAutoGratCejas(node, fonte, referencia);
-
-    if (item) {
-      resultado.push(item);
-      return resultado;
-    }
-
-    Object.entries(node).forEach(([key, value]) => {
-      if (value && typeof value === "object") {
-        coletarGratuidadesObjetoCejas(value, fonte, `${referencia}.${key}`, resultado, depth + 1);
-      }
-    });
-  }
-
-  return resultado;
-}
-
-async function gratuidadesAutomaticasCejas() {
-  const resultado = [];
-
-  const report = await carregarRelatorioParaGratCejas();
-  const eventosRelatorio = Array.isArray(report?.eventos) ? report.eventos : [];
-
-  eventosRelatorio.forEach((evento, index) => {
-    const item = criarItemAutoGratCejas(evento, "relatorio", `relatorio.eventos[${index}]`);
-    if (item) resultado.push(item);
-  });
-
-  const dataDir = path.join(__dirname, "data");
-  const arquivos = fs.existsSync(dataDir)
-    ? fs.readdirSync(dataDir).filter(name => {
-        const lower = name.toLowerCase();
-
-        if (!lower.endsWith(".json")) return false;
-        if (lower.includes("gratuidades")) return false;
-        if (lower.includes("relatorio-atual")) return false;
-        if (lower.includes("relatorio-supera")) return false;
-
-        return lower.includes("agenda") ||
-          lower.includes("evento") ||
-          lower.includes("calendario") ||
-          lower.includes("painel") ||
-          lower.includes("tarefas");
-      })
-    : [];
-
-  for (const file of arquivos) {
-    try {
-      const full = path.join(dataDir, file);
-      const json = JSON.parse(fs.readFileSync(full, "utf8"));
-      const fonte = file.includes("agenda") ? "agenda" : "sistema";
-      coletarGratuidadesObjetoCejas(json, fonte, file, resultado);
-    } catch {}
-  }
-
-  const vistos = new Set();
-
-  return resultado.filter(item => {
-    if (!item || !item.id) return false;
-    if (vistos.has(item.id)) return false;
-    vistos.add(item.id);
-    return true;
-  });
-}
-
-function normalizarManualGratCejas(item) {
-  const dataISO = dataParaISOGratCejas(item?.dataISO || item?.data || item?.dataEvento || "");
-
-  const valorTotal = numeroGratCejas(
+  const valorTotal = numeroGratManualCejas(
     item?.valorTotal ??
     item?.valorEvento ??
-    item?.valor_evento ??
-    item?.total
+    item?.total ??
+    0
   );
 
-  const valorPago = numeroGratCejas(
+  const valorPago = numeroGratManualCejas(
     item?.valorPago ??
-    item?.valor_pago ??
-    item?.pago
+    item?.pago ??
+    0
   );
 
-  const valorPerda = calcularPerdaGratCejas(
+  const valorPerda = calcularPerdaManualCejas(
     valorTotal,
     valorPago,
     item?.valorPerda ??
-    item?.valor_perda ??
     item?.perda ??
     item?.valorGratuidade ??
-    item?.valorAbatido
+    0
   );
 
   return {
-    id: item?.id || `manual-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    id: item?.id || `manual-${Date.now()}-${cryptoCejasGratManual.randomBytes(4).toString("hex")}`,
     origem: "manual",
     tipo: "manual",
     editavel: true,
-    data: isoParaDataBRGratCejas(dataISO),
+    data: isoParaDataBRManualCejas(dataISO),
     dataISO,
     evento: String(item?.evento || "Gratuidade sem evento").trim(),
     valorTotal,
@@ -1923,64 +1635,84 @@ function normalizarManualGratCejas(item) {
     valorPerda,
     orgaoAssociado: String(
       item?.orgaoAssociado ||
-      item?.orgao_associado ||
       item?.orgao ||
       item?.associado ||
-      item?.empresa ||
       item?.referencia ||
       "NÃO INFORMADO"
     ).trim(),
-    referencia: String(item?.referencia || item?.origemReferencia || "").trim(),
+    referencia: String(item?.referencia || "").trim(),
     observacao: String(item?.observacao || "").trim(),
     criadoEm: item?.criadoEm || new Date().toISOString(),
-    atualizadoEm: new Date().toISOString(),
-    sourceId: item?.sourceId || ""
+    atualizadoEm: new Date().toISOString()
   };
 }
 
-function resumirGratuidadesCejas(itens) {
-  const resumo = {
-    quantidade: itens.length,
+function filtrarGratuidadesManualCejas(lista, query = {}) {
+  const de = String(query.de || "").slice(0, 10);
+  const ate = String(query.ate || "").slice(0, 10);
+  const busca = normalizarBuscaManualCejas(query.busca || "");
+
+  let itens = lista.map(normalizarGratuidadeManualCejas);
+
+  if (de || ate) {
+    itens = itens.filter(item => {
+      if (!item.dataISO) return false;
+      if (de && item.dataISO < de) return false;
+      if (ate && item.dataISO > ate) return false;
+      return true;
+    });
+  }
+
+  if (busca) {
+    itens = itens.filter(item => {
+      const texto = normalizarBuscaManualCejas(`${item.evento} ${item.orgaoAssociado} ${item.referencia} ${item.observacao}`);
+      return texto.includes(busca);
+    });
+  }
+
+  itens.sort((a, b) => String(b.dataISO || "").localeCompare(String(a.dataISO || "")) || String(a.evento).localeCompare(String(b.evento)));
+
+  return itens;
+}
+
+function resumirGratuidadesManualCejas(itens) {
+  return itens.reduce((acc, item) => {
+    acc.quantidade += 1;
+    acc.valorTotal += numeroGratManualCejas(item.valorTotal);
+    acc.valorPago += numeroGratManualCejas(item.valorPago);
+    acc.valorPerda += perdaNegativaManualCejas(item.valorPerda);
+    acc.manual += 1;
+    return acc;
+  }, {
+    quantidade: 0,
     valorTotal: 0,
     valorPago: 0,
     valorPerda: 0,
     manual: 0,
     automatica: 0
+  });
+}
+
+function graficosGratuidadesManualCejas(itens) {
+  const porMes = {};
+  const porOrgao = {};
+  const porOrigem = {
+    manual: {
+      key: "manual",
+      label: "Manual",
+      quantidade: 0,
+      valorPerda: 0
+    }
   };
 
   for (const item of itens) {
-    resumo.valorTotal += numeroGratCejas(item.valorTotal);
-    resumo.valorPago += numeroGratCejas(item.valorPago);
-    resumo.valorPerda += perdaNegativaGratCejas(item.valorPerda);
-
-    if (item.tipo === "manual") resumo.manual += 1;
-    else resumo.automatica += 1;
-  }
-
-  return resumo;
-}
-
-function graficosGratuidadesCejas(itens) {
-  const porMes = {};
-  const porOrigem = {};
-  const porOrgao = {};
-
-  for (const item of itens) {
     const mesKey = item.dataISO ? item.dataISO.slice(0, 7) : "SEM DATA";
-    const origem = item.origem || "manual";
     const orgao = item.orgaoAssociado || "NÃO INFORMADO";
-    const perda = perdaNegativaGratCejas(item.valorPerda);
+    const perda = perdaNegativaManualCejas(item.valorPerda);
 
     porMes[mesKey] = porMes[mesKey] || {
       key: mesKey,
-      label: nomeMesGratCejas(mesKey),
-      quantidade: 0,
-      valorPerda: 0
-    };
-
-    porOrigem[origem] = porOrigem[origem] || {
-      key: origem,
-      label: origem === "agenda" ? "Agenda" : origem === "relatorio" ? "Relatório" : origem === "manual" ? "Manual" : "Sistema",
+      label: nomeMesManualCejas(mesKey),
       quantidade: 0,
       valorPerda: 0
     };
@@ -1995,107 +1727,46 @@ function graficosGratuidadesCejas(itens) {
     porMes[mesKey].quantidade += 1;
     porMes[mesKey].valorPerda += perda;
 
-    porOrigem[origem].quantidade += 1;
-    porOrigem[origem].valorPerda += perda;
-
     porOrgao[orgao].quantidade += 1;
     porOrgao[orgao].valorPerda += perda;
+
+    porOrigem.manual.quantidade += 1;
+    porOrigem.manual.valorPerda += perda;
   }
 
   return {
     porMes: Object.values(porMes).sort((a, b) => String(a.key).localeCompare(String(b.key))),
-    porOrigem: Object.values(porOrigem).sort((a, b) => Math.abs(b.valorPerda) - Math.abs(a.valorPerda)),
+    porOrigem: Object.values(porOrigem),
     porOrgao: Object.values(porOrgao).sort((a, b) => Math.abs(b.valorPerda) - Math.abs(a.valorPerda)).slice(0, 12)
   };
 }
 
 async function montarGratuidadesCejas(query = {}) {
-  const de = String(query.de || query.inicio || "").slice(0, 10);
-  const ate = String(query.ate || query.fim || "").slice(0, 10);
-  const origemFiltro = String(query.origem || "todas");
-  const busca = normalizarTextoGratCejas(query.busca || "");
-
-  const ocultas = carregarGratuidadesOcultasCejas();
-  const manuais = carregarGratuidadesManuaisCejas().map(normalizarManualGratCejas);
-  const automaticas = (await gratuidadesAutomaticasCejas()).filter(item => !ocultas.has(item.id));
-
-  let itens = [...automaticas, ...manuais];
-
-  if (origemFiltro !== "todas") {
-    if (origemFiltro === "automatica") {
-      itens = itens.filter(item => item.tipo !== "manual");
-    } else {
-      itens = itens.filter(item => item.origem === origemFiltro || item.tipo === origemFiltro);
-    }
-  }
-
-  if (de || ate) {
-    itens = itens.filter(item => dentroPeriodoGratCejas(item.dataISO, de, ate));
-  }
-
-  if (busca) {
-    itens = itens.filter(item => {
-      const texto = normalizarTextoGratCejas(`${item.evento} ${item.orgaoAssociado} ${item.referencia} ${item.observacao}`);
-      return texto.includes(busca);
-    });
-  }
-
-  itens.sort((a, b) => String(b.dataISO || "").localeCompare(String(a.dataISO || "")) || String(a.evento).localeCompare(String(b.evento)));
+  const lista = carregarGratuidadesManualCejas();
+  const itens = filtrarGratuidadesManualCejas(lista, query);
 
   return {
     itens,
-    resumo: resumirGratuidadesCejas(itens),
-    graficos: graficosGratuidadesCejas(itens),
+    resumo: resumirGratuidadesManualCejas(itens),
+    graficos: graficosGratuidadesManualCejas(itens),
     atualizadoEm: new Date().toISOString()
   };
 }
 
 async function montarDashboardFinanceiroCejas() {
-  const relatorio = await carregarRelatorioParaGratCejas();
-  const eventos = Array.isArray(relatorio?.eventos) ? relatorio.eventos : [];
-  const meses = {};
-
-  let totalReceitaConfirmada = 0;
-  let totalEventosConfirmados = 0;
-
-  for (const evento of eventos) {
-    const status = normalizarTextoGratCejas(evento.status || "");
-
-    if (!status.includes("CONFIRMADO") && status !== "CONFIRMADA") continue;
-
-    const iso = dataParaISOGratCejas(evento.data || evento.dataEvento || "");
-    if (!iso) continue;
-
-    const key = iso.slice(0, 7);
-    const valor = numeroGratCejas(evento.valor || evento.valorPago || 0);
-
-    meses[key] = meses[key] || {
-      key,
-      mes: nomeMesGratCejas(key),
-      receitaConfirmada: 0,
-      eventosConfirmados: 0
-    };
-
-    meses[key].receitaConfirmada += valor;
-    meses[key].eventosConfirmados += 1;
-
-    totalReceitaConfirmada += valor;
-    totalEventosConfirmados += 1;
-  }
-
   const gratuidades = await montarGratuidadesCejas({});
 
   return {
     ok: true,
-    receitaMensal: Object.values(meses).sort((a, b) => String(a.key).localeCompare(String(b.key))),
+    receitaMensal: [],
     resumo: {
-      totalReceitaConfirmada,
-      totalEventosConfirmados,
-      mesesComReceita: Object.keys(meses).length,
+      totalReceitaConfirmada: 0,
+      totalEventosConfirmados: 0,
+      mesesComReceita: 0,
       gratuidades: gratuidades.resumo
     },
     graficosGratuidades: gratuidades.graficos,
-    atualizadoEm: relatorio?.atualizadoEm || new Date().toISOString()
+    atualizadoEm: new Date().toISOString()
   };
 }
 
@@ -2113,8 +1784,8 @@ app.get("/api/gratuidades", async (req, res) => {
 
 app.post("/api/gratuidades", express.json({ limit: "2mb" }), (req, res) => {
   try {
-    const lista = carregarGratuidadesManuaisCejas();
-    const novo = normalizarManualGratCejas(req.body || {});
+    const lista = carregarGratuidadesManualCejas();
+    const novo = normalizarGratuidadeManualCejas(req.body || {});
 
     if (!novo.dataISO) {
       return res.status(400).json({ ok: false, message: "Informe a data da gratuidade." });
@@ -2125,7 +1796,7 @@ app.post("/api/gratuidades", express.json({ limit: "2mb" }), (req, res) => {
     }
 
     lista.push(novo);
-    salvarGratuidadesManuaisCejas(lista);
+    salvarGratuidadesManualCejas(lista);
 
     res.json({
       ok: true,
@@ -2143,49 +1814,28 @@ app.post("/api/gratuidades", express.json({ limit: "2mb" }), (req, res) => {
 app.put("/api/gratuidades/:id", express.json({ limit: "2mb" }), (req, res) => {
   try {
     const id = req.params.id;
-    const lista = carregarGratuidadesManuaisCejas();
+    const lista = carregarGratuidadesManualCejas();
     const index = lista.findIndex(item => item.id === id);
 
-    if (index >= 0) {
-      lista[index] = normalizarManualGratCejas({
-        ...lista[index],
-        ...req.body,
-        id
-      });
-
-      salvarGratuidadesManuaisCejas(lista);
-
-      return res.json({
-        ok: true,
-        item: lista[index],
-        message: "Gratuidade atualizada."
+    if (index < 0) {
+      return res.status(404).json({
+        ok: false,
+        message: "Gratuidade não encontrada."
       });
     }
 
-    if (String(id).startsWith("auto-")) {
-      const ocultas = carregarGratuidadesOcultasCejas();
-      ocultas.add(id);
-      salvarGratuidadesOcultasCejas(ocultas);
+    lista[index] = normalizarGratuidadeManualCejas({
+      ...lista[index],
+      ...req.body,
+      id
+    });
 
-      const novo = normalizarManualGratCejas({
-        ...req.body,
-        sourceId: id,
-        referencia: req.body?.referencia || "Editado a partir de gratuidade automática"
-      });
+    salvarGratuidadesManualCejas(lista);
 
-      lista.push(novo);
-      salvarGratuidadesManuaisCejas(lista);
-
-      return res.json({
-        ok: true,
-        item: novo,
-        message: "Gratuidade automática editada como lançamento manual."
-      });
-    }
-
-    res.status(404).json({
-      ok: false,
-      message: "Gratuidade não encontrada."
+    res.json({
+      ok: true,
+      item: lista[index],
+      message: "Gratuidade atualizada."
     });
   } catch (error) {
     res.status(500).json({
@@ -2198,29 +1848,17 @@ app.put("/api/gratuidades/:id", express.json({ limit: "2mb" }), (req, res) => {
 app.delete("/api/gratuidades/:id", (req, res) => {
   try {
     const id = req.params.id;
-
-    if (String(id).startsWith("auto-")) {
-      const ocultas = carregarGratuidadesOcultasCejas();
-      ocultas.add(id);
-      salvarGratuidadesOcultasCejas(ocultas);
-
-      return res.json({
-        ok: true,
-        message: "Gratuidade automática ocultada."
-      });
-    }
-
-    const lista = carregarGratuidadesManuaisCejas();
+    const lista = carregarGratuidadesManualCejas();
     const novaLista = lista.filter(item => item.id !== id);
 
     if (novaLista.length === lista.length) {
       return res.status(404).json({
         ok: false,
-        message: "Gratuidade manual não encontrada."
+        message: "Gratuidade não encontrada."
       });
     }
 
-    salvarGratuidadesManuaisCejas(novaLista);
+    salvarGratuidadesManualCejas(novaLista);
 
     res.json({
       ok: true,
@@ -2246,6 +1884,7 @@ app.get("/api/dashboard-financeiro", async (_req, res) => {
   }
 });
 // CEJAS_GRATUIDADES_API_END
+
 
 
 
