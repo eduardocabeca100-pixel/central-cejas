@@ -829,6 +829,26 @@ async function carregarRelatorioAtualDoSupabaseServidor() {
   }
 }
 
+
+// CEJAS_BACKUP_RELATORIO_START
+function criarHistoricoRelatorioAtualCejas() {
+  try {
+    if (!fs.existsSync(RELATORIO_FILE)) return "";
+
+    const historicoDir = path.join(__dirname, "data", "historico-relatorios");
+    fs.mkdirSync(historicoDir, { recursive: true });
+
+    const destino = path.join(historicoDir, `relatorio-atual-${cejasTimestampSeguro()}.json`);
+    fs.copyFileSync(RELATORIO_FILE, destino);
+
+    return destino;
+  } catch (error) {
+    console.warn("⚠️ Não foi possível salvar histórico do relatório:", error.message);
+    return "";
+  }
+}
+// CEJAS_BACKUP_RELATORIO_END
+
 function emptySuperaReport() {
   return {
     atualizadoEm: null,
@@ -1300,7 +1320,8 @@ app.get("/api/relatorio-atual", async (_req, res) => {
 
     if (!report) {
       report = emptySuperaReport();
-      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+      criarHistoricoRelatorioAtualCejas();
+    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
     }
 
     res.json({
@@ -2050,6 +2071,95 @@ app.use(requirePagePermission);
 const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
 fs.mkdirSync(SERVIDOR_DIR, { recursive: true });
 
+// CEJAS_PROTECAO_DADOS_START
+function cejasTimestampSeguro() {
+  return new Date().toISOString().replace(/[:.]/g, "-");
+}
+
+function copiarDiretorioSeguroCejas(origem, destino) {
+  if (!fs.existsSync(origem)) return false;
+
+  fs.mkdirSync(destino, { recursive: true });
+
+  for (const entry of fs.readdirSync(origem, { withFileTypes: true })) {
+    if (entry.name === "tmp-servidor") continue;
+
+    const origemItem = path.join(origem, entry.name);
+    const destinoItem = path.join(destino, entry.name);
+
+    if (entry.isDirectory()) {
+      copiarDiretorioSeguroCejas(origemItem, destinoItem);
+    } else if (entry.isFile()) {
+      fs.mkdirSync(path.dirname(destinoItem), { recursive: true });
+      fs.copyFileSync(origemItem, destinoItem);
+    }
+  }
+
+  return true;
+}
+
+function criarBackupServidorAntesMudancaCejas(motivo = "mudanca") {
+  try {
+    const backupBase = path.join(__dirname, ".cejas-local-backups");
+    const destino = path.join(backupBase, `servidor-${motivo}-${cejasTimestampSeguro()}`);
+
+    fs.mkdirSync(backupBase, { recursive: true });
+
+    if (fs.existsSync(SERVIDOR_DIR)) {
+      copiarDiretorioSeguroCejas(SERVIDOR_DIR, destino);
+    }
+
+    return destino;
+  } catch (error) {
+    console.warn("⚠️ Não foi possível criar backup do servidor:", error.message);
+    return "";
+  }
+}
+
+function moverParaLixeiraServidorCejas(itemPath, relativePath = "") {
+  const lixeiraDir = path.join(SERVIDOR_DIR, "_LIXEIRA", cejasTimestampSeguro().slice(0, 10));
+  const destinoBase = path.join(lixeiraDir, relativePath || path.basename(itemPath));
+  let destino = destinoBase;
+
+  fs.mkdirSync(path.dirname(destino), { recursive: true });
+
+  if (fs.existsSync(destino)) {
+    const ext = path.extname(destinoBase);
+    const name = path.basename(destinoBase, ext);
+    const dir = path.dirname(destinoBase);
+    let count = 1;
+
+    while (fs.existsSync(destino)) {
+      destino = path.join(dir, `${name}-${count}${ext}`);
+      count++;
+    }
+  }
+
+  fs.renameSync(itemPath, destino);
+
+  return path.relative(SERVIDOR_DIR, destino).replace(/\\/g, "/");
+}
+
+app.post("/api/servidor/backup-seguranca", (_req, res) => {
+  try {
+    const destino = criarBackupServidorAntesMudancaCejas("manual");
+
+    res.json({
+      ok: true,
+      destino,
+      message: "Backup de segurança criado."
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: "Erro ao criar backup: " + error.message
+    });
+  }
+});
+// CEJAS_PROTECAO_DADOS_END
+
+
+
 const servidorUpload = multer({
   storage: multer.memoryStorage(),
   limits: {
@@ -2293,6 +2403,8 @@ app.post("/api/servidor/mover", (req, res) => {
 
 
 
+
+
 const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
 fs.mkdirSync(SERVIDOR_TMP_DIR, { recursive: true });
 
@@ -2306,282 +2418,263 @@ const servidorBulkUpload = multer({
   }),
   limits: {
     fileSize: 500 * 1024 * 1024,
-    files: 8000
+    files: 10000
   }
 });
 
-function normalizarTextoServidor(texto) {
+const MESES_SERVIDOR_FINAL = [
+  { numero: "01", nome: "JANEIRO", simples: "JANEIRO", aliases: ["JANEIRO", "JAN"] },
+  { numero: "02", nome: "FEVEREIRO", simples: "FEVEREIRO", aliases: ["FEVEREIRO", "FEV"] },
+  { numero: "03", nome: "MARÇO", simples: "MARÇO", aliases: ["MARCO", "MARÇO", "MAR"] },
+  { numero: "04", nome: "ABRIL", simples: "ABRIL", aliases: ["ABRIL", "ABR"] },
+  { numero: "05", nome: "MAIO", simples: "MAIO", aliases: ["MAIO", "MAI"] },
+  { numero: "06", nome: "JUNHO", simples: "JUNHO", aliases: ["JUNHO", "JUN"] },
+  { numero: "07", nome: "JULHO", simples: "JULHO", aliases: ["JULHO", "JUL"] },
+  { numero: "08", nome: "AGOSTO", simples: "AGOSTO", aliases: ["AGOSTO", "AGO"] },
+  { numero: "09", nome: "SETEMBRO", simples: "SETEMBRO", aliases: ["SETEMBRO", "SET"] },
+  { numero: "10", nome: "OUTUBRO", simples: "OUTUBRO", aliases: ["OUTUBRO", "OUT"] },
+  { numero: "11", nome: "NOVEMBRO", simples: "NOVEMBRO", aliases: ["NOVEMBRO", "NOV"] },
+  { numero: "12", nome: "DEZEMBRO", simples: "DEZEMBRO", aliases: ["DEZEMBRO", "DEZ"] }
+];
+
+const PALAVRAS_DOCUMENTO_SERVIDOR_FINAL = [
+  "CONTRATO", "CONTRATOS",
+  "BOLETO", "BOLETOS",
+  "DEMONSTRATIVO", "DEMONSTRATIVOS",
+  "RELATORIO", "RELATÓRIO",
+  "ORCAMENTO", "ORÇAMENTO",
+  "PROPOSTA",
+  "RECIBO", "RECIBOS",
+  "COMPROVANTE", "COMPROVANTES",
+  "NOTA FISCAL", "NOTAS FISCAIS", "NOTA", "NFS", "NF",
+  "EVENTO", "EVENTOS",
+  "ENTIDADE", "ENTIDADES",
+  "ASSINADO", "ASSINADA",
+  "FINAL", "OK", "PDF", "DOC", "DOCX", "XLS", "XLSX", "PNG", "JPG", "JPEG"
+];
+
+function normalizarServidorFinal(texto) {
   return String(texto || "")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toUpperCase();
 }
 
-function slugPastaServidor(texto, fallback = "VERIFICAR") {
-  const limpo = String(texto || "")
+function slugServidorFinal(texto, fallback = "VERIFICAR") {
+  const limpo = normalizarServidorFinal(texto)
     .replace(/[\\/:*?"<>|]/g, "-")
+    .replace(/[_-]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 
   return limpo || fallback;
 }
 
-function nomeArquivoSeguroServidor(texto, fallback = "arquivo") {
-  return slugPastaServidor(texto, fallback).replace(/^\.+/, fallback);
+function nomeArquivoSeguroServidorFinal(texto, fallback = "arquivo") {
+  return String(texto || fallback)
+    .replace(/[\\/:*?"<>|]/g, "-")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/^\.+/, fallback) || fallback;
 }
 
-const MESES_SERVIDOR = [
-  { numero: "01", nome: "JANEIRO", aliases: ["JANEIRO", "JAN"] },
-  { numero: "02", nome: "FEVEREIRO", aliases: ["FEVEREIRO", "FEV"] },
-  { numero: "03", nome: "MARÇO", aliases: ["MARCO", "MARÇO", "MAR"] },
-  { numero: "04", nome: "ABRIL", aliases: ["ABRIL", "ABR"] },
-  { numero: "05", nome: "MAIO", aliases: ["MAIO", "MAI"] },
-  { numero: "06", nome: "JUNHO", aliases: ["JUNHO", "JUN"] },
-  { numero: "07", nome: "JULHO", aliases: ["JULHO", "JUL"] },
-  { numero: "08", nome: "AGOSTO", aliases: ["AGOSTO", "AGO"] },
-  { numero: "09", nome: "SETEMBRO", aliases: ["SETEMBRO", "SET"] },
-  { numero: "10", nome: "OUTUBRO", aliases: ["OUTUBRO", "OUT"] },
-  { numero: "11", nome: "NOVEMBRO", aliases: ["NOVEMBRO", "NOV"] },
-  { numero: "12", nome: "DEZEMBRO", aliases: ["DEZEMBRO", "DEZ"] }
-];
-
-const ENTIDADES_SERVIDOR = [
-  { pasta: "PEV", aliases: ["PEV", "PROGRAMA EMPRESA VIVA", "EMPRESA VIVA"] },
-  { pasta: "CDL", aliases: ["CDL", "CAMARA DE DIRIGENTES LOJISTAS", "CÂMARA DE DIRIGENTES LOJISTAS"] },
-  { pasta: "SINDICATOS", aliases: ["SINDICATO", "SINDICATOS", "SINDICAL", "SIND"] },
-  { pasta: "ASSIS", aliases: ["ASSIS"] }
-];
-
-const TIPOS_DOCUMENTO_SERVIDOR = [
-  { id: "boleto", pasta: "02 BOLETOS ENTIDADES", geral: "BOLETOS", aliases: ["BOLETO", "BOLETOS", "FATURA", "FATURAS", "COBRANCA", "COBRANÇA", "PAGAMENTO", "PARCELA"] },
-  { id: "evento", pasta: "01 EVENTOS ENTIDADES", geral: "EVENTOS", aliases: ["EVENTO", "EVENTOS", "ORCAMENTO", "ORÇAMENTO", "PROPOSTA", "BRIEFING", "PROJETO", "CONTRATACAO", "CONTRATAÇÃO"] },
-  { id: "demonstrativo", pasta: "03 DEMONSTRATIVOS ENTIDADES", geral: "DEMONSTRATIVOS", aliases: ["DEMONSTRATIVO", "DEMONSTRATIVOS", "RELATORIO", "RELATÓRIO", "EXTRATO", "PRESTACAO", "PRESTAÇÃO"] },
-  { id: "nota", pasta: "04 NOTAS E RECIBOS", geral: "NOTAS E RECIBOS", aliases: ["NOTA FISCAL", "NOTAS FISCAIS", "NFS", "NF", "RECIBO", "COMPROVANTE"] },
-  { id: "contrato", pasta: "05 CONTRATOS", geral: "CONTRATOS", aliases: ["CONTRATO", "CONTRATOS", "TERMO", "ADITIVO"] }
-];
-
-function pastaMesServidor(numeroMes) {
-  const mes = MESES_SERVIDOR.find(item => item.numero === String(numeroMes).padStart(2, "0"));
-  return mes ? `${mes.numero} ${mes.nome}` : "VERIFICAR MES";
+function itemMesServidorFinal(mes) {
+  const numero = String(mes || "").padStart(2, "0");
+  return MESES_SERVIDOR_FINAL.find(m => m.numero === numero) || null;
 }
 
-function regexPalavraServidor(alias) {
-  const aliasNormal = normalizarTextoServidor(alias).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return new RegExp(`(^|[^A-Z0-9])${aliasNormal}([^A-Z0-9]|$)`);
+function pastaMesServidorFinal(mes) {
+  const item = itemMesServidorFinal(mes);
+  return item ? `${item.numero} ${item.nome}` : "MES NAO IDENTIFICADO";
 }
 
-function detectarMesPorNomeServidor(texto) {
-  const normalizado = normalizarTextoServidor(texto);
+function pastaMesVerificarServidorFinal(mes) {
+  const item = itemMesServidorFinal(mes);
+  return item ? item.simples : "SEM MES";
+}
 
-  for (const mes of MESES_SERVIDOR) {
+function mesPorNomeServidorFinal(texto) {
+  const normal = normalizarServidorFinal(texto);
+
+  for (const mes of MESES_SERVIDOR_FINAL) {
     for (const alias of mes.aliases) {
-      if (regexPalavraServidor(alias).test(normalizado)) return mes.numero;
+      const aliasNormal = normalizarServidorFinal(alias).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const re = new RegExp(`(^|[^A-Z0-9])${aliasNormal}([^A-Z0-9]|$)`);
+      if (re.test(normal)) return mes.numero;
     }
   }
 
   return "";
 }
 
-function detectarDataServidor(texto, anoPadrao) {
+function detectarDataServidorFinal(texto, anoPadrao = "2026") {
   const original = String(texto || "");
-  const anoDefault = String(anoPadrao || new Date().getFullYear());
+  const anoDefault = String(anoPadrao || "2026");
 
-  let match = original.match(/\b(20\d{2})[.\-_/](0?[1-9]|1[0-2])[.\-_/](\d{1,2})\b/);
+  let match = original.match(/\b(20\d{2})[.\-_/ ](0?[1-9]|1[0-2])[.\-_/ ](\d{1,2})\b/);
   if (match) {
     return {
+      ok: true,
       ano: match[1],
       mes: String(match[2]).padStart(2, "0"),
       dia: String(match[3]).padStart(2, "0"),
-      label: `${String(match[3]).padStart(2, "0")}.${String(match[2]).padStart(2, "0")}`,
-      precisao: "dia"
+      anoExplicito: true
     };
   }
 
-  match = original.match(/\b(\d{1,2})[.\-_/](\d{1,2})[.\-_/](20\d{2}|\d{2})\b/);
+  match = original.match(/\b(\d{1,2})[.\-_/ ](\d{1,2})[.\-_/ ](20\d{2}|\d{2})\b/);
   if (match) {
-    const ano = String(match[3]).length === 2 ? `20${match[3]}` : match[3];
     return {
-      ano,
+      ok: true,
+      ano: String(match[3]).length === 2 ? `20${match[3]}` : match[3],
       mes: String(match[2]).padStart(2, "0"),
       dia: String(match[1]).padStart(2, "0"),
-      label: `${String(match[1]).padStart(2, "0")}.${String(match[2]).padStart(2, "0")}`,
-      precisao: "dia"
+      anoExplicito: true
     };
   }
 
-  match = original.match(/(?:^|[^\d])(\d{1,2})\s*(?:do|de)?\s*(0?[1-9]|1[0-2])(?:\s*(?:de|do)?\s*(20\d{2}|\d{2}))?(?:[^\d]|$)/i);
+  match = original.match(/(?:^|[^\d])(\d{1,2})\s*(?:DO|DE|\/|-|_|\.)\s*(0?[1-9]|1[0-2])(?:\s*(?:DE|DO|\/|-|_|\.)\s*(20\d{2}|\d{2}))?(?:[^\d]|$)/i);
   if (match) {
-    const ano = match[3]
-      ? (String(match[3]).length === 2 ? `20${match[3]}` : match[3])
-      : anoDefault;
-
     return {
-      ano,
+      ok: true,
+      ano: match[3] ? (String(match[3]).length === 2 ? `20${match[3]}` : match[3]) : anoDefault,
       mes: String(match[2]).padStart(2, "0"),
       dia: String(match[1]).padStart(2, "0"),
-      label: `${String(match[1]).padStart(2, "0")}.${String(match[2]).padStart(2, "0")}`,
-      precisao: "dia"
+      anoExplicito: Boolean(match[3])
     };
   }
 
-  match = original.match(/\b(0?[1-9]|1[0-2])[.\-_/](20\d{2}|\d{2})\b/);
+  match = original.match(/(?:^|[^\d])(\d{1,2})\s+(0?[1-9]|1[0-2])(?:\s+(20\d{2}|\d{2}))?(?:[^\d]|$)/);
   if (match) {
-    const ano = String(match[2]).length === 2 ? `20${match[2]}` : match[2];
     return {
-      ano,
-      mes: String(match[1]).padStart(2, "0"),
-      dia: "",
-      label: `${String(match[1]).padStart(2, "0")}.${ano}`,
-      precisao: "mes"
+      ok: true,
+      ano: match[3] ? (String(match[3]).length === 2 ? `20${match[3]}` : match[3]) : anoDefault,
+      mes: String(match[2]).padStart(2, "0"),
+      dia: String(match[1]).padStart(2, "0"),
+      anoExplicito: Boolean(match[3])
     };
   }
 
-  const mesPorNome = detectarMesPorNomeServidor(original);
+  const mesNome = mesPorNomeServidorFinal(original);
   const anoCompleto = original.match(/\b(20\d{2})\b/);
 
-  if (mesPorNome) {
-    const ano = anoCompleto ? anoCompleto[1] : anoDefault;
-    return {
-      ano,
-      mes: mesPorNome,
-      dia: "",
-      label: `${mesPorNome}.${ano}`,
-      precisao: "mes"
-    };
-  }
-
   return {
+    ok: false,
     ano: anoCompleto ? anoCompleto[1] : anoDefault,
-    mes: "",
+    mes: mesNome,
     dia: "",
-    label: "SEM DATA",
-    precisao: "nenhuma"
+    anoExplicito: Boolean(anoCompleto)
   };
 }
 
-function detectarEntidadeServidor(texto) {
-  const normalizado = normalizarTextoServidor(texto);
-
-  for (const entidade of ENTIDADES_SERVIDOR) {
-    for (const alias of entidade.aliases) {
-      if (regexPalavraServidor(alias).test(normalizado)) return entidade;
-    }
-  }
-
-  return null;
-}
-
-function detectarContextoEntidadeServidor(texto) {
-  const normalizado = normalizarTextoServidor(texto);
-  return Boolean(
-    detectarEntidadeServidor(texto) ||
-    regexPalavraServidor("ENTIDADE").test(normalizado) ||
-    regexPalavraServidor("ENTIDADES").test(normalizado) ||
-    normalizado.includes("EVENTOS ENTIDADES") ||
-    normalizado.includes("BOLETOS ENTIDADES")
-  );
-}
-
-function detectarTipoDocumentoServidor(texto) {
-  const normalizado = normalizarTextoServidor(texto);
-
-  for (const tipo of TIPOS_DOCUMENTO_SERVIDOR) {
-    for (const alias of tipo.aliases) {
-      if (regexPalavraServidor(alias).test(normalizado)) return tipo;
-    }
-  }
-
-  return null;
-}
-
-function removerDatasDoNomeServidor(texto) {
+function removerDatasServidorFinal(texto) {
   return String(texto || "")
-    .replace(/\b20\d{2}[.\-_/](0?[1-9]|1[0-2])[.\-_/]\d{1,2}\b/g, " ")
-    .replace(/\b\d{1,2}[.\-_/]\d{1,2}[.\-_/](20\d{2}|\d{2})\b/g, " ")
-    .replace(/\b\d{1,2}[.\-_/]\d{1,2}\b/g, " ")
-    .replace(/\b(0?[1-9]|1[0-2])[.\-_/](20\d{2}|\d{2})\b/g, " ")
-    .replace(/\b\d{1,2}\s*(do|de)?\s*(0?[1-9]|1[0-2])\s*((de|do)?\s*(20\d{2}|\d{2}))?\b/gi, " ");
+    .replace(/\b20\d{2}[.\-_/ ](0?[1-9]|1[0-2])[.\-_/ ]\d{1,2}\b/g, " ")
+    .replace(/\b\d{1,2}[.\-_/ ]\d{1,2}[.\-_/ ](20\d{2}|\d{2})\b/g, " ")
+    .replace(/(^|[^\d])\d{1,2}\s*(?:DO|DE|\/|-|_|\.)\s*(0?[1-9]|1[0-2])(?:\s*(?:DE|DO|\/|-|_|\.)\s*(20\d{2}|\d{2}))?($|[^\d])/gi, " ")
+    .replace(/(^|[^\d])\d{1,2}\s+(0?[1-9]|1[0-2])(?:\s+(20\d{2}|\d{2}))?($|[^\d])/g, " ");
 }
 
-function limparNomeDocumentoServidor(originalPath, fileName) {
+function removerPalavrasDocumentoServidorFinal(texto) {
+  let saida = normalizarServidorFinal(texto);
+
+  for (const palavra of PALAVRAS_DOCUMENTO_SERVIDOR_FINAL) {
+    const normal = normalizarServidorFinal(palavra).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const re = new RegExp(`(^|[^A-Z0-9])${normal}([^A-Z0-9]|$)`, "gi");
+    saida = saida.replace(re, " ");
+  }
+
+  for (const mes of MESES_SERVIDOR_FINAL) {
+    for (const alias of mes.aliases) {
+      const normal = normalizarServidorFinal(alias).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const re = new RegExp(`(^|[^A-Z0-9])${normal}([^A-Z0-9]|$)`, "gi");
+      saida = saida.replace(re, " ");
+    }
+  }
+
+  return saida;
+}
+
+function parteIgnoradaServidorFinal(parte) {
+  const normal = normalizarServidorFinal(parte);
+
+  if (!normal) return true;
+  if (normal === "SERVIDOR") return true;
+  if (normal === "DOCUMENTOS") return true;
+  if (normal === "EVENTOS") return true;
+  if (normal === "BOLETOS") return true;
+  if (normal === "DEMONSTRATIVOS") return true;
+  if (normal === "CONTRATOS") return true;
+  if (normal === "ENTIDADES") return true;
+  if (normal === "VERIFICAR") return true;
+  if (normal === "UPLOADS") return true;
+  if (normal === "ARQUIVOS") return true;
+  if (/^20\d{2}$/.test(normal)) return true;
+  if (/^\d{2}\s+[A-Z]/.test(normal)) return true;
+
+  return MESES_SERVIDOR_FINAL.some(m => normal === m.simples || normal === `${m.numero} ${normalizarServidorFinal(m.nome)}`);
+}
+
+function limparNomeEventoServidorFinal(originalPath, fileName) {
   const partes = String(originalPath || fileName || "")
     .replace(/\\/g, "/")
     .split("/")
     .filter(Boolean);
 
+  const candidatos = [];
+
   const baseArquivo = path.basename(String(fileName || partes[partes.length - 1] || "arquivo"), path.extname(String(fileName || "")));
-  const candidatos = [baseArquivo, ...partes.slice(0, -1).reverse()];
+  candidatos.push(baseArquivo);
+
+  for (let i = partes.length - 2; i >= 0; i--) {
+    if (!parteIgnoradaServidorFinal(partes[i])) {
+      candidatos.push(partes[i]);
+    }
+  }
 
   for (const candidato of candidatos) {
-    let base = path.basename(String(candidato || ""), path.extname(String(candidato || "")));
+    let nome = path.basename(String(candidato || ""), path.extname(String(candidato || "")));
 
-    base = removerDatasDoNomeServidor(base)
-      .replace(/\b(BOLETO|BOLETOS|FATURA|FATURAS|EVENTO|EVENTOS|ENTIDADE|ENTIDADES|ORCAMENTO|ORÇAMENTO|DEMONSTRATIVO|RELATORIO|RELATÓRIO|RECIBO|COMPROVANTE|NOTA|FISCAL|CONTRATO|PDF|DOC|DOCX|XLS|XLSX)\b/gi, " ")
+    nome = removerDatasServidorFinal(nome);
+    nome = removerPalavrasDocumentoServidorFinal(nome);
+
+    nome = nome
       .replace(/[_\-.]+/g, " ")
+      .replace(/\b(DO|DE|DA|DAS|DOS)\b$/gi, " ")
       .replace(/\s+/g, " ")
       .trim();
 
-    if (base.length >= 3) return slugPastaServidor(base.toUpperCase());
+    if (nome.length >= 2) {
+      return slugServidorFinal(nome, "VERIFICAR");
+    }
   }
 
-  return slugPastaServidor(baseArquivo.toUpperCase(), "VERIFICAR");
+  return "";
 }
 
-function montarPastaDocumentoServidor(data, titulo) {
-  const nome = slugPastaServidor(titulo, "VERIFICAR");
-
-  if (data.precisao === "dia") return `${data.label} - ${nome}`;
-  if (data.precisao === "mes") return `${data.label} - ${nome}`;
-
-  return nome;
+function pastaEventoServidorFinal(titulo, data) {
+  return slugServidorFinal(`${titulo} ${data.dia}.${data.mes}`, "VERIFICAR");
 }
 
-function destinoInteligenteServidor(originalPath, fileName, anoPadrao) {
-  const texto = `${originalPath || ""} ${fileName || ""}`;
-  const data = detectarDataServidor(texto, anoPadrao);
-  const mes = data.mes ? pastaMesServidor(data.mes) : "VERIFICAR";
-  const entidade = detectarEntidadeServidor(texto);
-  const contextoEntidade = detectarContextoEntidadeServidor(texto);
-  const tipo = detectarTipoDocumentoServidor(texto);
-  const nomeArquivo = nomeArquivoSeguroServidor(fileName || path.basename(originalPath || "arquivo"), "arquivo");
-  const titulo = limparNomeDocumentoServidor(originalPath, fileName);
-  const pastaDocumento = montarPastaDocumentoServidor(data, titulo);
+function destinoServidorFinal(originalPath, fileName, anoPadrao = "2026") {
+  const textoCompleto = `${originalPath || ""} ${fileName || ""}`;
+  const data = detectarDataServidorFinal(textoCompleto, anoPadrao);
+  const titulo = limparNomeEventoServidorFinal(originalPath, fileName);
+  const nomeArquivo = nomeArquivoSeguroServidorFinal(fileName || path.basename(originalPath || "arquivo"), "arquivo");
 
-  if (contextoEntidade) {
-    if (!data.mes) {
-      const entidadePasta = entidade ? entidade.pasta : "ENTIDADE NAO IDENTIFICADA";
-      return `${data.ano}/VERIFICAR/ENTIDADES/${entidadePasta}/${pastaDocumento}/${nomeArquivo}`;
+  if (data.ok && data.dia && data.mes && titulo) {
+    const mesPasta = pastaMesServidorFinal(data.mes);
+    const eventoPasta = pastaEventoServidorFinal(titulo, data);
+
+    if (data.ano && data.ano !== String(anoPadrao || "2026")) {
+      return `${data.ano}/${mesPasta}/${eventoPasta}/${nomeArquivo}`;
     }
 
-    if (!entidade) {
-      const tipoVerificacao = tipo ? tipo.geral : "TIPO NAO IDENTIFICADO";
-      return `${data.ano}/${mes}/VERIFICAR/ENTIDADES/${tipoVerificacao}/${pastaDocumento}/${nomeArquivo}`;
-    }
-
-    if (!tipo) {
-      return `${data.ano}/${mes}/ENTIDADES/${entidade.pasta}/VERIFICAR/${pastaDocumento}/${nomeArquivo}`;
-    }
-
-    return `${data.ano}/${mes}/ENTIDADES/${entidade.pasta}/${tipo.pasta}/${pastaDocumento}/${nomeArquivo}`;
+    return `${mesPasta}/${eventoPasta}/${nomeArquivo}`;
   }
 
-  if (tipo && tipo.id === "boleto") {
-    if (!data.mes) {
-      return `${data.ano}/VERIFICAR/BOLETOS/${pastaDocumento}/${nomeArquivo}`;
-    }
-
-    return `${data.ano}/${mes}/VERIFICAR/BOLETOS/${pastaDocumento}/${nomeArquivo}`;
-  }
-
-  if (!data.mes) {
-    return `${data.ano}/VERIFICAR/SEM DATA/${pastaDocumento}/${nomeArquivo}`;
-  }
-
-  if (tipo && tipo.id !== "evento") {
-    return `${data.ano}/${mes}/DOCUMENTOS/${tipo.geral}/${pastaDocumento}/${nomeArquivo}`;
-  }
-
-  return `${data.ano}/${mes}/EVENTOS/${pastaDocumento}/${nomeArquivo}`;
+  const mesVerificar = data.mes ? pastaMesVerificarServidorFinal(data.mes) : "SEM MES";
+  return `VERIFICAR/${mesVerificar}/${nomeArquivo}`;
 }
 
 function caminhoUnicoServidor(target) {
@@ -2602,6 +2695,156 @@ function caminhoUnicoServidor(target) {
   return candidate;
 }
 
+function listarArquivosServidorRecursivo(dir, base = SERVIDOR_DIR, resultado = []) {
+  if (!fs.existsSync(dir)) return resultado;
+
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (entry.name === "tmp-servidor") continue;
+
+    const full = path.join(dir, entry.name);
+    const rel = path.relative(base, full).replace(/\\/g, "/");
+
+    if (entry.isDirectory()) {
+      listarArquivosServidorRecursivo(full, base, resultado);
+    } else if (entry.isFile()) {
+      resultado.push({ full, rel, name: entry.name });
+    }
+  }
+
+  return resultado;
+}
+
+function listarPastasServidorRecursivo(dir = SERVIDOR_DIR, base = SERVIDOR_DIR, resultado = []) {
+  if (!fs.existsSync(dir)) return resultado;
+
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (entry.name === "tmp-servidor") continue;
+
+    const full = path.join(dir, entry.name);
+    const rel = path.relative(base, full).replace(/\\/g, "/");
+
+    if (entry.isDirectory()) {
+      resultado.push(rel);
+      listarPastasServidorRecursivo(full, base, resultado);
+    }
+  }
+
+  return resultado;
+}
+
+function pastaJaPareceCorretaServidor(rel) {
+  const partes = String(rel || "").split("/").filter(Boolean);
+
+  if (partes[0] === "VERIFICAR") return false;
+
+  let idxMes = 0;
+
+  if (/^20\d{2}$/.test(partes[0])) {
+    idxMes = 1;
+  }
+
+  if (partes.length < idxMes + 3) return false;
+  if (!/^\d{2}\s+[A-ZÁÉÍÓÚÂÊÔÃÕÇ]/.test(partes[idxMes])) return false;
+
+  const nomeEvento = partes[idxMes + 1] || "";
+  const normal = normalizarServidorFinal(nomeEvento);
+
+  const bloqueadas = [
+    "DOCUMENTOS", "EVENTOS", "BOLETOS", "DEMONSTRATIVOS",
+    "CONTRATOS", "ENTIDADES", "NOTAS E RECIBOS", "VERIFICAR"
+  ];
+
+  if (bloqueadas.includes(normal)) return false;
+
+  return /\b\d{2}\.\d{2}\b/.test(nomeEvento);
+}
+
+function listarVerificarServidor() {
+  const verificarDir = safeServidorPath("VERIFICAR");
+
+  if (!fs.existsSync(verificarDir)) return [];
+
+  return listarArquivosServidorRecursivo(verificarDir)
+    .map(item => ({
+      path: item.rel,
+      nome: item.name,
+      pasta: path.dirname(item.rel).replace(/\\/g, "/"),
+      mes: item.rel.split("/")[1] || "SEM MES"
+    }))
+    .sort((a, b) => a.path.localeCompare(b.path, "pt-BR"));
+}
+
+app.get("/api/servidor/pastas", (_req, res) => {
+  try {
+    const pastas = listarPastasServidorRecursivo()
+      .filter(Boolean)
+      .filter(pasta => !pasta.startsWith("VERIFICAR/"))
+      .sort((a, b) => a.localeCompare(b, "pt-BR"))
+      .slice(0, 3000);
+
+    res.json({ ok: true, pastas });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: "Erro ao listar pastas: " + error.message
+    });
+  }
+});
+
+app.get("/api/servidor/verificar", (_req, res) => {
+  try {
+    res.json({
+      ok: true,
+      itens: listarVerificarServidor()
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: "Erro ao listar VERIFICAR: " + error.message
+    });
+  }
+});
+
+app.post("/api/servidor/mover", express.json({ limit: "2mb" }), (req, res) => {
+  try {
+    const origem = String(req.body?.origem || "").trim();
+    const destinoPasta = String(req.body?.destinoPasta || "").trim();
+
+    if (!origem || !destinoPasta) {
+      return res.status(400).json({
+        ok: false,
+        message: "Informe origem e destino."
+      });
+    }
+
+    const origemAbs = safeServidorPath(origem);
+    const destinoDir = safeServidorPath(destinoPasta);
+
+    if (!fs.existsSync(origemAbs)) {
+      return res.status(404).json({
+        ok: false,
+        message: "Item de origem não encontrado."
+      });
+    }
+
+    fs.mkdirSync(destinoDir, { recursive: true });
+
+    const target = caminhoUnicoServidor(path.join(destinoDir, path.basename(origemAbs)));
+    fs.renameSync(origemAbs, target);
+
+    res.json({
+      ok: true,
+      destino: path.relative(SERVIDOR_DIR, target).replace(/\\/g, "/"),
+      message: "Item movido com sucesso."
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: "Erro ao mover item: " + error.message
+    });
+  }
+});
+
 app.post("/api/servidor/upload-inteligente", servidorBulkUpload.array("arquivos"), (req, res) => {
   try {
     const files = req.files || [];
@@ -2619,12 +2862,10 @@ app.post("/api/servidor/upload-inteligente", servidorBulkUpload.array("arquivos"
 
     const salvos = [];
     const verificar = [];
-    const entidades = {};
-    const tipos = {};
 
     files.forEach((file, index) => {
       const originalRelative = paths[index] || file.originalname;
-      const destinoRelativo = destinoInteligenteServidor(originalRelative, file.originalname, anoPadrao);
+      const destinoRelativo = destinoServidorFinal(originalRelative, file.originalname, anoPadrao);
       const target = caminhoUnicoServidor(safeServidorPath(destinoRelativo));
       const destinoFinalRelativo = path.relative(SERVIDOR_DIR, target).replace(/\\/g, "/");
 
@@ -2633,30 +2874,72 @@ app.post("/api/servidor/upload-inteligente", servidorBulkUpload.array("arquivos"
 
       salvos.push(destinoFinalRelativo);
 
-      if (destinoFinalRelativo.includes("/VERIFICAR/") || destinoFinalRelativo.includes("/VERIFICAR") || destinoFinalRelativo.includes("SEM DATA")) {
+      if (destinoFinalRelativo.startsWith("VERIFICAR/")) {
         verificar.push(destinoFinalRelativo);
       }
-
-      const entidade = detectarEntidadeServidor(`${originalRelative} ${file.originalname}`);
-      const tipo = detectarTipoDocumentoServidor(`${originalRelative} ${file.originalname}`);
-      if (entidade) entidades[entidade.pasta] = (entidades[entidade.pasta] || 0) + 1;
-      if (tipo) tipos[tipo.geral] = (tipos[tipo.geral] || 0) + 1;
     });
 
     res.json({
       ok: true,
       saved: salvos.length,
       verificar: verificar.length,
-      organizar: verificar.length,
-      entidades,
-      tipos,
       exemplos: salvos.slice(0, 10),
-      message: `${salvos.length} arquivo(s) organizados em pastas próprias. ${verificar.length} foram enviados para VERIFICAR.`
+      message: `${salvos.length} arquivo(s) enviados e organizados. ${verificar.length} foram para VERIFICAR.`
     });
   } catch (error) {
     res.status(500).json({
       ok: false,
       message: "Erro no upload inteligente: " + error.message
+    });
+  }
+});
+
+app.post("/api/servidor/reorganizar-eventos", express.json({ limit: "2mb" }), (req, res) => {
+  try {
+    criarBackupServidorAntesMudancaCejas("reorganizar-eventos");
+    const anoPadrao = String(req.body?.anoPadrao || "2026");
+    const arquivos = listarArquivosServidorRecursivo(SERVIDOR_DIR);
+    const movidos = [];
+    const verificar = [];
+    const ignorados = [];
+
+    for (const arquivo of arquivos) {
+      if (pastaJaPareceCorretaServidor(arquivo.rel)) {
+        ignorados.push(arquivo.rel);
+        continue;
+      }
+
+      const destinoRelativo = destinoServidorFinal(arquivo.rel, arquivo.name, anoPadrao);
+      const destinoAbs = caminhoUnicoServidor(safeServidorPath(destinoRelativo));
+      const destinoFinalRelativo = path.relative(SERVIDOR_DIR, destinoAbs).replace(/\\/g, "/");
+
+      if (path.resolve(arquivo.full) === path.resolve(destinoAbs)) {
+        ignorados.push(arquivo.rel);
+        continue;
+      }
+
+      fs.mkdirSync(path.dirname(destinoAbs), { recursive: true });
+      fs.renameSync(arquivo.full, destinoAbs);
+
+      movidos.push({ de: arquivo.rel, para: destinoFinalRelativo });
+
+      if (destinoFinalRelativo.startsWith("VERIFICAR/")) {
+        verificar.push(destinoFinalRelativo);
+      }
+    }
+
+    res.json({
+      ok: true,
+      movidos: movidos.length,
+      ignorados: ignorados.length,
+      verificar: verificar.length,
+      exemplos: movidos.slice(0, 12),
+      message: `${movidos.length} arquivo(s) reorganizados. ${verificar.length} ficaram em VERIFICAR.`
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: "Erro ao reorganizar servidor: " + error.message
     });
   }
 });
@@ -2678,7 +2961,7 @@ app.get("/api/servidor/arquivo", (req, res) => {
 
 app.delete("/api/servidor/item", (req, res) => {
   try {
-    const relativePath = req.query.path || "";
+    const relativePath = String(req.query.path || "").trim();
     const itemPath = safeServidorPath(relativePath);
 
     if (!fs.existsSync(itemPath)) {
@@ -2688,22 +2971,24 @@ app.delete("/api/servidor/item", (req, res) => {
       });
     }
 
-    const stats = fs.statSync(itemPath);
-
-    if (stats.isDirectory()) {
-      fs.rmSync(itemPath, { recursive: true, force: true });
-    } else {
-      fs.unlinkSync(itemPath);
+    if (relativePath.startsWith("_LIXEIRA/")) {
+      return res.status(400).json({
+        ok: false,
+        message: "Este item já está na lixeira. Exclusão definitiva bloqueada para proteger os documentos."
+      });
     }
+
+    const destinoLixeira = moverParaLixeiraServidorCejas(itemPath, relativePath);
 
     res.json({
       ok: true,
-      message: "Item excluído com sucesso."
+      destino: destinoLixeira,
+      message: "Item movido para a lixeira de segurança. Nada foi apagado definitivamente."
     });
   } catch (error) {
     res.status(500).json({
       ok: false,
-      message: "Erro ao excluir item: " + error.message
+      message: "Erro ao mover item para lixeira: " + error.message
     });
   }
 });

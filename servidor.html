@@ -1474,5 +1474,433 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 <script src="/js/cejas-menu-fixo.js?v=3"></script>
 <script src="/js/cejas-mobile-menu.js?v=1"></script>
+
+<script>
+// CEJAS_VERIFICAR_PANEL_START
+(function () {
+  if (window.__CEJAS_VERIFICAR_PANEL__) return;
+  window.__CEJAS_VERIFICAR_PANEL__ = true;
+
+  function escapeHTML(value) {
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function criarPainelVerificar() {
+    if (document.getElementById("painelVerificarServidor")) return;
+
+    const main = document.querySelector("main") || document.body;
+
+    const panel = document.createElement("section");
+    panel.id = "painelVerificarServidor";
+    panel.style.cssText = `
+      background: #111114;
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 22px;
+      padding: 18px;
+      margin: 18px 0;
+      color: #fff;
+    `;
+
+    panel.innerHTML = `
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px;">
+        <div>
+          <h3 style="margin:0 0 6px;font-size:20px;">VERIFICAR</h3>
+          <p style="margin:0;color:#b3b3b3;font-size:13px;line-height:1.45;">
+            Arquivos que o sistema não entendeu. Você pode apagar ou mover para uma pasta de evento já criada.
+          </p>
+        </div>
+        <button class="btn" type="button" onclick="carregarPainelVerificarServidor()">Atualizar VERIFICAR</button>
+      </div>
+      <div id="listaVerificarServidor" style="display:grid;gap:10px;"></div>
+    `;
+
+    const tree = document.querySelector("#serverTree, #tree, .tree-panel, .server-tree");
+    if (tree && tree.parentNode) {
+      tree.parentNode.insertBefore(panel, tree);
+    } else {
+      main.appendChild(panel);
+    }
+  }
+
+  async function carregarPastasServidorVerificar() {
+    try {
+      const response = await fetch("/api/servidor/pastas", { cache: "no-store" });
+      const data = await response.json();
+      if (!data.ok) return [];
+      return data.pastas || [];
+    } catch {
+      return [];
+    }
+  }
+
+  window.carregarPainelVerificarServidor = async function carregarPainelVerificarServidor() {
+    criarPainelVerificar();
+
+    const lista = document.getElementById("listaVerificarServidor");
+    lista.innerHTML = `<div style="color:#b3b3b3;">Carregando arquivos para verificar...</div>`;
+
+    const [pastasResponse, verificarResponse] = await Promise.all([
+      carregarPastasServidorVerificar(),
+      fetch("/api/servidor/verificar", { cache: "no-store" }).then(r => r.json()).catch(() => ({ ok: false, itens: [] }))
+    ]);
+
+    const pastas = pastasResponse || [];
+    const itens = verificarResponse.ok ? (verificarResponse.itens || []) : [];
+
+    if (!itens.length) {
+      lista.innerHTML = `<div style="color:#b3b3b3;padding:14px;border:1px dashed rgba(255,255,255,.16);border-radius:14px;">Nenhum arquivo pendente em VERIFICAR.</div>`;
+      return;
+    }
+
+    const options = [
+      `<option value="">Selecione a pasta de destino...</option>`,
+      ...pastas.map(pasta => `<option value="${escapeHTML(pasta)}">${escapeHTML(pasta)}</option>`)
+    ].join("");
+
+    lista.innerHTML = itens.map((item, index) => `
+      <article style="display:grid;grid-template-columns:1fr 220px auto auto;gap:10px;align-items:center;background:#17171c;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:12px;">
+        <div style="min-width:0;">
+          <strong style="display:block;overflow-wrap:anywhere;">${escapeHTML(item.nome)}</strong>
+          <small style="display:block;color:#b3b3b3;overflow-wrap:anywhere;margin-top:4px;">${escapeHTML(item.pasta)}</small>
+        </div>
+
+        <select id="verificarDestino-${index}" style="width:100%;padding:11px;border-radius:11px;background:#0b0b10;color:#fff;border:1px solid rgba(255,255,255,.14);">
+          ${options}
+        </select>
+
+        <button class="btn" type="button" onclick="moverVerificarServidor('${encodeURIComponent(item.path)}', 'verificarDestino-${index}')">
+          Mover
+        </button>
+
+        <button class="btn red" type="button" onclick="apagarVerificarServidor('${encodeURIComponent(item.path)}')">
+          Apagar
+        </button>
+      </article>
+    `).join("");
+  };
+
+  window.moverVerificarServidor = async function moverVerificarServidor(pathEncoded, selectId) {
+    const origem = decodeURIComponent(pathEncoded);
+    const destinoPasta = document.getElementById(selectId)?.value || "";
+
+    if (!destinoPasta) {
+      alert("Selecione a pasta de destino.");
+      return;
+    }
+
+    const response = await fetch("/api/servidor/mover", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ origem, destinoPasta })
+    });
+
+    const data = await response.json();
+
+    if (!data.ok) {
+      alert(data.message || "Erro ao mover arquivo.");
+      return;
+    }
+
+    if (typeof loadTree === "function") await loadTree();
+    await carregarPainelVerificarServidor();
+
+    alert("Arquivo movido com sucesso.");
+  };
+
+  window.apagarVerificarServidor = async function apagarVerificarServidor(pathEncoded) {
+    const path = decodeURIComponent(pathEncoded);
+
+    if (!confirm("Apagar este arquivo de VERIFICAR?")) return;
+
+    if (typeof deleteItem === "function") {
+      await deleteItem(path, "file");
+      await carregarPainelVerificarServidor();
+      return;
+    }
+
+    alert("Não encontrei a função de apagar nesta tela.");
+  };
+
+  const iniciar = () => {
+    criarPainelVerificar();
+    carregarPainelVerificarServidor();
+
+    const originalLoadTree = window.loadTree;
+
+    if (typeof originalLoadTree === "function" && !window.__CEJAS_LOADTREE_VERIFICAR_PATCH__) {
+      window.__CEJAS_LOADTREE_VERIFICAR_PATCH__ = true;
+      window.loadTree = async function patchedLoadTree() {
+        const result = await originalLoadTree.apply(this, arguments);
+        carregarPainelVerificarServidor();
+        return result;
+      };
+    }
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", iniciar);
+  } else {
+    iniciar();
+  }
+})();
+// CEJAS_VERIFICAR_PANEL_END
+</script>
+
+
+<script>
+// CEJAS_UPLOAD_FINAL_OVERRIDE_START
+(function () {
+  let arquivosSelecionadosServidorFinal = [];
+
+  function $(id) {
+    return document.getElementById(id);
+  }
+
+  function atualizarListaUploadFinal() {
+    const status = $("uploadStatus");
+    const preview = $("uploadPreview");
+
+    if (!status) return;
+
+    status.textContent = arquivosSelecionadosServidorFinal.length
+      ? `${arquivosSelecionadosServidorFinal.length} arquivo(s) selecionado(s). O sistema vai organizar por evento, data e mês.`
+      : "Nenhum arquivo selecionado.";
+
+    if (preview) {
+      preview.style.display = arquivosSelecionadosServidorFinal.length ? "block" : "none";
+      preview.innerHTML = arquivosSelecionadosServidorFinal
+        .slice(0, 60)
+        .map(item => `<div>• ${item.path}</div>`)
+        .join("") + (arquivosSelecionadosServidorFinal.length > 60 ? `<div>+ ${arquivosSelecionadosServidorFinal.length - 60} arquivo(s)...</div>` : "");
+    }
+  }
+
+  function adicionarArquivosServidorFinal(lista) {
+    const mapa = new Map(arquivosSelecionadosServidorFinal.map(item => [`${item.path}::${item.file.size}`, item]));
+
+    lista.forEach(item => {
+      if (!item || !item.file) return;
+      const path = item.path || item.file.webkitRelativePath || item.file.name;
+      mapa.set(`${path}::${item.file.size}`, {
+        file: item.file,
+        path
+      });
+    });
+
+    arquivosSelecionadosServidorFinal = [...mapa.values()];
+    atualizarListaUploadFinal();
+  }
+
+  function lerEntradaServidorFinal(entry, base = "") {
+    return new Promise((resolve, reject) => {
+      if (entry.isFile) {
+        entry.file(file => {
+          resolve([{ file, path: `${base}${file.name}` }]);
+        }, reject);
+        return;
+      }
+
+      if (!entry.isDirectory) {
+        resolve([]);
+        return;
+      }
+
+      const reader = entry.createReader();
+      const entries = [];
+
+      function readBatch() {
+        reader.readEntries(async batch => {
+          if (!batch.length) {
+            try {
+              const nested = await Promise.all(entries.map(child => lerEntradaServidorFinal(child, `${base}${entry.name}/`)));
+              resolve(nested.flat());
+            } catch (error) {
+              reject(error);
+            }
+            return;
+          }
+
+          entries.push(...batch);
+          readBatch();
+        }, reject);
+      }
+
+      readBatch();
+    });
+  }
+
+  async function processarDropServidorFinal(event) {
+    event.preventDefault();
+
+    const drop = $("dropZoneServidor");
+    if (drop) drop.classList.remove("dragover");
+
+    const items = [...(event.dataTransfer.items || [])];
+    const arquivos = [];
+
+    if (items.length && items[0].webkitGetAsEntry) {
+      for (const item of items) {
+        const entry = item.webkitGetAsEntry();
+        if (!entry) continue;
+        arquivos.push(...await lerEntradaServidorFinal(entry));
+      }
+    } else {
+      arquivos.push(...[...(event.dataTransfer.files || [])].map(file => ({
+        file,
+        path: file.name
+      })));
+    }
+
+    adicionarArquivosServidorFinal(arquivos);
+  }
+
+  window.clearSelectedFiles = function clearSelectedFiles() {
+    arquivosSelecionadosServidorFinal = [];
+
+    if ($("folderInput")) $("folderInput").value = "";
+    if ($("fileInput")) $("fileInput").value = "";
+
+    atualizarListaUploadFinal();
+  };
+
+  window.uploadFolder = async function uploadFolder() {
+    if (!arquivosSelecionadosServidorFinal.length) {
+      alert("Selecione arquivos soltos, uma pasta ou arraste várias pastas primeiro.");
+      return;
+    }
+
+    const mode = document.querySelector("input[name='uploadMode']:checked")?.value || "auto";
+    const endpoint = mode === "auto" ? "/api/servidor/upload-inteligente" : "/api/servidor/upload";
+
+    const formData = new FormData();
+
+    const destino = typeof getUploadDestination === "function" ? getUploadDestination() : "";
+    formData.append("destino", destino);
+
+    const anoPadrao = $("autoYear")?.value || "2026";
+    formData.append("anoPadrao", anoPadrao);
+
+    arquivosSelecionadosServidorFinal.forEach(item => {
+      formData.append("arquivos", item.file);
+      formData.append("paths", item.path);
+    });
+
+    const status = $("uploadStatus");
+    if (status) status.textContent = "Enviando e organizando por evento...";
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.ok) {
+        throw new Error(data.message || "Erro ao enviar.");
+      }
+
+      if (status) {
+        status.textContent = data.message || "Arquivos enviados.";
+      }
+
+      clearSelectedFiles();
+
+      if (typeof loadTree === "function") {
+        await loadTree();
+      }
+
+      if (typeof carregarPainelVerificarServidor === "function") {
+        await carregarPainelVerificarServidor();
+      }
+
+      alert(data.message || "Arquivos enviados e organizados.");
+    } catch (error) {
+      if (status) status.textContent = "Erro: " + error.message;
+      alert("Erro ao enviar: " + error.message);
+    }
+  };
+
+  function iniciarUploadFinal() {
+    const folder = $("folderInput");
+    const file = $("fileInput");
+    const drop = $("dropZoneServidor");
+
+    if (folder && !folder.dataset.cejasUploadFinal) {
+      folder.dataset.cejasUploadFinal = "1";
+      folder.addEventListener("change", () => {
+        adicionarArquivosServidorFinal([...folder.files].map(file => ({
+          file,
+          path: file.webkitRelativePath || file.name
+        })));
+      });
+    }
+
+    if (file && !file.dataset.cejasUploadFinal) {
+      file.dataset.cejasUploadFinal = "1";
+      file.addEventListener("change", () => {
+        adicionarArquivosServidorFinal([...file.files].map(file => ({
+          file,
+          path: file.name
+        })));
+      });
+    }
+
+    if (drop && !drop.dataset.cejasUploadFinal) {
+      drop.dataset.cejasUploadFinal = "1";
+
+      drop.addEventListener("dragover", event => {
+        event.preventDefault();
+        drop.classList.add("dragover");
+      });
+
+      drop.addEventListener("dragleave", () => {
+        drop.classList.remove("dragover");
+      });
+
+      drop.addEventListener("drop", processarDropServidorFinal);
+    }
+
+    atualizarListaUploadFinal();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", iniciarUploadFinal);
+  } else {
+    iniciarUploadFinal();
+  }
+})();
+// CEJAS_UPLOAD_FINAL_OVERRIDE_END
+</script>
+
+
+<script>
+// CEJAS_BACKUP_BUTTON_START
+async function criarBackupSegurancaServidorCejas() {
+  if (!confirm("Criar backup de segurança dos arquivos do servidor agora?")) return;
+
+  const response = await fetch("/api/servidor/backup-seguranca", {
+    method: "POST"
+  });
+
+  const data = await response.json();
+
+  if (!data.ok) {
+    alert(data.message || "Erro ao criar backup.");
+    return;
+  }
+
+  alert("Backup criado com sucesso. Local: " + data.destino);
+}
+// CEJAS_BACKUP_BUTTON_END
+</script>
+
 </body>
 </html>
