@@ -14,6 +14,7 @@ const { iniciarProtecaoServidorSupabase, uploadBufferSupabaseServidor, uploadLoc
 const session = require("express-session");
 const bcrypt = require("bcryptjs");
 const path = require("path");
+const { syncDataParaSupabase } = require("./lib/dados-supabase-cejas");
 const { registrarRotasServidorSupabaseDefinitivo } = require("./lib/servidor-supabase-definitivo");
 const { getSupabaseEnvStatus } = require("./lib/supabase");
 
@@ -58,6 +59,46 @@ require("dotenv").config();
 prepararDadosPersistentes(__dirname);
 
 const app = express();
+
+// CEJAS_SYNC_DATA_SUPABASE_START
+app.use((req, res, next) => {
+  const mudaDados = ["POST", "PUT", "PATCH", "DELETE"].includes(req.method);
+  const rotasData = [
+    "/api/importar-relatorio",
+    "/api/relatorio",
+    "/api/dashboard",
+    "/api/gratuidades",
+    "/api/agenda",
+    "/api/tarefas",
+    "/api/configuracoes"
+  ];
+
+  if (mudaDados && rotasData.some(prefix => req.path.startsWith(prefix))) {
+    res.on("finish", () => {
+      if (res.statusCode < 400) {
+        setTimeout(() => {
+          syncDataParaSupabase().catch(error => {
+            console.warn("⚠️ Sync data/ pós alteração falhou:", error.message);
+          });
+        }, 1200);
+      }
+    });
+  }
+
+  next();
+});
+
+app.post("/api/sistema/sync-data", async (_req, res) => {
+  try {
+    const result = await syncDataParaSupabase();
+    res.json({ ok: true, ...result });
+  } catch (error) {
+    res.status(500).json({ ok: false, message: error.message });
+  }
+});
+// CEJAS_SYNC_DATA_SUPABASE_END
+
+
 registrarRotasServidorSupabaseDefinitivo(app);
 
 // CEJAS_SERVIDOR_API_PING_START

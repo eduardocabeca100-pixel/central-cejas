@@ -3,19 +3,16 @@ require("dotenv").config();
 (async () => {
   console.log("🛡️ Iniciando CEJAS em modo seguro...");
   console.log("📦 Servidor de arquivos: Supabase Storage direto.");
-  console.log("⚠️ Não será feita restauração de uploads locais no start.");
 
   try {
-    const { statusPersistenciaCejas } = require("../lib/persistencia-total-supabase");
+    const { restoreDataDoSupabase, statusDadosSupabase } = require("../lib/dados-supabase-cejas");
 
-    const status = await statusPersistenciaCejas().catch((error) => ({
-      ok: false,
-      message: error.message
-    }));
+    console.log("📊 Status data/Supabase:", statusDadosSupabase());
 
-    console.log("📊 Status de persistência:", status);
+    const restore = await restoreDataDoSupabase();
+    console.log("✅ data/ restaurado do Supabase:", restore);
   } catch (error) {
-    console.warn("⚠️ Check de persistência ignorado:", error.message);
+    console.warn("⚠️ Restore de data/ ignorado:", error.message);
   }
 
   try {

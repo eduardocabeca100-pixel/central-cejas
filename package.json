@@ -17,7 +17,9 @@
     "persist:check": "node scripts/persistencia-check.js",
     "servidor:check-definitivo": "node scripts/check-servidor-definitivo.js",
     "env:check": "node scripts/check-env-render.js",
-    "storage:runtime": "node scripts/check-storage-runtime.js"
+    "storage:runtime": "node scripts/check-storage-runtime.js",
+    "data:sync": "node scripts/data-sync-cejas.js",
+    "data:restore": "node scripts/data-restore-cejas.js"
   },
   "keywords": [],
   "author": "",
