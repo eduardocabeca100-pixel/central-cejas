@@ -58,6 +58,18 @@ prepararDadosPersistentes(__dirname);
 
 const app = express();
 
+// CEJAS_SERVIDOR_API_PING_START
+app.get("/api/servidor/ping", (_req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.json({
+    ok: true,
+    message: "API do servidor ativa",
+    at: new Date().toISOString()
+  });
+});
+// CEJAS_SERVIDOR_API_PING_END
+
+
 // CEJAS_DEBUG_STORAGE_RUNTIME_START
 app.get("/api/debug/storage-runtime", (_req, res) => {
   try {
@@ -3411,6 +3423,21 @@ registrarChatCejasApi(app);
 
 
 
+
+
+
+// CEJAS_UPLOAD_JSON_ERROR_HANDLER_START
+app.use((error, req, res, next) => {
+  if (req.path && req.path.startsWith("/api/servidor/")) {
+    return res.status(error.status || error.statusCode || 500).json({
+      ok: false,
+      message: "Erro no upload/servidor: " + (error.message || "erro desconhecido")
+    });
+  }
+
+  next(error);
+});
+// CEJAS_UPLOAD_JSON_ERROR_HANDLER_END
 
 
 app.listen(PORT, "0.0.0.0", () => {
