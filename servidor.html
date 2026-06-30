@@ -2124,5 +2124,170 @@ async function criarBackupSegurancaServidorCejas() {
 // CEJAS_UPLOAD_SEGURO_SERVIDOR_END
 </script>
 
+
+<script>
+// CEJAS_SERVIDOR_ESTAVEL_APAGAR_TUDO_START
+(function () {
+  if (window.__CEJAS_SERVIDOR_ESTAVEL_APAGAR_TUDO__) return;
+  window.__CEJAS_SERVIDOR_ESTAVEL_APAGAR_TUDO__ = true;
+
+  const originalFetch = window.fetch;
+
+  window.fetch = function (input, options) {
+    let url = typeof input === "string" ? input : String(input && input.url || "");
+
+    if (url.includes("/api/servidor/")) {
+      const sep = url.includes("?") ? "&" : "?";
+      url = `${url}${sep}_ts=${Date.now()}`;
+
+      options = {
+        ...(options || {}),
+        cache: "no-store",
+        headers: {
+          ...((options && options.headers) || {}),
+          "Cache-Control": "no-cache",
+          "Pragma": "no-cache"
+        }
+      };
+
+      return originalFetch(url, options);
+    }
+
+    return originalFetch(input, options);
+  };
+
+  function criarBotaoApagarTudo() {
+    if (document.getElementById("cejasApagarTudoServidor")) return;
+
+    const botoesArea =
+      document.querySelector(".actions") ||
+      document.querySelector(".topbar") ||
+      document.querySelector("main") ||
+      document.body;
+
+    const btn = document.createElement("button");
+    btn.id = "cejasApagarTudoServidor";
+    btn.type = "button";
+    btn.textContent = "Apagar tudo";
+    btn.style.cssText = `
+      border:1px solid rgba(239,68,68,.35);
+      background:rgba(239,68,68,.16);
+      color:#fecaca;
+      border-radius:12px;
+      padding:11px 14px;
+      font-weight:900;
+      cursor:pointer;
+      margin-left:8px;
+    `;
+
+    btn.addEventListener("click", apagarTudoServidorCejas);
+
+    botoesArea.appendChild(btn);
+  }
+
+  async function respostaJsonSegura(response) {
+    const text = await response.text();
+
+    try {
+      return JSON.parse(text);
+    } catch {
+      throw new Error(text.slice(0, 400) || `Resposta inválida HTTP ${response.status}`);
+    }
+  }
+
+  async function apagarTudoServidorCejas() {
+    const aviso1 = confirm(
+      "ATENÇÃO: isso vai apagar TODOS os arquivos do Servidor no Supabase Storage. Esta ação não volta. Continuar?"
+    );
+
+    if (!aviso1) return;
+
+    const digitado = prompt('Para confirmar, digite exatamente: APAGAR TUDO');
+
+    if (digitado !== "APAGAR TUDO") {
+      alert("Confirmação cancelada. Nada foi apagado.");
+      return;
+    }
+
+    const aviso2 = confirm(
+      "Última confirmação: apagar definitivamente todos os arquivos do Servidor?"
+    );
+
+    if (!aviso2) return;
+
+    try {
+      const response = await fetch("/api/servidor/tudo", {
+        method: "DELETE",
+        cache: "no-store",
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache"
+        },
+        body: JSON.stringify({
+          confirmacao: "APAGAR TUDO"
+        })
+      });
+
+      const data = await respostaJsonSegura(response);
+
+      if (!response.ok || data.ok === false) {
+        throw new Error(data.message || "Erro ao apagar tudo.");
+      }
+
+      alert(data.message || "Arquivos apagados.");
+
+      setTimeout(() => {
+        if (typeof window.carregarServidor === "function") {
+          window.carregarServidor();
+        } else {
+          location.reload();
+        }
+      }, 600);
+    } catch (error) {
+      alert("Erro ao apagar tudo: " + error.message);
+    }
+  }
+
+  function melhorarCarregamentoServidor() {
+    const botoes = [...document.querySelectorAll("button, a")];
+
+    for (const b of botoes) {
+      const txt = String(b.textContent || "").toLowerCase();
+
+      if (txt.includes("atualizar") && !b.__cejasRefreshFix) {
+        b.__cejasRefreshFix = true;
+
+        b.addEventListener("click", () => {
+          setTimeout(() => {
+            if (typeof window.carregarServidor === "function") {
+              window.carregarServidor();
+            }
+          }, 300);
+        });
+      }
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    criarBotaoApagarTudo();
+    melhorarCarregamentoServidor();
+
+    setTimeout(() => {
+      if (typeof window.carregarServidor === "function") {
+        window.carregarServidor();
+      }
+    }, 500);
+
+    setTimeout(() => {
+      criarBotaoApagarTudo();
+      melhorarCarregamentoServidor();
+    }, 1500);
+  });
+
+  window.apagarTudoServidorCejas = apagarTudoServidorCejas;
+})();
+// CEJAS_SERVIDOR_ESTAVEL_APAGAR_TUDO_END
+</script>
+
 </body>
 </html>

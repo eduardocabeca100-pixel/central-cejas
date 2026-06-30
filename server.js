@@ -14,8 +14,9 @@ const { iniciarProtecaoServidorSupabase, uploadBufferSupabaseServidor, uploadLoc
 const session = require("express-session");
 const bcrypt = require("bcryptjs");
 const path = require("path");
-const { getSupabaseEnvStatus } = require("./lib/supabase");
 const { registrarRotasServidorSupabaseDefinitivo } = require("./lib/servidor-supabase-definitivo");
+const { getSupabaseEnvStatus } = require("./lib/supabase");
+
 const persistenciaTotalCejas = require("./lib/persistencia-total-supabase");
 const fs = require("fs");
 const multer = require("multer");
@@ -57,6 +58,7 @@ require("dotenv").config();
 prepararDadosPersistentes(__dirname);
 
 const app = express();
+registrarRotasServidorSupabaseDefinitivo(app);
 
 // CEJAS_SERVIDOR_API_PING_START
 app.get("/api/servidor/ping", (_req, res) => {
@@ -87,15 +89,6 @@ app.get("/api/debug/storage-runtime", (_req, res) => {
   }
 });
 // CEJAS_DEBUG_STORAGE_RUNTIME_END
-
-
-
-
-
-
-registrarRotasServidorSupabaseDefinitivo(app);
-
-
 // CEJAS_PERSISTENCIA_TOTAL_DEPLOY_START
 const CEJAS_ROTAS_QUE_SALVAM_DADOS = [
   "/api/servidor",
@@ -2408,99 +2401,9 @@ function buildServidorTree(dirPath, relative = "") {
     });
 }
 
-/* ROTA ANTIGA SERVIDOR DESATIVADA PELO PATCH SUPABASE DEFINITIVO
 
-/* ROTA ANTIGA DESATIVADA RESET SUPABASE ONLY
 
-app.get("/api/servidor/tree", async (_req, res) => {
-  try {
-    const cloudTree = await listarStorageServidor();
 
-    if (Array.isArray(cloudTree) && cloudTree.length) {
-      return res.json({
-        ok: true,
-        origem: "supabase-storage",
-        root: cloudTree
-      });
-    }
-
-    fs.mkdirSync(SERVIDOR_DIR, { recursive: true });
-
-    res.json({
-      ok: true,
-      origem: "local-fallback",
-      root: buildServidorTree(SERVIDOR_DIR)
-    });
-  } catch (error) {
-    try {
-      return res.json({
-        ok: true,
-        origem: "local-fallback-erro-storage",
-        aviso: error.message,
-        root: buildServidorTree(SERVIDOR_DIR)
-      });
-    } catch (localError) {
-      res.status(500).json({
-        ok: false,
-        message: "Erro ao carregar servidor: " + localError.message
-      });
-    }
-  }
-});
-*/
-*/
-
-/* ROTA ANTIGA SERVIDOR DESATIVADA PELO PATCH SUPABASE DEFINITIVO
-
-/* ROTA ANTIGA DESATIVADA RESET SUPABASE ONLY
-
-app.post("/api/servidor/upload", servidorUpload.array("arquivos"), (req, res) => {
-  try {
-    const files = req.files || [];
-    let paths = req.body.paths || [];
-
-    if (!Array.isArray(paths)) {
-      paths = [paths];
-    }
-
-    if (!files.length) {
-      return res.status(400).json({
-        ok: false,
-        message: "Nenhum arquivo enviado."
-      });
-    }
-
-    let saved = 0;
-
-    files.forEach((file, index) => {
-      const destino = String(req.body.destino || "").trim();
-      const relativeFromClient = paths[index] || file.originalname;
-      const finalRelativePath = destino
-        ? path.join(destino, relativeFromClient).replace(/\\/g, "/")
-        : relativeFromClient;
-
-      const target = safeServidorPath(finalRelativePath);
-
-      fs.mkdirSync(path.dirname(target), { recursive: true });
-      fs.writeFileSync(target, file.buffer);
-
-      saved += 1;
-    });
-
-    res.json({
-      ok: true,
-      message: `${saved} arquivo(s) salvo(s) no servidor.`,
-      saved
-    });
-  } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: "Erro ao salvar arquivos: " + error.message
-    });
-  }
-});
-*/
-*/
 
 
 app.post("/api/servidor/criar-estrutura", (req, res) => {
@@ -2552,78 +2455,7 @@ app.post("/api/servidor/criar-estrutura", (req, res) => {
 
 
 
-/* ROTA ANTIGA SERVIDOR DESATIVADA PELO PATCH SUPABASE DEFINITIVO
 
-/* ROTA ANTIGA DESATIVADA RESET SUPABASE ONLY
-
-app.post("/api/servidor/mover", (req, res) => {
-  try {
-    const { origem, destinoPasta } = req.body;
-
-    if (!origem || !destinoPasta) {
-      return res.status(400).json({
-        ok: false,
-        message: "Origem e destino são obrigatórios."
-      });
-    }
-
-    const origemPath = safeServidorPath(origem);
-    const destinoDir = safeServidorPath(destinoPasta);
-
-    if (!fs.existsSync(origemPath)) {
-      return res.status(404).json({
-        ok: false,
-        message: "Item de origem não encontrado."
-      });
-    }
-
-    if (!fs.existsSync(destinoDir)) {
-      fs.mkdirSync(destinoDir, { recursive: true });
-    }
-
-    if (!fs.statSync(destinoDir).isDirectory()) {
-      return res.status(400).json({
-        ok: false,
-        message: "Destino precisa ser uma pasta."
-      });
-    }
-
-    if (origemPath === destinoDir || destinoDir.startsWith(origemPath + path.sep)) {
-      return res.status(400).json({
-        ok: false,
-        message: "Não é possível mover uma pasta para dentro dela mesma."
-      });
-    }
-
-    const baseName = path.basename(origemPath);
-    let destinoFinal = path.join(destinoDir, baseName);
-
-    if (fs.existsSync(destinoFinal)) {
-      const ext = path.extname(baseName);
-      const name = path.basename(baseName, ext);
-      let count = 1;
-
-      while (fs.existsSync(destinoFinal)) {
-        destinoFinal = path.join(destinoDir, `${name}-${count}${ext}`);
-        count++;
-      }
-    }
-
-    fs.renameSync(origemPath, destinoFinal);
-
-    res.json({
-      ok: true,
-      message: "Item movido com sucesso."
-    });
-  } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: "Erro ao mover item: " + error.message
-    });
-  }
-});
-*/
-*/
 
 
 
@@ -3000,232 +2832,17 @@ function listarVerificarServidor() {
     .sort((a, b) => a.path.localeCompare(b.path, "pt-BR"));
 }
 
-/* ROTA ANTIGA SERVIDOR DESATIVADA PELO PATCH SUPABASE DEFINITIVO
 
-/* ROTA ANTIGA DESATIVADA RESET SUPABASE ONLY
 
-app.get("/api/servidor/pastas", (_req, res) => {
-  try {
-    const pastas = listarPastasServidorRecursivo()
-      .filter(Boolean)
-      .filter(pasta => !pasta.startsWith("VERIFICAR/"))
-      .sort((a, b) => a.localeCompare(b, "pt-BR"))
-      .slice(0, 3000);
 
-    res.json({ ok: true, pastas });
-  } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: "Erro ao listar pastas: " + error.message
-    });
-  }
-});
-*/
-*/
 
-/* ROTA ANTIGA SERVIDOR DESATIVADA PELO PATCH SUPABASE DEFINITIVO
 
-/* ROTA ANTIGA DESATIVADA RESET SUPABASE ONLY
 
-app.get("/api/servidor/verificar", (_req, res) => {
-  try {
-    res.json({
-      ok: true,
-      itens: listarVerificarServidor()
-    });
-  } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: "Erro ao listar VERIFICAR: " + error.message
-    });
-  }
-});
-*/
-*/
 
-/* ROTA ANTIGA SERVIDOR DESATIVADA PELO PATCH SUPABASE DEFINITIVO
 
-/* ROTA ANTIGA DESATIVADA RESET SUPABASE ONLY
 
-app.post("/api/servidor/mover", express.json({ limit: "2mb" }), (req, res) => {
-  try {
-    const origem = String(req.body?.origem || "").trim();
-    const destinoPasta = String(req.body?.destinoPasta || "").trim();
 
-    if (!origem || !destinoPasta) {
-      return res.status(400).json({
-        ok: false,
-        message: "Informe origem e destino."
-      });
-    }
 
-    const origemAbs = safeServidorPath(origem);
-    const destinoDir = safeServidorPath(destinoPasta);
-
-    if (!fs.existsSync(origemAbs)) {
-      return res.status(404).json({
-        ok: false,
-        message: "Item de origem não encontrado."
-      });
-    }
-
-    fs.mkdirSync(destinoDir, { recursive: true });
-
-    const target = caminhoUnicoServidor(path.join(destinoDir, path.basename(origemAbs)));
-    fs.renameSync(origemAbs, target);
-
-    res.json({
-      ok: true,
-      destino: path.relative(SERVIDOR_DIR, target).replace(/\\/g, "/"),
-      message: "Item movido com sucesso."
-    });
-  } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: "Erro ao mover item: " + error.message
-    });
-  }
-});
-*/
-*/
-
-/* ROTA ANTIGA SERVIDOR DESATIVADA PELO PATCH SUPABASE DEFINITIVO
-
-/* ROTA ANTIGA DESATIVADA RESET SUPABASE ONLY
-
-app.post("/api/servidor/upload-inteligente", servidorBulkUpload.array("arquivos"), (req, res) => {
-  try {
-    const files = req.files || [];
-    let paths = req.body.paths || [];
-    const anoPadrao = req.body.anoPadrao || "2026";
-
-    if (!Array.isArray(paths)) paths = [paths];
-
-    if (!files.length) {
-      return res.status(400).json({
-        ok: false,
-        message: "Nenhum arquivo enviado."
-      });
-    }
-
-    const salvos = [];
-    const verificar = [];
-
-    files.forEach((file, index) => {
-      const originalRelative = paths[index] || file.originalname;
-      const destinoRelativo = destinoServidorFinal(originalRelative, file.originalname, anoPadrao);
-      const target = caminhoUnicoServidor(safeServidorPath(destinoRelativo));
-      const destinoFinalRelativo = path.relative(SERVIDOR_DIR, target).replace(/\\/g, "/");
-
-      fs.mkdirSync(path.dirname(target), { recursive: true });
-      fs.renameSync(file.path, target);
-
-      salvos.push(destinoFinalRelativo);
-
-      if (destinoFinalRelativo.startsWith("VERIFICAR/")) {
-        verificar.push(destinoFinalRelativo);
-      }
-    });
-
-    res.json({
-      ok: true,
-      saved: salvos.length,
-      verificar: verificar.length,
-      exemplos: salvos.slice(0, 10),
-      message: `${salvos.length} arquivo(s) enviados e organizados. ${verificar.length} foram para VERIFICAR.`
-    });
-  } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: "Erro no upload inteligente: " + error.message
-    });
-  }
-});
-*/
-*/
-
-/* ROTA ANTIGA SERVIDOR DESATIVADA PELO PATCH SUPABASE DEFINITIVO
-
-app.post("/api/servidor/reorganizar-eventos", express.json({ limit: "2mb" }), (req, res) => {
-  try {
-    criarBackupServidorAntesMudancaCejas("reorganizar-eventos");
-    const anoPadrao = String(req.body?.anoPadrao || "2026");
-    const arquivos = listarArquivosServidorRecursivo(SERVIDOR_DIR);
-    const movidos = [];
-    const verificar = [];
-    const ignorados = [];
-
-    for (const arquivo of arquivos) {
-      if (pastaJaPareceCorretaServidor(arquivo.rel)) {
-        ignorados.push(arquivo.rel);
-        continue;
-      }
-
-      const destinoRelativo = destinoServidorFinal(arquivo.rel, arquivo.name, anoPadrao);
-      const destinoAbs = caminhoUnicoServidor(safeServidorPath(destinoRelativo));
-      const destinoFinalRelativo = path.relative(SERVIDOR_DIR, destinoAbs).replace(/\\/g, "/");
-
-      if (path.resolve(arquivo.full) === path.resolve(destinoAbs)) {
-        ignorados.push(arquivo.rel);
-        continue;
-      }
-
-      fs.mkdirSync(path.dirname(destinoAbs), { recursive: true });
-      fs.renameSync(arquivo.full, destinoAbs);
-
-      movidos.push({ de: arquivo.rel, para: destinoFinalRelativo });
-
-      if (destinoFinalRelativo.startsWith("VERIFICAR/")) {
-        verificar.push(destinoFinalRelativo);
-      }
-    }
-
-    res.json({
-      ok: true,
-      movidos: movidos.length,
-      ignorados: ignorados.length,
-      verificar: verificar.length,
-      exemplos: movidos.slice(0, 12),
-      message: `${movidos.length} arquivo(s) reorganizados. ${verificar.length} ficaram em VERIFICAR.`
-    });
-  } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: "Erro ao reorganizar servidor: " + error.message
-    });
-  }
-});
-*/
-
-/* ROTA ANTIGA SERVIDOR DESATIVADA PELO PATCH SUPABASE DEFINITIVO
-
-/* ROTA ANTIGA DESATIVADA RESET SUPABASE ONLY
-
-app.get("/api/servidor/arquivo", async (req, res) => {
-  try {
-    const relativePath = req.query.path || "";
-    const filePath = safeServidorPath(relativePath);
-
-    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-      return res.sendFile(filePath);
-    }
-
-    const buffer = await downloadBufferSupabaseServidor(relativePath);
-
-    if (!buffer) {
-      return res.status(404).send("Arquivo não encontrado.");
-    }
-
-    fs.mkdirSync(path.dirname(filePath), { recursive: true });
-    fs.writeFileSync(filePath, buffer);
-
-    res.sendFile(filePath);
-  } catch (error) {
-    res.status(500).send("Erro ao abrir arquivo: " + error.message);
-  }
-});
-*/
-*/
 
 
 function listarArquivosParaDeleteServidorCejas(absPath, relPath, resultado = []) {
@@ -3249,63 +2866,7 @@ function listarArquivosParaDeleteServidorCejas(absPath, relPath, resultado = [])
   return resultado;
 }
 
-/* ROTA ANTIGA SERVIDOR DESATIVADA PELO PATCH SUPABASE DEFINITIVO
 
-/* ROTA ANTIGA DESATIVADA RESET SUPABASE ONLY
-
-app.delete("/api/servidor/item", async (req, res) => {
-  try {
-    const relativePath = String(req.query.path || "").trim();
-
-    if (!relativePath) {
-      return res.status(400).json({
-        ok: false,
-        message: "Informe o caminho do item."
-      });
-    }
-
-    const itemPath = safeServidorPath(relativePath);
-    const apagadosStorage = [];
-    let apagouLocal = false;
-
-    if (fs.existsSync(itemPath)) {
-      const stat = fs.statSync(itemPath);
-
-      if (stat.isDirectory()) {
-        const arquivosLocais = listarArquivosParaDeleteServidorCejas(itemPath, relativePath);
-        apagadosStorage.push(...arquivosLocais);
-        fs.rmSync(itemPath, { recursive: true, force: true });
-        apagouLocal = true;
-      } else if (stat.isFile()) {
-        apagadosStorage.push(relativePath.replace(/\\/g, "/"));
-        fs.rmSync(itemPath, { force: true });
-        apagouLocal = true;
-      }
-    }
-
-    let storageResult = { ok: true, deleted: 0, paths: [] };
-
-    if (apagadosStorage.length) {
-      storageResult = await deletarSupabaseServidor(apagadosStorage);
-    } else {
-      storageResult = await deletarPrefixoSupabaseServidor(relativePath);
-    }
-
-    res.json({
-      ok: true,
-      apagouLocal,
-      apagadosStorage: storageResult.deleted || 0,
-      message: `Item apagado definitivamente. Local: ${apagouLocal ? "sim" : "não encontrado"} | Supabase: ${storageResult.deleted || 0} arquivo(s).`
-    });
-  } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: "Erro ao apagar definitivamente: " + error.message
-    });
-  }
-});
-*/
-*/
 
 
 app.use(express.static(path.join(__dirname), { dotfiles: "deny" }));
