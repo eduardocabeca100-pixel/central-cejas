@@ -1902,5 +1902,131 @@ async function criarBackupSegurancaServidorCejas() {
 // CEJAS_BACKUP_BUTTON_END
 </script>
 
+
+<script>
+// CEJAS_UPLOAD_LOTES_SERVIDOR_START
+(function () {
+  if (window.__CEJAS_UPLOAD_LOTES_SERVIDOR__) return;
+  window.__CEJAS_UPLOAD_LOTES_SERVIDOR__ = true;
+
+  const TAMANHO_LOTE = 20;
+
+  function obterArquivosSelecionados() {
+    const inputs = [...document.querySelectorAll('input[type="file"]')];
+    const arquivos = [];
+
+    for (const input of inputs) {
+      for (const file of Array.from(input.files || [])) {
+        arquivos.push(file);
+      }
+    }
+
+    return arquivos;
+  }
+
+  function obterAnoPadrao() {
+    const el = document.querySelector("#anoPadrao, [name='anoPadrao'], select[name='anoPadrao']");
+    return el && el.value ? el.value : "2026";
+  }
+
+  function atualizarStatusUpload(texto) {
+    const candidatos = [...document.querySelectorAll("div,p,span,strong")];
+
+    const status = candidatos.find((el) => {
+      const t = String(el.textContent || "").toLowerCase();
+      return t.includes("enviando") || t.includes("organizando") || t.includes("arquivo");
+    });
+
+    if (status) {
+      status.textContent = texto;
+    }
+  }
+
+  async function enviarLoteServidor(files, inicio, total) {
+    const form = new FormData();
+
+    files.forEach((file) => {
+      form.append("arquivos", file, file.webkitRelativePath || file.name);
+      form.append("paths", file.webkitRelativePath || file.name);
+    });
+
+    form.append("anoPadrao", obterAnoPadrao());
+
+    const response = await fetch("/api/servidor/upload-inteligente", {
+      method: "POST",
+      body: form
+    });
+
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok || !data) {
+      throw new Error(`Erro HTTP ${response.status}`);
+    }
+
+    return data;
+  }
+
+  async function uploadEmLotesCejas(event) {
+    const botao = event.target.closest("button, a");
+    if (!botao) return;
+
+    const texto = String(botao.textContent || "").toLowerCase();
+    const ehEnviar = texto.includes("enviar para o servidor") || texto.includes("subir") || texto.includes("upload");
+
+    if (!ehEnviar) return;
+
+    const arquivos = obterArquivosSelecionados();
+
+    if (arquivos.length <= TAMANHO_LOTE) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    let salvos = 0;
+    let falhas = [];
+
+    botao.disabled = true;
+
+    try {
+      for (let i = 0; i < arquivos.length; i += TAMANHO_LOTE) {
+        const lote = arquivos.slice(i, i + TAMANHO_LOTE);
+        atualizarStatusUpload(`Enviando lote ${Math.floor(i / TAMANHO_LOTE) + 1} de ${Math.ceil(arquivos.length / TAMANHO_LOTE)}...`);
+
+        const result = await enviarLoteServidor(lote, i, arquivos.length);
+
+        salvos += Number(result.saved || 0);
+
+        if (Array.isArray(result.falhas)) {
+          falhas.push(...result.falhas);
+        }
+      }
+
+      atualizarStatusUpload(`Upload finalizado: ${salvos} arquivo(s) enviados. ${falhas.length} falha(s).`);
+
+      if (falhas.length) {
+        console.warn("Falhas no upload CEJAS:", falhas);
+        alert(`${salvos} arquivo(s) enviados. ${falhas.length} falha(s). Veja o console para detalhes.`);
+      } else {
+        alert(`${salvos} arquivo(s) enviados com sucesso.`);
+      }
+
+      if (typeof window.carregarServidor === "function") {
+        window.carregarServidor();
+      } else {
+        location.reload();
+      }
+    } catch (error) {
+      alert("Erro no upload em lotes: " + error.message);
+    } finally {
+      botao.disabled = false;
+    }
+  }
+
+  document.addEventListener("click", uploadEmLotesCejas, true);
+})();
+// CEJAS_UPLOAD_LOTES_SERVIDOR_END
+</script>
+
 </body>
 </html>
