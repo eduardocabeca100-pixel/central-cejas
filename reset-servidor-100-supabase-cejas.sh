@@ -1,3 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ ! -f "server.js" ]; then
+  echo "❌ Rode dentro da pasta raiz do projeto."
+  exit 1
+fi
+
+STAMP="$(date +%Y%m%d-%H%M%S)"
+BACKUP_DIR=".cejas-local-backups/reset-servidor-100-supabase-$STAMP"
+mkdir -p "$BACKUP_DIR" lib
+
+cp server.js package.json servidor.html "$BACKUP_DIR/" 2>/dev/null || true
+[ -f lib/servidor-supabase-definitivo.js ] && cp lib/servidor-supabase-definitivo.js "$BACKUP_DIR/" 2>/dev/null || true
+
+echo "✅ Backup criado em: $BACKUP_DIR"
+
+cat > lib/servidor-supabase-definitivo.js <<'EOF'
 require("dotenv").config();
 
 const fs = require("fs");
@@ -838,3 +856,138 @@ module.exports = {
   destinoInteligente,
   getSupabaseRuntimeStatus
 };
+EOF
+
+python3 <<'PY'
+from pathlib import Path
+import re
+
+p = Path("server.js")
+s = p.read_text()
+
+require_line = 'const { registrarRotasServidorSupabaseDefinitivo } = require("./lib/servidor-supabase-definitivo");'
+
+if require_line not in s:
+    if 'const path = require("path");' in s:
+        s = s.replace('const path = require("path");', 'const path = require("path");\n' + require_line, 1)
+    else:
+        s = require_line + "\n" + s
+
+# Remove rotas antigas do servidor para evitar conflito.
+rotas = [
+    "/api/servidor/tree",
+    "/api/servidor/pastas",
+    "/api/servidor/verificar",
+    "/api/servidor/arquivo",
+    "/api/servidor/upload-inteligente",
+    "/api/servidor/upload",
+    "/api/servidor/mover",
+    "/api/servidor/item",
+    "/api/servidor/storage-status"
+]
+
+for rota in rotas:
+    s = re.sub(
+        rf'\napp\.(get|post|delete|put|patch)\("{re.escape(rota)}"[\s\S]*?\n\}}\);',
+        lambda m: "\n/* ROTA ANTIGA DESATIVADA RESET SUPABASE ONLY\n" + m.group(0) + "\n*/",
+        s
+    )
+
+if "registrarRotasServidorSupabaseDefinitivo(app);" not in s:
+    marker = "const app = express();"
+
+    if marker not in s:
+        raise SystemExit("❌ Não encontrei const app = express(); no server.js.")
+
+    s = s.replace(marker, marker + "\nregistrarRotasServidorSupabaseDefinitivo(app);", 1)
+
+p.write_text(s)
+PY
+
+if [ -f "servidor.html" ]; then
+python3 <<'PY'
+from pathlib import Path
+import re
+
+p = Path("servidor.html")
+s = p.read_text()
+
+# Força chamadas sem cache no navegador.
+if "CEJAS_SERVIDOR_NO_CACHE_START" not in s:
+    js = r'''
+<script>
+// CEJAS_SERVIDOR_NO_CACHE_START
+(function () {
+  if (window.__CEJAS_SERVIDOR_NO_CACHE__) return;
+  window.__CEJAS_SERVIDOR_NO_CACHE__ = true;
+
+  const originalFetch = window.fetch;
+
+  window.fetch = function (input, options) {
+    let url = typeof input === "string" ? input : String(input && input.url || "");
+
+    if (url.includes("/api/servidor/")) {
+      const sep = url.includes("?") ? "&" : "?";
+      url = `${url}${sep}_ts=${Date.now()}`;
+
+      options = {
+        ...(options || {}),
+        cache: "no-store",
+        headers: {
+          ...((options && options.headers) || {}),
+          "Cache-Control": "no-cache"
+        }
+      };
+
+      return originalFetch(url, options);
+    }
+
+    return originalFetch(input, options);
+  };
+})();
+// CEJAS_SERVIDOR_NO_CACHE_END
+</script>
+'''
+
+    if "</head>" in s:
+        s = s.replace("</head>", js + "\n</head>", 1)
+    elif "</body>" in s:
+        s = s.replace("</body>", js + "\n</body>", 1)
+    else:
+        s += js
+
+p.write_text(s)
+PY
+fi
+
+node --check lib/servidor-supabase-definitivo.js
+node --check server.js
+
+if [ -f "servidor.html" ]; then
+  node <<'NODE'
+const fs = require("fs");
+const html = fs.readFileSync("servidor.html", "utf8");
+const scripts = [...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/gi)].map((m) => m[1]);
+
+fs.mkdirSync(".cejas-local-backups/check-servidor-reset", { recursive: true });
+
+scripts.forEach((code, i) => {
+  fs.writeFileSync(`.cejas-local-backups/check-servidor-reset/script-${i + 1}.js`, code);
+});
+NODE
+
+  for f in .cejas-local-backups/check-servidor-reset/*.js; do
+    [ -f "$f" ] && node --check "$f"
+  done
+
+  rm -rf .cejas-local-backups/check-servidor-reset
+fi
+
+echo ""
+echo "✅ Servidor resetado para Supabase Storage 100%."
+echo ""
+echo "Agora rode:"
+echo "npm run dev"
+echo ""
+echo "Depois teste:"
+echo "/api/servidor/storage-status?detalhado=1"

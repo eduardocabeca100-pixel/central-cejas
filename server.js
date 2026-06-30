@@ -2398,6 +2398,8 @@ function buildServidorTree(dirPath, relative = "") {
 
 /* ROTA ANTIGA SERVIDOR DESATIVADA PELO PATCH SUPABASE DEFINITIVO
 
+/* ROTA ANTIGA DESATIVADA RESET SUPABASE ONLY
+
 app.get("/api/servidor/tree", async (_req, res) => {
   try {
     const cloudTree = await listarStorageServidor();
@@ -2434,8 +2436,11 @@ app.get("/api/servidor/tree", async (_req, res) => {
   }
 });
 */
+*/
 
 /* ROTA ANTIGA SERVIDOR DESATIVADA PELO PATCH SUPABASE DEFINITIVO
+
+/* ROTA ANTIGA DESATIVADA RESET SUPABASE ONLY
 
 app.post("/api/servidor/upload", servidorUpload.array("arquivos"), (req, res) => {
   try {
@@ -2482,6 +2487,7 @@ app.post("/api/servidor/upload", servidorUpload.array("arquivos"), (req, res) =>
     });
   }
 });
+*/
 */
 
 
@@ -2535,6 +2541,8 @@ app.post("/api/servidor/criar-estrutura", (req, res) => {
 
 
 /* ROTA ANTIGA SERVIDOR DESATIVADA PELO PATCH SUPABASE DEFINITIVO
+
+/* ROTA ANTIGA DESATIVADA RESET SUPABASE ONLY
 
 app.post("/api/servidor/mover", (req, res) => {
   try {
@@ -2602,6 +2610,7 @@ app.post("/api/servidor/mover", (req, res) => {
     });
   }
 });
+*/
 */
 
 
@@ -2981,6 +2990,8 @@ function listarVerificarServidor() {
 
 /* ROTA ANTIGA SERVIDOR DESATIVADA PELO PATCH SUPABASE DEFINITIVO
 
+/* ROTA ANTIGA DESATIVADA RESET SUPABASE ONLY
+
 app.get("/api/servidor/pastas", (_req, res) => {
   try {
     const pastas = listarPastasServidorRecursivo()
@@ -2998,8 +3009,11 @@ app.get("/api/servidor/pastas", (_req, res) => {
   }
 });
 */
+*/
 
 /* ROTA ANTIGA SERVIDOR DESATIVADA PELO PATCH SUPABASE DEFINITIVO
+
+/* ROTA ANTIGA DESATIVADA RESET SUPABASE ONLY
 
 app.get("/api/servidor/verificar", (_req, res) => {
   try {
@@ -3015,8 +3029,11 @@ app.get("/api/servidor/verificar", (_req, res) => {
   }
 });
 */
+*/
 
 /* ROTA ANTIGA SERVIDOR DESATIVADA PELO PATCH SUPABASE DEFINITIVO
+
+/* ROTA ANTIGA DESATIVADA RESET SUPABASE ONLY
 
 app.post("/api/servidor/mover", express.json({ limit: "2mb" }), (req, res) => {
   try {
@@ -3058,8 +3075,11 @@ app.post("/api/servidor/mover", express.json({ limit: "2mb" }), (req, res) => {
   }
 });
 */
+*/
 
 /* ROTA ANTIGA SERVIDOR DESATIVADA PELO PATCH SUPABASE DEFINITIVO
+
+/* ROTA ANTIGA DESATIVADA RESET SUPABASE ONLY
 
 app.post("/api/servidor/upload-inteligente", servidorBulkUpload.array("arquivos"), (req, res) => {
   try {
@@ -3109,6 +3129,7 @@ app.post("/api/servidor/upload-inteligente", servidorBulkUpload.array("arquivos"
     });
   }
 });
+*/
 */
 
 /* ROTA ANTIGA SERVIDOR DESATIVADA PELO PATCH SUPABASE DEFINITIVO
@@ -3166,6 +3187,8 @@ app.post("/api/servidor/reorganizar-eventos", express.json({ limit: "2mb" }), (r
 
 /* ROTA ANTIGA SERVIDOR DESATIVADA PELO PATCH SUPABASE DEFINITIVO
 
+/* ROTA ANTIGA DESATIVADA RESET SUPABASE ONLY
+
 app.get("/api/servidor/arquivo", async (req, res) => {
   try {
     const relativePath = req.query.path || "";
@@ -3189,6 +3212,7 @@ app.get("/api/servidor/arquivo", async (req, res) => {
     res.status(500).send("Erro ao abrir arquivo: " + error.message);
   }
 });
+*/
 */
 
 
@@ -3214,6 +3238,8 @@ function listarArquivosParaDeleteServidorCejas(absPath, relPath, resultado = [])
 }
 
 /* ROTA ANTIGA SERVIDOR DESATIVADA PELO PATCH SUPABASE DEFINITIVO
+
+/* ROTA ANTIGA DESATIVADA RESET SUPABASE ONLY
 
 app.delete("/api/servidor/item", async (req, res) => {
   try {
@@ -3266,6 +3292,7 @@ app.delete("/api/servidor/item", async (req, res) => {
     });
   }
 });
+*/
 */
 
 

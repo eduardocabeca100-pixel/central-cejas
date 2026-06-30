@@ -589,6 +589,40 @@
   </style>
   <link rel="stylesheet" href="/css/cejas-interface-compacta.css?v=3">
   <link rel="stylesheet" href="/css/cejas-mobile-fix.css?v=1">
+
+<script>
+// CEJAS_SERVIDOR_NO_CACHE_START
+(function () {
+  if (window.__CEJAS_SERVIDOR_NO_CACHE__) return;
+  window.__CEJAS_SERVIDOR_NO_CACHE__ = true;
+
+  const originalFetch = window.fetch;
+
+  window.fetch = function (input, options) {
+    let url = typeof input === "string" ? input : String(input && input.url || "");
+
+    if (url.includes("/api/servidor/")) {
+      const sep = url.includes("?") ? "&" : "?";
+      url = `${url}${sep}_ts=${Date.now()}`;
+
+      options = {
+        ...(options || {}),
+        cache: "no-store",
+        headers: {
+          ...((options && options.headers) || {}),
+          "Cache-Control": "no-cache"
+        }
+      };
+
+      return originalFetch(url, options);
+    }
+
+    return originalFetch(input, options);
+  };
+})();
+// CEJAS_SERVIDOR_NO_CACHE_END
+</script>
+
 </head>
 
 <body>
