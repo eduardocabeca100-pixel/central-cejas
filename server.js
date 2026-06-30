@@ -60,6 +60,216 @@ prepararDadosPersistentes(__dirname);
 
 const app = express();
 
+// CEJAS_RECEITA_MENSAL_API_START
+app.get("/api/cejas/receita-mensal", async (_req, res) => {
+  try {
+    const fs = require("fs");
+    const path = require("path");
+
+    const DATA_DIR = path.join(__dirname, "data");
+
+    function numeroBR(valor) {
+      if (typeof valor === "number") return Number.isFinite(valor) ? valor : 0;
+
+      const texto = String(valor || "")
+        .replace(/R\$/gi, "")
+        .replace(/\s/g, "")
+        .replace(/\./g, "")
+        .replace(",", ".");
+
+      const numero = Number(texto);
+      return Number.isFinite(numero) ? numero : 0;
+    }
+
+    function dataISO(valor) {
+      const texto = String(valor || "").trim();
+
+      if (/^\d{4}-\d{2}-\d{2}/.test(texto)) return texto.slice(0, 10);
+
+      let m = texto.match(/\b(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})\b/);
+      if (m) return `${m[3]}-${String(m[2]).padStart(2, "0")}-${String(m[1]).padStart(2, "0")}`;
+
+      m = texto.match(/\b(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2})\b/);
+      if (m) return `20${m[3]}-${String(m[2]).padStart(2, "0")}-${String(m[1]).padStart(2, "0")}`;
+
+      return "";
+    }
+
+    function statusConfirmado(item) {
+      const status = String(
+        item.status ||
+        item.situacao ||
+        item.estado ||
+        item.confirmacao ||
+        item.statusEvento ||
+        ""
+      ).toUpperCase();
+
+      if (!status) return false;
+
+      return status.includes("CONFIRM") ||
+        status.includes("LIBERAD") ||
+        status.includes("REALIZAD") ||
+        status.includes("APROVAD");
+    }
+
+    function valorEvento(item) {
+      const campos = [
+        item.receitaConfirmada,
+        item.valorConfirmado,
+        item.valorPago,
+        item.valorFinal,
+        item.valorTotal,
+        item.total,
+        item.valor,
+        item.preco
+      ];
+
+      for (const campo of campos) {
+        const n = numeroBR(campo);
+        if (n > 0) return n;
+      }
+
+      return 0;
+    }
+
+    function dataEvento(item) {
+      return dataISO(
+        item.dataISO ||
+        item.data ||
+        item.dataEvento ||
+        item.inicio ||
+        item.start ||
+        item.date ||
+        ""
+      );
+    }
+
+    function pareceEvento(item) {
+      if (!item || typeof item !== "object" || Array.isArray(item)) return false;
+
+      return Boolean(
+        item.evento ||
+        item.nomeEvento ||
+        item.titulo ||
+        item.title ||
+        item.sala ||
+        item.local ||
+        item.data ||
+        item.dataEvento ||
+        item.valorTotal ||
+        item.receitaConfirmada ||
+        item.valorConfirmado
+      );
+    }
+
+    function extrairEventos(obj, lista = []) {
+      if (!obj) return lista;
+
+      if (Array.isArray(obj)) {
+        obj.forEach(item => extrairEventos(item, lista));
+        return lista;
+      }
+
+      if (typeof obj !== "object") return lista;
+
+      if (pareceEvento(obj)) lista.push(obj);
+
+      Object.values(obj).forEach(value => {
+        if (value && typeof value === "object") extrairEventos(value, lista);
+      });
+
+      return lista;
+    }
+
+    function listarJson(dir, result = []) {
+      if (!fs.existsSync(dir)) return result;
+
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, entry.name);
+
+        if (entry.isDirectory()) listarJson(full, result);
+        else if (entry.isFile() && entry.name.endsWith(".json")) result.push(full);
+      }
+
+      return result;
+    }
+
+    const arquivos = listarJson(DATA_DIR);
+    const eventos = [];
+
+    for (const file of arquivos) {
+      try {
+        const json = JSON.parse(fs.readFileSync(file, "utf8"));
+        extrairEventos(json, eventos);
+      } catch {}
+    }
+
+    const porMes = {};
+    let totalConfirmado = 0;
+    let qtdConfirmados = 0;
+
+    for (const ev of eventos) {
+      if (!statusConfirmado(ev)) continue;
+
+      const iso = dataEvento(ev);
+      const valor = valorEvento(ev);
+
+      if (!iso || !valor) continue;
+
+      const key = iso.slice(0, 7);
+
+      porMes[key] = porMes[key] || {
+        key,
+        valor: 0,
+        quantidade: 0
+      };
+
+      porMes[key].valor += valor;
+      porMes[key].quantidade += 1;
+
+      totalConfirmado += valor;
+      qtdConfirmados += 1;
+    }
+
+    const nomes = [
+      "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+      "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+    ];
+
+    let meses = Object.values(porMes)
+      .sort((a, b) => a.key.localeCompare(b.key))
+      .map(item => {
+        const [ano, mes] = item.key.split("-");
+        return {
+          ...item,
+          mes: nomes[Number(mes) - 1] || item.key,
+          mesCurto: (nomes[Number(mes) - 1] || item.key).slice(0, 3),
+          ano
+        };
+      });
+
+    res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+
+    res.json({
+      ok: true,
+      meses,
+      totalConfirmado,
+      qtdConfirmados,
+      arquivosLidos: arquivos.length,
+      eventosEncontrados: eventos.length,
+      atualizadoEm: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: error.message
+    });
+  }
+});
+// CEJAS_RECEITA_MENSAL_API_END
+
+
 // CEJAS_SYNC_DATA_SUPABASE_START
 app.use((req, res, next) => {
   const mudaDados = ["POST", "PUT", "PATCH", "DELETE"].includes(req.method);
