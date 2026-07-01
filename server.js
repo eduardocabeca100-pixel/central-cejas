@@ -14,6 +14,8 @@ const { iniciarProtecaoServidorSupabase, uploadBufferSupabaseServidor, uploadLoc
 const session = require("express-session");
 const bcrypt = require("bcryptjs");
 const path = require("path");
+const { registrarRotasSyncRelatorioCompleto } = require("./lib/relatorio-oficial-sync-cejas");
+const { registrarRotasRelatorioOficialSupabase } = require("./lib/relatorio-oficial-supabase-cejas");
 const { registrarRotasRelatoriosSuperaStorage } = require("./lib/relatorios-supera-storage-cejas");
 const { registrarUploadLotePathsServidorCejas } = require("./lib/servidor-upload-lote-paths-cejas");
 const { registrarUploadZipServidorCejas } = require("./lib/servidor-upload-zip-cejas");
@@ -64,6 +66,8 @@ prepararDadosPersistentes(__dirname);
 
 aplicarPatchWriteFileJsonStore();
 const app = express();
+registrarRotasSyncRelatorioCompleto(app);
+registrarRotasRelatorioOficialSupabase(app);
 registrarRotasRelatoriosSuperaStorage(app);
 registrarUploadLotePathsServidorCejas(app);
 registrarUploadZipServidorCejas(app);

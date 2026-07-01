@@ -46,6 +46,23 @@ require("dotenv").config();
   }
   // CEJAS_RESTORE_RELATORIOS_SUPERA_STORAGE_END
 
+  
+  // CEJAS_RESTORE_RELATORIO_OFICIAL_SUPABASE_START
+  try {
+    const {
+      statusRelatorioOficialSupabase,
+      restaurarRelatorioOficialDoSupabase
+    } = require("../lib/relatorio-oficial-supabase-cejas");
+
+    console.log("📊 Status relatório oficial Supabase:", statusRelatorioOficialSupabase());
+
+    const restoreRelatorioOficial = await restaurarRelatorioOficialDoSupabase();
+    console.log("✅ Relatório oficial restaurado do Supabase:", restoreRelatorioOficial);
+  } catch (error) {
+    console.warn("⚠️ Restore relatório oficial ignorado:", error.message);
+  }
+  // CEJAS_RESTORE_RELATORIO_OFICIAL_SUPABASE_END
+
   console.log("🚀 Abrindo servidor...");
   require("../server.js");
 })();

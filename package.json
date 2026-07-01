@@ -23,7 +23,9 @@
     "json:sync": "node scripts/json-store-sync-cejas.js",
     "json:restore": "node scripts/json-store-restore-cejas.js",
     "relatorios:sync": "node scripts/relatorios-supera-sync-cejas.js",
-    "relatorios:restore": "node scripts/relatorios-supera-restore-cejas.js"
+    "relatorios:restore": "node scripts/relatorios-supera-restore-cejas.js",
+    "relatorio:restore": "node scripts/relatorio-oficial-restore-cejas.js",
+    "relatorio:sync-oficial": "node scripts/relatorio-oficial-sync-completo-cejas.js"
   },
   "keywords": [],
   "author": "",
