@@ -14,6 +14,7 @@ const { iniciarProtecaoServidorSupabase, uploadBufferSupabaseServidor, uploadLoc
 const session = require("express-session");
 const bcrypt = require("bcryptjs");
 const path = require("path");
+const { registrarUploadLotePathsServidorCejas } = require("./lib/servidor-upload-lote-paths-cejas");
 const { registrarUploadZipServidorCejas } = require("./lib/servidor-upload-zip-cejas");
 const { syncDataParaSupabase } = require("./lib/dados-supabase-cejas");
 const { registrarRotasServidorSupabaseDefinitivo } = require("./lib/servidor-supabase-definitivo");
@@ -62,6 +63,7 @@ prepararDadosPersistentes(__dirname);
 
 aplicarPatchWriteFileJsonStore();
 const app = express();
+registrarUploadLotePathsServidorCejas(app);
 registrarUploadZipServidorCejas(app);
 
 // CEJAS_JSON_STORE_API_START

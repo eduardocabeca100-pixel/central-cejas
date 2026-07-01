@@ -623,6 +623,7 @@
 // CEJAS_SERVIDOR_NO_CACHE_END
 </script>
 
+<script src="/vendor/jszip.min.js"></script>
 </head>
 
 <body>
@@ -2291,10 +2292,13 @@ async function criarBackupSegurancaServidorCejas() {
 
 
 <script>
-// CEJAS_UPLOAD_ZIP_SERVIDOR_START
+// CEJAS_UPLOAD_ZIP_LOTES_BROWSER_START
 (function () {
-  if (window.__CEJAS_UPLOAD_ZIP_SERVIDOR__) return;
-  window.__CEJAS_UPLOAD_ZIP_SERVIDOR__ = true;
+  if (window.__CEJAS_UPLOAD_ZIP_LOTES_BROWSER__) return;
+  window.__CEJAS_UPLOAD_ZIP_LOTES_BROWSER__ = true;
+
+  const MAX_ARQUIVOS_LOTE = 5;
+  const MAX_BYTES_LOTE = 25 * 1024 * 1024;
 
   function criarBotaoZip() {
     if (document.getElementById("cejasZipServidorInput")) return;
@@ -2318,7 +2322,7 @@ async function criarBackupSegurancaServidorCejas() {
     const btn = document.createElement("button");
     btn.id = "cejasZipServidorBtn";
     btn.type = "button";
-    btn.textContent = "Enviar ZIP";
+    btn.textContent = "Enviar ZIP em lotes";
     btn.style.cssText = `
       border:1px solid rgba(168,85,247,.42);
       background:linear-gradient(135deg,rgba(168,85,247,.95),rgba(217,70,239,.90));
@@ -2348,7 +2352,7 @@ async function criarBackupSegurancaServidorCejas() {
       }
 
       const ok = confirm(
-        `Enviar o ZIP "${file.name}" para o Servidor?\n\nO sistema vai abrir o ZIP, manter as pastas e enviar os arquivos para o Supabase Storage.`
+        `Enviar o ZIP "${file.name}" em lotes?\n\nO ZIP será aberto no seu navegador e enviado em partes menores para evitar erro 502.`
       );
 
       if (!ok) {
@@ -2356,7 +2360,7 @@ async function criarBackupSegurancaServidorCejas() {
         return;
       }
 
-      await enviarZip(file, btn, status);
+      await processarZipEmLotes(file, btn, status);
       input.value = "";
     });
 
@@ -2364,6 +2368,19 @@ async function criarBackupSegurancaServidorCejas() {
     wrap.appendChild(btn);
     wrap.appendChild(status);
     area.appendChild(wrap);
+  }
+
+  function deveIgnorar(nome) {
+    const clean = String(nome || "").replace(/\\/g, "/");
+    const base = clean.split("/").pop();
+
+    return !clean ||
+      clean.endsWith("/") ||
+      clean.includes("__MACOSX/") ||
+      base === ".DS_Store" ||
+      base === "Thumbs.db" ||
+      base === "desktop.ini" ||
+      base.startsWith("._");
   }
 
   async function respostaJsonSegura(response) {
@@ -2376,36 +2393,95 @@ async function criarBackupSegurancaServidorCejas() {
     }
   }
 
-  async function enviarZip(file, btn, status) {
+  async function enviarLote(lote, numero, total, status) {
     const form = new FormData();
-    form.append("zip", file);
+    const paths = [];
+
+    lote.forEach(item => {
+      form.append("files", item.file, item.name.split("/").pop());
+      paths.push(item.name);
+    });
+
+    form.append("paths", JSON.stringify(paths));
+
+    status.textContent = `Enviando lote ${numero}/${total} (${lote.length} arquivo(s))...`;
+
+    const response = await fetch(`/api/servidor/upload-lote-paths?_ts=${Date.now()}`, {
+      method: "POST",
+      cache: "no-store",
+      body: form
+    });
+
+    const data = await respostaJsonSegura(response);
+
+    if (!response.ok || data.ok === false) {
+      throw new Error(data.message || `Falha no lote ${numero}.`);
+    }
+
+    return data;
+  }
+
+  async function processarZipEmLotes(zipFile, btn, status) {
+    if (!window.JSZip) {
+      alert("JSZip não carregou. Atualize a página com Command + Shift + R e tente novamente.");
+      return;
+    }
 
     btn.disabled = true;
-    btn.textContent = "Enviando ZIP...";
-    status.textContent = "Processando arquivo. Não feche a página.";
+    btn.textContent = "Abrindo ZIP...";
+    status.textContent = "Lendo ZIP no navegador. Não feche a página.";
 
     try {
-      const response = await fetch(`/api/servidor/upload-zip?_ts=${Date.now()}`, {
-        method: "POST",
-        cache: "no-store",
-        body: form
-      });
+      const zip = await window.JSZip.loadAsync(zipFile);
+      const entries = Object.values(zip.files).filter(entry => !deveIgnorar(entry.name));
 
-      const data = await respostaJsonSegura(response);
-
-      if (!response.ok || data.ok === false) {
-        throw new Error(data.message || "Erro ao enviar ZIP.");
+      if (!entries.length) {
+        alert("Nenhum arquivo válido encontrado dentro do ZIP.");
+        return;
       }
 
-      let msg = data.message || "ZIP enviado com sucesso.";
+      const lotes = [];
+      let loteAtual = [];
+      let bytesAtual = 0;
 
-      if (data.falhas && data.falhas.length) {
-        msg += `\n\nFalhas: ${data.falhas.length}`;
+      for (const entry of entries) {
+        const blob = await entry.async("blob");
+        const file = new File([blob], entry.name.split("/").pop(), {
+          type: blob.type || "application/octet-stream"
+        });
+
+        if (
+          loteAtual.length >= MAX_ARQUIVOS_LOTE ||
+          bytesAtual + file.size > MAX_BYTES_LOTE
+        ) {
+          if (loteAtual.length) lotes.push(loteAtual);
+          loteAtual = [];
+          bytesAtual = 0;
+        }
+
+        loteAtual.push({
+          name: entry.name,
+          file
+        });
+
+        bytesAtual += file.size;
       }
 
-      alert(msg);
+      if (loteAtual.length) lotes.push(loteAtual);
 
-      status.textContent = `${data.enviados || 0} arquivo(s) enviados.`;
+      btn.textContent = "Enviando ZIP...";
+      let enviados = 0;
+      let falhas = 0;
+
+      for (let i = 0; i < lotes.length; i++) {
+        const data = await enviarLote(lotes[i], i + 1, lotes.length, status);
+        enviados += Number(data.enviados || 0);
+        falhas += Array.isArray(data.falhas) ? data.falhas.length : 0;
+      }
+
+      alert(`ZIP enviado.\n\nArquivos enviados: ${enviados}\nFalhas: ${falhas}`);
+
+      status.textContent = `${enviados} arquivo(s) enviados.`;
 
       setTimeout(() => {
         if (typeof window.carregarServidor === "function") {
@@ -2413,14 +2489,14 @@ async function criarBackupSegurancaServidorCejas() {
         } else {
           location.reload();
         }
-      }, 800);
+      }, 1000);
     } catch (error) {
       console.error(error);
       alert("Erro ao enviar ZIP: " + error.message);
-      status.textContent = "Erro no envio do ZIP.";
+      status.textContent = "Erro no envio.";
     } finally {
       btn.disabled = false;
-      btn.textContent = "Enviar ZIP";
+      btn.textContent = "Enviar ZIP em lotes";
     }
   }
 
@@ -2430,7 +2506,7 @@ async function criarBackupSegurancaServidorCejas() {
     setTimeout(criarBotaoZip, 2500);
   });
 })();
-// CEJAS_UPLOAD_ZIP_SERVIDOR_END
+// CEJAS_UPLOAD_ZIP_LOTES_BROWSER_END
 </script>
 
 </body>
