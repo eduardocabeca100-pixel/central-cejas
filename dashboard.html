@@ -1529,5 +1529,229 @@ document.addEventListener("DOMContentLoaded", () => {
 // CEJAS_RECEITA_MENSAL_TOP_REAL_END
 </script>
 
+
+<script>
+// CEJAS_DASHBOARD_OFICIAL_START
+(function () {
+  if (window.__CEJAS_DASHBOARD_OFICIAL__) return;
+  window.__CEJAS_DASHBOARD_OFICIAL__ = true;
+
+  function brl(valor) {
+    return Number(valor || 0).toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
+  }
+
+  function normalizar(txt) {
+    return String(txt || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toUpperCase()
+      .trim();
+  }
+
+  function todosElementos() {
+    return Array.from(document.querySelectorAll("body *"));
+  }
+
+  function acharElementoPorTexto(texto) {
+    const alvo = normalizar(texto);
+
+    return todosElementos().find(el => {
+      const t = normalizar(el.textContent);
+      return t === alvo || t.includes(alvo);
+    });
+  }
+
+  function acharCard(label) {
+    const el = acharElementoPorTexto(label);
+    if (!el) return null;
+
+    let atual = el;
+
+    for (let i = 0; i < 8 && atual; i++) {
+      const txt = atual.textContent || "";
+
+      if (
+        txt.includes("R$") ||
+        normalizar(txt).includes("EVENTOS") ||
+        atual.className && String(atual.className).toLowerCase().includes("card")
+      ) {
+        return atual;
+      }
+
+      atual = atual.parentElement;
+    }
+
+    return el.parentElement || el;
+  }
+
+  function setPrimeiroDinheiro(card, valor) {
+    if (!card) return;
+
+    const els = Array.from(card.querySelectorAll("*"));
+    const alvo = els.find(el => /^R\$\s*/.test((el.textContent || "").trim()));
+
+    if (alvo) {
+      alvo.textContent = brl(valor);
+    }
+  }
+
+  function setSubtexto(card, texto) {
+    if (!card) return;
+
+    const els = Array.from(card.querySelectorAll("*"));
+    const alvo = els.find(el => {
+      const t = normalizar(el.textContent);
+      return t.includes("EVENTO") || t.includes("CONFIRMADO") || t.includes("CANCELADO") || t.includes("DESCONTO");
+    });
+
+    if (alvo) alvo.textContent = texto;
+  }
+
+  function setNumeroCard(card, numero, subtexto) {
+    if (!card) return;
+
+    const els = Array.from(card.querySelectorAll("*"));
+
+    const alvo = els.find(el => {
+      const t = (el.textContent || "").trim();
+      return /^[0-9]+$/.test(t);
+    });
+
+    if (alvo) alvo.textContent = String(numero);
+
+    setSubtexto(card, subtexto);
+  }
+
+  function atualizarTopo(dados) {
+    const titulo = acharElementoPorTexto("Dashboard de Resultados");
+    if (!titulo) return;
+
+    const parent = titulo.parentElement || titulo;
+    const els = Array.from(parent.querySelectorAll("*"));
+
+    const sub = els.find(el => normalizar(el.textContent).includes("DADOS REAIS"));
+
+    if (sub) {
+      sub.textContent = `Dados reais do relatório oficial • ${dados.eventosNaLista} eventos carregados • Atualizado pelo Supabase`;
+    }
+  }
+
+  function atualizarMensal(dados) {
+    const card = acharCard("Receita confirmada por mês");
+    if (!card) return;
+
+    let box = card.querySelector(".cejas-dashboard-oficial-meses");
+
+    if (!box) {
+      box = document.createElement("div");
+      box.className = "cejas-dashboard-oficial-meses";
+      box.style.cssText = "display:grid;gap:10px;margin-top:16px;width:100%;";
+      card.appendChild(box);
+    }
+
+    const meses = Array.isArray(dados.meses) ? dados.meses : [];
+    const max = Math.max(...meses.map(m => Number(m.receita || 0)), 1);
+
+    box.innerHTML = meses.map(m => {
+      const largura = Math.max(3, Math.round((Number(m.receita || 0) / max) * 100));
+
+      return `
+        <div style="display:grid;grid-template-columns:92px 1fr 120px;gap:10px;align-items:center;font-size:12px;">
+          <strong style="color:rgba(255,255,255,.82);">${m.nome}</strong>
+          <div style="height:12px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;">
+            <div style="height:100%;width:${largura}%;border-radius:999px;background:linear-gradient(90deg,#22c55e,#a855f7);"></div>
+          </div>
+          <span style="color:#22c55e;font-weight:900;text-align:right;">${brl(m.receita)}</span>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function atualizarGratuidades(dados) {
+    const card = acharCard("Gratuidades");
+    if (!card) return;
+    setPrimeiroDinheiro(card, dados.descontosAplicados || 0);
+  }
+
+  function atualizarFluxo(dados) {
+    const card = acharCard("Fluxo de Caixa");
+    if (!card) return;
+    setPrimeiroDinheiro(card, dados.fluxoCaixa || dados.receitaConfirmada || 0);
+  }
+
+  async function carregarDashboardOficial() {
+    try {
+      const res = await fetch(`/api/dashboard/relatorio-oficial?_ts=${Date.now()}`, {
+        cache: "no-store"
+      });
+
+      const dados = await res.json();
+
+      if (!dados || dados.ok === false) {
+        console.warn("Dashboard oficial não carregou:", dados);
+        return;
+      }
+
+      atualizarTopo(dados);
+
+      const cardPrevisto = acharCard("Faturamento previsto");
+      setPrimeiroDinheiro(cardPrevisto, dados.faturamentoPrevisto);
+      setSubtexto(cardPrevisto, `${dados.eventosNaLista} eventos no relatório`);
+
+      const cardReceita = acharCard("Receita confirmada");
+      setPrimeiroDinheiro(cardReceita, dados.receitaConfirmada);
+      setSubtexto(cardReceita, `${dados.eventosConfirmados} eventos confirmados`);
+
+      const cardDescontos = acharCard("Descontos aplicados");
+      setPrimeiroDinheiro(cardDescontos, dados.descontosAplicados);
+      setSubtexto(cardDescontos, `${brl(dados.descontosAplicados)} em descontos`);
+
+      const cardPendentes = acharCard("Eventos pendentes");
+      setNumeroCard(
+        cardPendentes,
+        dados.eventosEmEspera || 0,
+        `${dados.eventosConfirmados || 0} confirmados • ${dados.eventosCancelados || 0} cancelados`
+      );
+
+      atualizarGratuidades(dados);
+      atualizarMensal(dados);
+      atualizarFluxo(dados);
+
+      window.__CEJAS_DASHBOARD_OFICIAL_DADOS__ = dados;
+      console.log("✅ Dashboard atualizado pelo relatório oficial:", dados);
+    } catch (error) {
+      console.warn("⚠️ Falha ao atualizar dashboard oficial:", error);
+    }
+  }
+
+  function ligarBotaoAtualizar() {
+    document.addEventListener("click", function (event) {
+      const btn = event.target.closest("button, a");
+      if (!btn) return;
+
+      if (normalizar(btn.textContent).includes("ATUALIZAR DADOS")) {
+        setTimeout(carregarDashboardOficial, 300);
+        setTimeout(carregarDashboardOficial, 1200);
+      }
+    }, true);
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    carregarDashboardOficial();
+    ligarBotaoAtualizar();
+
+    setTimeout(carregarDashboardOficial, 800);
+    setTimeout(carregarDashboardOficial, 2000);
+    setTimeout(carregarDashboardOficial, 4500);
+  });
+
+  window.cejasCarregarDashboardOficial = carregarDashboardOficial;
+})();
+// CEJAS_DASHBOARD_OFICIAL_END
+</script>
+
 </body>
 </html>
