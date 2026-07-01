@@ -14,6 +14,7 @@ const { iniciarProtecaoServidorSupabase, uploadBufferSupabaseServidor, uploadLoc
 const session = require("express-session");
 const bcrypt = require("bcryptjs");
 const path = require("path");
+const { montarDashboard: montarDashboardRelatorioOficialCejasPublico } = require("./lib/dashboard-relatorio-oficial-cejas");
 const { registrarDashboardRelatorioOficialCejas } = require("./lib/dashboard-relatorio-oficial-cejas");
 const { registrarRotasSyncRelatorioCompleto } = require("./lib/relatorio-oficial-sync-cejas");
 const { registrarRotasRelatorioOficialSupabase } = require("./lib/relatorio-oficial-supabase-cejas");
@@ -67,6 +68,12 @@ prepararDadosPersistentes(__dirname);
 
 aplicarPatchWriteFileJsonStore();
 const app = express();
+
+
+
+
+
+
 registrarDashboardRelatorioOficialCejas(app);
 registrarRotasSyncRelatorioCompleto(app);
 registrarRotasRelatorioOficialSupabase(app);
