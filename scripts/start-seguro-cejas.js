@@ -29,6 +29,23 @@ require("dotenv").config();
     console.warn("⚠️ Check Storage runtime ignorado:", error.message);
   }
 
+  
+  // CEJAS_RESTORE_RELATORIOS_SUPERA_STORAGE_START
+  try {
+    const {
+      statusRelatoriosSuperaStorage,
+      restaurarRelatoriosSuperaDoStorage
+    } = require("../lib/relatorios-supera-storage-cejas");
+
+    console.log("📊 Status relatórios Supera Storage:", statusRelatoriosSuperaStorage());
+
+    const restoreRelatorios = await restaurarRelatoriosSuperaDoStorage();
+    console.log("✅ Relatórios Supera restaurados do Storage:", restoreRelatorios);
+  } catch (error) {
+    console.warn("⚠️ Restore relatórios Supera ignorado:", error.message);
+  }
+  // CEJAS_RESTORE_RELATORIOS_SUPERA_STORAGE_END
+
   console.log("🚀 Abrindo servidor...");
   require("../server.js");
 })();

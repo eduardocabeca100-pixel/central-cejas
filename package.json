@@ -21,7 +21,9 @@
     "data:sync": "node scripts/data-sync-cejas.js",
     "data:restore": "node scripts/data-restore-cejas.js",
     "json:sync": "node scripts/json-store-sync-cejas.js",
-    "json:restore": "node scripts/json-store-restore-cejas.js"
+    "json:restore": "node scripts/json-store-restore-cejas.js",
+    "relatorios:sync": "node scripts/relatorios-supera-sync-cejas.js",
+    "relatorios:restore": "node scripts/relatorios-supera-restore-cejas.js"
   },
   "keywords": [],
   "author": "",
