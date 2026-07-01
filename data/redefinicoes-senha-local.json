@@ -1,23 +1,23 @@
 [
   {
     "email": "marcel@cejas.com.br",
-    "codigo_hash": "$2b$10$L8Sj17U8/m86rv2bFcHOyeF4eyowgbUNHVXdGP.baA8TiYYH3h7ui",
     "usado": false,
+    "criado_em": "2026-06-17T16:29:06.074Z",
     "expira_em": "2026-06-17T16:44:04.788Z",
-    "criado_em": "2026-06-17T16:29:06.074Z"
+    "codigo_hash": "$2b$10$L8Sj17U8/m86rv2bFcHOyeF4eyowgbUNHVXdGP.baA8TiYYH3h7ui"
   },
   {
     "email": "marcel@cejas.com.br",
-    "codigo_hash": "$2b$10$nEAHRaLMIzhxPyV6b3sr6.FOF2nTJUJaSLCd/Cd2FsB4RttT7wL.S",
     "usado": false,
+    "criado_em": "2026-06-17T17:38:21.124Z",
     "expira_em": "2026-06-17T17:53:20.234Z",
-    "criado_em": "2026-06-17T17:38:21.124Z"
+    "codigo_hash": "$2b$10$nEAHRaLMIzhxPyV6b3sr6.FOF2nTJUJaSLCd/Cd2FsB4RttT7wL.S"
   },
   {
     "email": "marcel@cejas.com.br",
-    "codigo_hash": "$2b$10$QDgrP0xTU/GqWmeDiab0l.klln2OOgIFoRfubPT2vsYeC4PLdy.sG",
     "usado": false,
+    "criado_em": "2026-06-17T17:38:23.572Z",
     "expira_em": "2026-06-17T17:53:18.479Z",
-    "criado_em": "2026-06-17T17:38:23.572Z"
+    "codigo_hash": "$2b$10$QDgrP0xTU/GqWmeDiab0l.klln2OOgIFoRfubPT2vsYeC4PLdy.sG"
   }
 ]

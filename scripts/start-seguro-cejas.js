@@ -2,17 +2,24 @@ require("dotenv").config();
 
 (async () => {
   console.log("🛡️ Iniciando CEJAS em modo seguro...");
-  console.log("📦 Servidor de arquivos: Supabase Storage direto.");
+  console.log("📦 Dados JSON oficiais: Supabase cejas_json_store.");
 
   try {
-    const { restoreDataDoSupabase, statusDadosSupabase } = require("../lib/dados-supabase-cejas");
+    const {
+      statusJsonStore,
+      restaurarJsonsDoSupabase,
+      aplicarPatchWriteFileJsonStore
+    } = require("../lib/json-store-supabase-cejas");
 
-    console.log("📊 Status data/Supabase:", statusDadosSupabase());
+    console.log("📊 Status JSON Store:", statusJsonStore());
 
-    const restore = await restoreDataDoSupabase();
-    console.log("✅ data/ restaurado do Supabase:", restore);
+    const restore = await restaurarJsonsDoSupabase();
+    console.log("✅ JSONs restaurados do Supabase:", restore);
+
+    aplicarPatchWriteFileJsonStore();
+    console.log("✅ Sync automático de JSONs ativado.");
   } catch (error) {
-    console.warn("⚠️ Restore de data/ ignorado:", error.message);
+    console.warn("⚠️ JSON Store Supabase ignorado:", error.message);
   }
 
   try {

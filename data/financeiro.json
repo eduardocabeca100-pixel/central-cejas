@@ -3,49 +3,49 @@
     {
       "id": "financeiro-1781730935934-80943f",
       "chave": "zanotti 10",
-      "clienteEvento": "ZANOTTI 10",
-      "dataEvento": "10/02",
+      "boleto": {
+        "status": "nao_emitido",
+        "arquivos": [],
+        "atualizadoEm": "2026-06-17T21:20:44.906Z",
+        "vinculadoAoOrcamentoId": null
+      },
       "origem": "servidor",
+      "criadoEm": "2026-06-17T21:15:35.934Z",
+      "pagamento": {
+        "pagoEm": null,
+        "status": "pendente",
+        "valorPago": 0,
+        "atualizadoEm": null
+      },
+      "dataEvento": "10/02",
       "orcamentos": [
         {
           "id": "orc-1781730935934-8201fa",
           "nome": "ZANOTTI 10.02",
-          "nomeArquivo": "ORCAMENTO - ZANOTTI 10.02.pdf",
-          "caminho": "uploads/servidor/2026/Fevereiro/ZANOTTI 10.02/ORCAMENTO - ZANOTTI 10.02.pdf",
-          "chaveDocumento": "zanotti 10 02",
           "status": "gerado",
-          "criadoEm": "2026-06-17T21:15:35.934Z"
+          "caminho": "uploads/servidor/2026/Fevereiro/ZANOTTI 10.02/ORCAMENTO - ZANOTTI 10.02.pdf",
+          "criadoEm": "2026-06-17T21:15:35.934Z",
+          "nomeArquivo": "ORCAMENTO - ZANOTTI 10.02.pdf",
+          "chaveDocumento": "zanotti 10 02"
         }
       ],
-      "boleto": {
-        "status": "nao_emitido",
-        "arquivos": [],
-        "vinculadoAoOrcamentoId": null,
-        "atualizadoEm": "2026-06-17T21:20:44.906Z"
+      "faturamento": {
+        "status": "em_aberto",
+        "atualizadoEm": null,
+        "valorFaturado": 0,
+        "valorPrevisto": 0
       },
+      "observacoes": "",
+      "atualizadoEm": "2026-06-18T21:51:27.756Z",
+      "clienteEvento": "ZANOTTI 10",
       "demonstrativo": {
         "status": "nao_emitido",
         "arquivos": [],
-        "vinculadoAoOrcamentoId": null,
-        "atualizadoEm": null
-      },
-      "pagamento": {
-        "status": "pendente",
-        "valorPago": 0,
-        "pagoEm": null,
-        "atualizadoEm": null
-      },
-      "faturamento": {
-        "status": "em_aberto",
-        "valorPrevisto": 0,
-        "valorFaturado": 0,
-        "atualizadoEm": null
-      },
-      "observacoes": "",
-      "criadoEm": "2026-06-17T21:15:35.934Z",
-      "atualizadoEm": "2026-06-18T21:51:27.756Z"
+        "atualizadoEm": null,
+        "vinculadoAoOrcamentoId": null
+      }
     }
   ],
-  "atualizadoEm": "2026-06-18T21:51:27.756Z",
-  "ignorados": []
+  "ignorados": [],
+  "atualizadoEm": "2026-06-18T21:51:27.756Z"
 }

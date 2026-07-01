@@ -1,29 +1,29 @@
 [
   {
     "id": "e431a4ee-d9fd-4540-b18e-3edf1735b8aa",
-    "conversa_id": "marcel@cejas.com.br__renato@cejas.com.br",
-    "de_email": "marcel@cejas.com.br",
-    "de_nome": "Eduardo Cabeça",
-    "para_email": "renato@cejas.com.br",
-    "para_nome": "RENATO",
     "texto": "oi preciso de ajuda",
+    "de_nome": "Eduardo Cabeça",
     "lida_em": "2026-06-17T14:14:01.353Z",
-    "criado_em": "2026-06-17T13:47:15.912Z"
+    "de_email": "marcel@cejas.com.br",
+    "criado_em": "2026-06-17T13:47:15.912Z",
+    "para_nome": "RENATO",
+    "para_email": "renato@cejas.com.br",
+    "conversa_id": "marcel@cejas.com.br__renato@cejas.com.br"
   },
   {
     "id": "cbf1147f-41ad-49e0-a99c-135042192f7b",
-    "conversa_id": "marcel@cejas.com.br__renato@cejas.com.br",
-    "de_email": "marcel@cejas.com.br",
-    "de_nome": "Eduardo Cabeça",
-    "para_email": "renato@cejas.com.br",
-    "para_nome": "RENATO",
     "texto": "verifica para mim",
-    "arquivo_url": "/api/chat/anexo?path=chat%2F1781705617532-2575fbe1-1000-4411-b661-a0527f7dc7bd.jpeg",
-    "arquivo_path": "chat/1781705617532-2575fbe1-1000-4411-b661-a0527f7dc7bd.jpeg",
-    "arquivo_nome": "WhatsApp Image 2026-06-15 at 09.08.47.jpeg",
-    "arquivo_tipo": "image/jpeg",
-    "arquivo_tamanho": 207614,
+    "de_nome": "Eduardo Cabeça",
     "lida_em": "2026-06-17T14:14:01.353Z",
-    "criado_em": "2026-06-17T14:13:38.416Z"
+    "de_email": "marcel@cejas.com.br",
+    "criado_em": "2026-06-17T14:13:38.416Z",
+    "para_nome": "RENATO",
+    "para_email": "renato@cejas.com.br",
+    "arquivo_url": "/api/chat/anexo?path=chat%2F1781705617532-2575fbe1-1000-4411-b661-a0527f7dc7bd.jpeg",
+    "conversa_id": "marcel@cejas.com.br__renato@cejas.com.br",
+    "arquivo_nome": "WhatsApp Image 2026-06-15 at 09.08.47.jpeg",
+    "arquivo_path": "chat/1781705617532-2575fbe1-1000-4411-b661-a0527f7dc7bd.jpeg",
+    "arquivo_tipo": "image/jpeg",
+    "arquivo_tamanho": 207614
   }
 ]

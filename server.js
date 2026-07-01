@@ -20,6 +20,7 @@ const { getSupabaseEnvStatus } = require("./lib/supabase");
 
 const persistenciaTotalCejas = require("./lib/persistencia-total-supabase");
 const fs = require("fs");
+const { aplicarPatchWriteFileJsonStore, syncJsonsParaSupabase } = require("./lib/json-store-supabase-cejas");
 const multer = require("multer");
 const { prepararDadosPersistentes } = require("./lib/render-persistent-data");
 
@@ -58,7 +59,21 @@ async function parsePdfBuffer(buffer) {
 require("dotenv").config();
 prepararDadosPersistentes(__dirname);
 
+aplicarPatchWriteFileJsonStore();
 const app = express();
+
+// CEJAS_JSON_STORE_API_START
+app.post("/api/sistema/json-sync", async (_req, res) => {
+  try {
+    const result = await syncJsonsParaSupabase();
+    res.json({ ok: true, ...result });
+  } catch (error) {
+    res.status(500).json({ ok: false, message: error.message });
+  }
+});
+// CEJAS_JSON_STORE_API_END
+
+
 
 // CEJAS_RECEITA_MENSAL_API_START
 app.get("/api/cejas/receita-mensal", async (_req, res) => {

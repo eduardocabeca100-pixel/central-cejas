@@ -1,0 +1,1217 @@
+DIAGNÓSTICO DE SALVAMENTO LOCAL CEJAS
+Gerado em: Wed Jul  1 08:37:31 -03 2026
+
+=== localStorage ===
+./diagnosticar-salvamento-local-cejas.sh:10:echo "=== localStorage ===" >> "$OUT"
+./diagnosticar-salvamento-local-cejas.sh:11:grep -R "localStorage" -n . \
+./configuracoes.html:677:      localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+./configuracoes.html:712:        localStorage.setItem(inputId + "_preview", reader.result);
+./configuracoes.html:722:      const salvo = localStorage.getItem(STORAGE_KEY);
+./configuracoes.html:763:      const logo = localStorage.getItem("logoFile_preview");
+./configuracoes.html:764:      const favicon = localStorage.getItem("faviconFile_preview");
+./configuracoes.html:765:      const assinatura = localStorage.getItem("assinaturaFile_preview");
+./js/relatorio-limpar-tela.js:22:    Object.keys(localStorage).forEach((key) => {
+./js/relatorio-limpar-tela.js:31:        localStorage.removeItem(key);
+./configuracoes.backup-centro-controle-pro-20260617-001335.html:675:      localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+./configuracoes.backup-centro-controle-pro-20260617-001335.html:710:        localStorage.setItem(inputId + "_preview", reader.result);
+./configuracoes.backup-centro-controle-pro-20260617-001335.html:720:      const salvo = localStorage.getItem(STORAGE_KEY);
+./configuracoes.backup-centro-controle-pro-20260617-001335.html:761:      const logo = localStorage.getItem("logoFile_preview");
+./configuracoes.backup-centro-controle-pro-20260617-001335.html:762:      const favicon = localStorage.getItem("faviconFile_preview");
+./configuracoes.backup-centro-controle-pro-20260617-001335.html:763:      const assinatura = localStorage.getItem("assinaturaFile_preview");
+./configuracoes.backup-centro-controle-pro-20260617-001348.html:675:      localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+./configuracoes.backup-centro-controle-pro-20260617-001348.html:710:        localStorage.setItem(inputId + "_preview", reader.result);
+./configuracoes.backup-centro-controle-pro-20260617-001348.html:720:      const salvo = localStorage.getItem(STORAGE_KEY);
+./configuracoes.backup-centro-controle-pro-20260617-001348.html:761:      const logo = localStorage.getItem("logoFile_preview");
+./configuracoes.backup-centro-controle-pro-20260617-001348.html:762:      const favicon = localStorage.getItem("faviconFile_preview");
+./configuracoes.backup-centro-controle-pro-20260617-001348.html:763:      const assinatura = localStorage.getItem("assinaturaFile_preview");
+
+=== sessionStorage ===
+./diagnosticar-salvamento-local-cejas.sh:18:echo "=== sessionStorage ===" >> "$OUT"
+./diagnosticar-salvamento-local-cejas.sh:19:grep -R "sessionStorage" -n . \
+./js/relatorio-limpar-tela.js:35:    Object.keys(sessionStorage).forEach((key) => {
+./js/relatorio-limpar-tela.js:44:        sessionStorage.removeItem(key);
+
+=== fs.writeFile / writeFileSync ===
+./server.backup-relatorio-pdf-20260615-121727.js:22:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-relatorio-pdf-20260615-121727.js:39:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-corrige-menu-permissoes-20260617-113433.js:302:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-corrige-menu-permissoes-20260617-113433.js:319:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-corrige-menu-permissoes-20260617-113433.js:1108:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-corrige-menu-permissoes-20260617-113433.js:1140:    fs.writeFileSync(
+./server.backup-corrige-menu-permissoes-20260617-113433.js:1157:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-corrige-menu-permissoes-20260617-113433.js:1228:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-corrige-menu-permissoes-20260617-113433.js:1244:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-corrige-menu-permissoes-20260617-113433.js:1584:      fs.writeFileSync(target, file.buffer);
+./server.backup-login-master-ultra-20260617-151951.js:346:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-login-master-ultra-20260617-151951.js:363:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-login-master-ultra-20260617-151951.js:1173:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-login-master-ultra-20260617-151951.js:1205:    fs.writeFileSync(
+./server.backup-login-master-ultra-20260617-151951.js:1222:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-login-master-ultra-20260617-151951.js:1293:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-login-master-ultra-20260617-151951.js:1309:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-login-master-ultra-20260617-151951.js:1649:      fs.writeFileSync(target, file.buffer);
+./server.backup-corrige-admin-menu-20260617-164758.js:319:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-corrige-admin-menu-20260617-164758.js:336:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-corrige-admin-menu-20260617-164758.js:1179:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-corrige-admin-menu-20260617-164758.js:1211:    fs.writeFileSync(
+./server.backup-corrige-admin-menu-20260617-164758.js:1228:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-corrige-admin-menu-20260617-164758.js:1299:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-corrige-admin-menu-20260617-164758.js:1315:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-corrige-admin-menu-20260617-164758.js:1655:      fs.writeFileSync(target, file.buffer);
+./server.backup-chat-imagem-menu-fixo-20260617-111012.js:292:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-chat-imagem-menu-fixo-20260617-111012.js:309:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-chat-imagem-menu-fixo-20260617-111012.js:1098:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-chat-imagem-menu-fixo-20260617-111012.js:1130:    fs.writeFileSync(
+./server.backup-chat-imagem-menu-fixo-20260617-111012.js:1147:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-chat-imagem-menu-fixo-20260617-111012.js:1218:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-chat-imagem-menu-fixo-20260617-111012.js:1234:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-chat-imagem-menu-fixo-20260617-111012.js:1574:      fs.writeFileSync(target, file.buffer);
+./server.backup-login-admin-fix-20260617-143054.js:327:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-login-admin-fix-20260617-143054.js:344:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-login-admin-fix-20260617-143054.js:1146:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-login-admin-fix-20260617-143054.js:1178:    fs.writeFileSync(
+./server.backup-login-admin-fix-20260617-143054.js:1195:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-login-admin-fix-20260617-143054.js:1266:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-login-admin-fix-20260617-143054.js:1282:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-login-admin-fix-20260617-143054.js:1622:      fs.writeFileSync(target, file.buffer);
+./corrigir-orcamento-pdf-definitivo.sh:687:  fs.writeFileSync(`.cejas-local-backups/check-orcamento-pdf-definitivo/script-${index + 1}.js`, code);
+./blindagem-total-deploy-cejas.sh:258:    fs.writeFileSync(destino, buffer);
+./blindagem-total-deploy-cejas.sh:299:    fs.writeFileSync(destino, buffer);
+./hotfix-final-render-storage-orcamento.sh:869:    fs.writeFileSync(`.cejas-local-backups/check-orcamento-final-real/script-${i + 1}.js`, code);
+./corrigir-servidor-e-painel-dia-cejas.sh:595:  fs.writeFileSync(`.cejas-local-backups/check-painel-dia/script-${i + 1}.js`, code);
+./diagnosticar-salvamento-local-cejas.sh:26:echo "=== fs.writeFile / writeFileSync ===" >> "$OUT"
+./diagnosticar-salvamento-local-cejas.sh:27:grep -R "writeFile" -n . \
+./server.backup-corrige-js-agenda-plus-20260616-213957.js:60:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-corrige-js-agenda-plus-20260616-213957.js:77:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-corrige-js-agenda-plus-20260616-213957.js:866:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-corrige-js-agenda-plus-20260616-213957.js:898:    fs.writeFileSync(
+./server.backup-corrige-js-agenda-plus-20260616-213957.js:915:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-corrige-js-agenda-plus-20260616-213957.js:986:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-corrige-js-agenda-plus-20260616-213957.js:1002:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-corrige-js-agenda-plus-20260616-213957.js:1342:      fs.writeFileSync(target, file.buffer);
+./ajustar-gratuidades-sem-descontos-cejas.sh:38:    fs.writeFileSync(GRATUIDADES_FILE, "[]", "utf8");
+./ajustar-gratuidades-sem-descontos-cejas.sh:42:    fs.writeFileSync(GRATUIDADES_OCULTAS_FILE, "[]", "utf8");
+./ajustar-gratuidades-sem-descontos-cejas.sh:59:  fs.writeFileSync(file, JSON.stringify(lista || [], null, 2), "utf8");
+./ajustar-gratuidades-sem-descontos-cejas.sh:1717:    fs.writeFileSync(`.cejas-local-backups/check-gratuidades-final/${html}-${index + 1}.js`, code);
+./reset-servidor-100-supabase-cejas.sh:975:  fs.writeFileSync(`.cejas-local-backups/check-servidor-reset/script-${i + 1}.js`, code);
+./server.backup-parser-supera-real-20260615-125033.js:56:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-parser-supera-real-20260615-125033.js:73:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-parser-supera-real-20260615-125033.js:730:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-parser-supera-real-20260615-125033.js:762:    fs.writeFileSync(
+./server.backup-parser-supera-real-20260615-125033.js:779:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-login-mestre-final-20260617-151256.js:346:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-login-mestre-final-20260617-151256.js:363:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-login-mestre-final-20260617-151256.js:1173:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-login-mestre-final-20260617-151256.js:1205:    fs.writeFileSync(
+./server.backup-login-mestre-final-20260617-151256.js:1222:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-login-mestre-final-20260617-151256.js:1293:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-login-mestre-final-20260617-151256.js:1309:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-login-mestre-final-20260617-151256.js:1649:      fs.writeFileSync(target, file.buffer);
+./server.backup-forca-api-agenda-dia-20260616-215025.js:75:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-forca-api-agenda-dia-20260616-215025.js:92:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-forca-api-agenda-dia-20260616-215025.js:881:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-forca-api-agenda-dia-20260616-215025.js:913:    fs.writeFileSync(
+./server.backup-forca-api-agenda-dia-20260616-215025.js:930:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-forca-api-agenda-dia-20260616-215025.js:1001:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-forca-api-agenda-dia-20260616-215025.js:1017:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-forca-api-agenda-dia-20260616-215025.js:1357:      fs.writeFileSync(target, file.buffer);
+./server.backup-corrige-admin-menu-20260617-114353.js:305:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-corrige-admin-menu-20260617-114353.js:322:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-corrige-admin-menu-20260617-114353.js:1111:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-corrige-admin-menu-20260617-114353.js:1143:    fs.writeFileSync(
+./server.backup-corrige-admin-menu-20260617-114353.js:1160:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-corrige-admin-menu-20260617-114353.js:1231:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-corrige-admin-menu-20260617-114353.js:1247:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-corrige-admin-menu-20260617-114353.js:1587:      fs.writeFileSync(target, file.buffer);
+./server.backup-login-publico-final-20260617-132552.js:326:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-login-publico-final-20260617-132552.js:343:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-login-publico-final-20260617-132552.js:1140:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-login-publico-final-20260617-132552.js:1172:    fs.writeFileSync(
+./server.backup-login-publico-final-20260617-132552.js:1189:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-login-publico-final-20260617-132552.js:1260:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-login-publico-final-20260617-132552.js:1276:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-login-publico-final-20260617-132552.js:1616:      fs.writeFileSync(target, file.buffer);
+./server.backup-usuarios-permissoes-20260615-132614.js:56:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-usuarios-permissoes-20260615-132614.js:73:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-usuarios-permissoes-20260615-132614.js:822:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-usuarios-permissoes-20260615-132614.js:854:    fs.writeFileSync(
+./server.backup-usuarios-permissoes-20260615-132614.js:871:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-pdf-viewer-servidor-20260616-233423.js:83:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-pdf-viewer-servidor-20260616-233423.js:100:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-pdf-viewer-servidor-20260616-233423.js:889:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-pdf-viewer-servidor-20260616-233423.js:921:    fs.writeFileSync(
+./server.backup-pdf-viewer-servidor-20260616-233423.js:938:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-pdf-viewer-servidor-20260616-233423.js:1009:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-pdf-viewer-servidor-20260616-233423.js:1025:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-pdf-viewer-servidor-20260616-233423.js:1365:      fs.writeFileSync(target, file.buffer);
+./server.backup-login-bypass-final-20260617-152208.js:346:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-login-bypass-final-20260617-152208.js:363:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-login-bypass-final-20260617-152208.js:1173:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-login-bypass-final-20260617-152208.js:1205:    fs.writeFileSync(
+./server.backup-login-bypass-final-20260617-152208.js:1222:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-login-bypass-final-20260617-152208.js:1293:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-login-bypass-final-20260617-152208.js:1309:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-login-bypass-final-20260617-152208.js:1649:      fs.writeFileSync(target, file.buffer);
+./restaurar-painel-receita-mensal-real-cejas.sh:579:  fs.writeFileSync(`.cejas-local-backups/check-receita-real/script-${i + 1}.js`, code);
+./server.backup-fase2-seguranca-agenda-20260616-212353.js:57:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-fase2-seguranca-agenda-20260616-212353.js:74:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-fase2-seguranca-agenda-20260616-212353.js:862:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-fase2-seguranca-agenda-20260616-212353.js:894:    fs.writeFileSync(
+./server.backup-fase2-seguranca-agenda-20260616-212353.js:911:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-fase2-seguranca-agenda-20260616-212353.js:982:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-fase2-seguranca-agenda-20260616-212353.js:998:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-fase2-seguranca-agenda-20260616-212353.js:1338:      fs.writeFileSync(target, file.buffer);
+./server.js:668:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.js:685:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.js:1675:        fs.writeFileSync(RELATORIO_FILE, JSON.stringify(supabaseReport, null, 2), "utf8");
+./server.js:1683:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.js:1716:    fs.writeFileSync(
+./server.js:1733:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.js:1782:    fs.writeFileSync(GRATUIDADES_FILE, "[]", "utf8");
+./server.js:1799:  fs.writeFileSync(GRATUIDADES_FILE, JSON.stringify(lista || [], null, 2), "utf8");
+./server.js:2229:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.js:2245:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-login-form-direto-20260617-150559.js:346:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-login-form-direto-20260617-150559.js:363:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-login-form-direto-20260617-150559.js:1173:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-login-form-direto-20260617-150559.js:1205:    fs.writeFileSync(
+./server.backup-login-form-direto-20260617-150559.js:1222:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-login-form-direto-20260617-150559.js:1293:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-login-form-direto-20260617-150559.js:1309:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-login-form-direto-20260617-150559.js:1649:      fs.writeFileSync(target, file.buffer);
+./server.backup-remove-trava-agenda-dia-20260616-215452.js:78:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-remove-trava-agenda-dia-20260616-215452.js:95:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-remove-trava-agenda-dia-20260616-215452.js:884:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-remove-trava-agenda-dia-20260616-215452.js:916:    fs.writeFileSync(
+./server.backup-remove-trava-agenda-dia-20260616-215452.js:933:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-remove-trava-agenda-dia-20260616-215452.js:1004:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-remove-trava-agenda-dia-20260616-215452.js:1020:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-remove-trava-agenda-dia-20260616-215452.js:1360:      fs.writeFileSync(target, file.buffer);
+./servidor-upload-final-cejas.sh:825:  fs.writeFileSync(`.cejas-local-backups/check-servidor-upload-final/script-${i + 1}.js`, code);
+./blindar-dados-supabase-cejas.sh:278:    fs.writeFileSync(localPath, buffer);
+./blindar-dados-supabase-cejas.sh:507:    fs.writeFileSync(filePath, buffer);
+./server.backup-corrige-api-agenda-dia-20260616-214705.js:74:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-corrige-api-agenda-dia-20260616-214705.js:91:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-corrige-api-agenda-dia-20260616-214705.js:880:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-corrige-api-agenda-dia-20260616-214705.js:912:    fs.writeFileSync(
+./server.backup-corrige-api-agenda-dia-20260616-214705.js:929:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-corrige-api-agenda-dia-20260616-214705.js:1000:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-corrige-api-agenda-dia-20260616-214705.js:1016:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-corrige-api-agenda-dia-20260616-214705.js:1356:      fs.writeFileSync(target, file.buffer);
+./corrigir-upload-html-json-servidor-cejas.sh:302:  fs.writeFileSync(`.cejas-local-backups/check-upload-html-json/script-${i + 1}.js`, code);
+./server.backup-corrige-admin-menu-20260617-114348.js:305:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-corrige-admin-menu-20260617-114348.js:322:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-corrige-admin-menu-20260617-114348.js:1111:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-corrige-admin-menu-20260617-114348.js:1143:    fs.writeFileSync(
+./server.backup-corrige-admin-menu-20260617-114348.js:1160:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-corrige-admin-menu-20260617-114348.js:1231:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-corrige-admin-menu-20260617-114348.js:1247:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-corrige-admin-menu-20260617-114348.js:1587:      fs.writeFileSync(target, file.buffer);
+./server.backup-ajuste-login-ordem-20260617-125330.js:308:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-ajuste-login-ordem-20260617-125330.js:325:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-ajuste-login-ordem-20260617-125330.js:1114:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-ajuste-login-ordem-20260617-125330.js:1146:    fs.writeFileSync(
+./server.backup-ajuste-login-ordem-20260617-125330.js:1163:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-ajuste-login-ordem-20260617-125330.js:1234:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-ajuste-login-ordem-20260617-125330.js:1250:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-ajuste-login-ordem-20260617-125330.js:1590:      fs.writeFileSync(target, file.buffer);
+./server.backup-refaz-login-limpo-20260617-145226.js:346:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-refaz-login-limpo-20260617-145226.js:363:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-refaz-login-limpo-20260617-145226.js:1173:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-refaz-login-limpo-20260617-145226.js:1205:    fs.writeFileSync(
+./server.backup-refaz-login-limpo-20260617-145226.js:1222:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-refaz-login-limpo-20260617-145226.js:1293:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-refaz-login-limpo-20260617-145226.js:1309:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-refaz-login-limpo-20260617-145226.js:1649:      fs.writeFileSync(target, file.buffer);
+./ajustar-gratuidades-planilha-cejas.sh:36:    fs.writeFileSync(GRATUIDADES_FILE, "[]", "utf8");
+./ajustar-gratuidades-planilha-cejas.sh:40:    fs.writeFileSync(GRATUIDADES_OCULTAS_FILE, "[]", "utf8");
+./ajustar-gratuidades-planilha-cejas.sh:57:  fs.writeFileSync(file, JSON.stringify(lista || [], null, 2), "utf8");
+./ajustar-gratuidades-planilha-cejas.sh:1829:    fs.writeFileSync(`.cejas-local-backups/check-gratuidades-planilha/${html}-${index + 1}.js`, code);
+./server.backup-corrige-syntax-financeiro-20260617-180236.js:325:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-corrige-syntax-financeiro-20260617-180236.js:342:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-corrige-syntax-financeiro-20260617-180236.js:1214:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-corrige-syntax-financeiro-20260617-180236.js:1249:    fs.writeFileSync(
+./server.backup-corrige-syntax-financeiro-20260617-180236.js:1266:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-corrige-syntax-financeiro-20260617-180236.js:1342:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-corrige-syntax-financeiro-20260617-180236.js:1358:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-corrige-syntax-financeiro-20260617-180236.js:1699:      fs.writeFileSync(target, file.buffer);
+./server.backup-destrava-login-sessao-20260617-143718.js:327:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-destrava-login-sessao-20260617-143718.js:344:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-destrava-login-sessao-20260617-143718.js:1146:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-destrava-login-sessao-20260617-143718.js:1178:    fs.writeFileSync(
+./server.backup-destrava-login-sessao-20260617-143718.js:1195:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-destrava-login-sessao-20260617-143718.js:1266:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-destrava-login-sessao-20260617-143718.js:1282:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-destrava-login-sessao-20260617-143718.js:1622:      fs.writeFileSync(target, file.buffer);
+./aplicar-servidor-v2-mobile-relatorio.sh:543:        fs.writeFileSync(RELATORIO_FILE, JSON.stringify(supabaseReport, null, 2), "utf8");
+./aplicar-servidor-v2-mobile-relatorio.sh:550:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./aplicar-servidor-v2-mobile-relatorio.sh:568:old_import = '''    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./aplicar-servidor-v2-mobile-relatorio.sh:571:new_import = '''    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-orcamento-pdf-servidor-20260616-230757.js:82:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-orcamento-pdf-servidor-20260616-230757.js:99:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-orcamento-pdf-servidor-20260616-230757.js:888:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-orcamento-pdf-servidor-20260616-230757.js:920:    fs.writeFileSync(
+./server.backup-orcamento-pdf-servidor-20260616-230757.js:937:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-orcamento-pdf-servidor-20260616-230757.js:1008:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-orcamento-pdf-servidor-20260616-230757.js:1024:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-orcamento-pdf-servidor-20260616-230757.js:1364:      fs.writeFileSync(target, file.buffer);
+./server.backup-apagar-relatorio-definitivo-20260617-105458.js:165:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-apagar-relatorio-definitivo-20260617-105458.js:182:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-apagar-relatorio-definitivo-20260617-105458.js:971:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-apagar-relatorio-definitivo-20260617-105458.js:1003:    fs.writeFileSync(
+./server.backup-apagar-relatorio-definitivo-20260617-105458.js:1020:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-apagar-relatorio-definitivo-20260617-105458.js:1091:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-apagar-relatorio-definitivo-20260617-105458.js:1107:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-apagar-relatorio-definitivo-20260617-105458.js:1447:      fs.writeFileSync(target, file.buffer);
+./hotfix-supabase-render-e-pdf-orcamento.sh:686:scripts.forEach((code, i) => fs.writeFileSync(`.cejas-local-backups/check-pdf-limpo/script-${i + 1}.js`, code));
+./server.backup-permissao-upload-supera-20260617-165714.js:319:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-permissao-upload-supera-20260617-165714.js:336:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-permissao-upload-supera-20260617-165714.js:1202:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-permissao-upload-supera-20260617-165714.js:1234:    fs.writeFileSync(
+./server.backup-permissao-upload-supera-20260617-165714.js:1251:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-permissao-upload-supera-20260617-165714.js:1322:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-permissao-upload-supera-20260617-165714.js:1338:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-permissao-upload-supera-20260617-165714.js:1678:      fs.writeFileSync(target, file.buffer);
+./server.backup-financeiro-clicavel-20260617-180601.js:325:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-financeiro-clicavel-20260617-180601.js:342:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-financeiro-clicavel-20260617-180601.js:1214:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-financeiro-clicavel-20260617-180601.js:1249:    fs.writeFileSync(
+./server.backup-financeiro-clicavel-20260617-180601.js:1266:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-financeiro-clicavel-20260617-180601.js:1342:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-financeiro-clicavel-20260617-180601.js:1358:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-financeiro-clicavel-20260617-180601.js:1699:      fs.writeFileSync(target, file.buffer);
+./server.backup-upload-inteligente-20260615-143023.js:56:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-upload-inteligente-20260615-143023.js:73:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-upload-inteligente-20260615-143023.js:861:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-upload-inteligente-20260615-143023.js:893:    fs.writeFileSync(
+./server.backup-upload-inteligente-20260615-143023.js:910:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-upload-inteligente-20260615-143023.js:981:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-upload-inteligente-20260615-143023.js:997:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-upload-inteligente-20260615-143023.js:1337:      fs.writeFileSync(target, file.buffer);
+./proteger-dados-servidor-cejas.sh:294:        'fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");',
+./proteger-dados-servidor-cejas.sh:295:        'criarHistoricoRelatorioAtualCejas();\n    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");',
+./proteger-dados-servidor-cejas.sh:358:    fs.writeFileSync(`.cejas-local-backups/check-protecao-dados/script-${i + 1}.js`, code);
+./server.backup-servidor-drag-drop-20260615-135041.js:56:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-servidor-drag-drop-20260615-135041.js:73:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-servidor-drag-drop-20260615-135041.js:861:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-servidor-drag-drop-20260615-135041.js:893:    fs.writeFileSync(
+./server.backup-servidor-drag-drop-20260615-135041.js:910:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-servidor-drag-drop-20260615-135041.js:981:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-servidor-drag-drop-20260615-135041.js:997:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-servidor-drag-drop-20260615-135041.js:1337:      fs.writeFileSync(target, file.buffer);
+./server.backup-servidor-20260615-132754.js:56:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-servidor-20260615-132754.js:73:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-servidor-20260615-132754.js:861:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-servidor-20260615-132754.js:893:    fs.writeFileSync(
+./server.backup-servidor-20260615-132754.js:910:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-servidor-20260615-132754.js:981:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-servidor-20260615-132754.js:997:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-financeiro-20260617-175917.js:324:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-financeiro-20260617-175917.js:341:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-financeiro-20260617-175917.js:1210:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-financeiro-20260617-175917.js:1245:    fs.writeFileSync(
+./server.backup-financeiro-20260617-175917.js:1262:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-financeiro-20260617-175917.js:1333:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-financeiro-20260617-175917.js:1349:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-financeiro-20260617-175917.js:1689:      fs.writeFileSync(target, file.buffer);
+./aplicar-gratuidades-dashboard-cejas.sh:36:    fs.writeFileSync(GRATUIDADES_FILE, "[]", "utf8");
+./aplicar-gratuidades-dashboard-cejas.sh:53:  fs.writeFileSync(GRATUIDADES_FILE, JSON.stringify(lista, null, 2), "utf8");
+./corrigir-pdf-orcamento-a4-cejas.sh:546:  fs.writeFileSync(`.cejas-local-backups/check-orcamento-pdf-final/script-${index + 1}.js`, code);
+./ajustar-layout-orcamento-cejas.sh:362:  fs.writeFileSync(`.cejas-local-backups/check-layout-orcamento/script-${index + 1}.js`, code);
+./server.backup-pdf-sem-json-20260616-233754.js:84:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-pdf-sem-json-20260616-233754.js:101:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-pdf-sem-json-20260616-233754.js:890:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-pdf-sem-json-20260616-233754.js:922:    fs.writeFileSync(
+./server.backup-pdf-sem-json-20260616-233754.js:939:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-pdf-sem-json-20260616-233754.js:1010:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-pdf-sem-json-20260616-233754.js:1026:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-pdf-sem-json-20260616-233754.js:1366:      fs.writeFileSync(target, file.buffer);
+./server.backup-financeiro-20260617-175937.js:324:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-financeiro-20260617-175937.js:341:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-financeiro-20260617-175937.js:1210:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-financeiro-20260617-175937.js:1245:    fs.writeFileSync(
+./server.backup-financeiro-20260617-175937.js:1262:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-financeiro-20260617-175937.js:1333:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-financeiro-20260617-175937.js:1349:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-financeiro-20260617-175937.js:1689:      fs.writeFileSync(target, file.buffer);
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214507.js:74:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214507.js:91:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214507.js:880:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214507.js:912:    fs.writeFileSync(
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214507.js:929:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214507.js:1000:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214507.js:1016:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214507.js:1356:      fs.writeFileSync(target, file.buffer);
+./server.backup-upload-debug-20260615-122645.js:22:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-upload-debug-20260615-122645.js:39:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-dashboard-permissoes-orcamento-servidor-20260616-224721.js:81:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-dashboard-permissoes-orcamento-servidor-20260616-224721.js:98:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-dashboard-permissoes-orcamento-servidor-20260616-224721.js:887:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-dashboard-permissoes-orcamento-servidor-20260616-224721.js:919:    fs.writeFileSync(
+./server.backup-dashboard-permissoes-orcamento-servidor-20260616-224721.js:936:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-dashboard-permissoes-orcamento-servidor-20260616-224721.js:1007:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-dashboard-permissoes-orcamento-servidor-20260616-224721.js:1023:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-dashboard-permissoes-orcamento-servidor-20260616-224721.js:1363:      fs.writeFileSync(target, file.buffer);
+./server.backup-libera-entrar-login-20260617-151513.js:346:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-libera-entrar-login-20260617-151513.js:363:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-libera-entrar-login-20260617-151513.js:1173:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-libera-entrar-login-20260617-151513.js:1205:    fs.writeFileSync(
+./server.backup-libera-entrar-login-20260617-151513.js:1222:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-libera-entrar-login-20260617-151513.js:1293:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-libera-entrar-login-20260617-151513.js:1309:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-libera-entrar-login-20260617-151513.js:1649:      fs.writeFileSync(target, file.buffer);
+./server.backup-configuracoes-2-20260617-000310.js:151:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-configuracoes-2-20260617-000310.js:168:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-configuracoes-2-20260617-000310.js:957:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-configuracoes-2-20260617-000310.js:989:    fs.writeFileSync(
+./server.backup-configuracoes-2-20260617-000310.js:1006:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-configuracoes-2-20260617-000310.js:1077:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-configuracoes-2-20260617-000310.js:1093:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-configuracoes-2-20260617-000310.js:1433:      fs.writeFileSync(target, file.buffer);
+./server.backup-botao-pdf-exclusao-superadmin-20260616-234307.js:84:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-botao-pdf-exclusao-superadmin-20260616-234307.js:101:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-botao-pdf-exclusao-superadmin-20260616-234307.js:890:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-botao-pdf-exclusao-superadmin-20260616-234307.js:922:    fs.writeFileSync(
+./server.backup-botao-pdf-exclusao-superadmin-20260616-234307.js:939:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-botao-pdf-exclusao-superadmin-20260616-234307.js:1010:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-botao-pdf-exclusao-superadmin-20260616-234307.js:1026:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-botao-pdf-exclusao-superadmin-20260616-234307.js:1366:      fs.writeFileSync(target, file.buffer);
+./server.backup-render-index-20260618-141014.js:332:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-render-index-20260618-141014.js:349:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-render-index-20260618-141014.js:1224:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-render-index-20260618-141014.js:1259:    fs.writeFileSync(
+./server.backup-render-index-20260618-141014.js:1276:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-render-index-20260618-141014.js:1352:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-render-index-20260618-141014.js:1368:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-render-index-20260618-141014.js:1709:      fs.writeFileSync(target, file.buffer);
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214513.js:74:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214513.js:91:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214513.js:880:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214513.js:912:    fs.writeFileSync(
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214513.js:929:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214513.js:1000:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214513.js:1016:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214513.js:1356:      fs.writeFileSync(target, file.buffer);
+./lib/login-cejas.js:25:    if (!fs.existsSync(file)) fs.writeFileSync(file, JSON.stringify(fallback, null, 2));
+./lib/login-cejas.js:34:  fs.writeFileSync(file, JSON.stringify(data, null, 2));
+./lib/orcamento-pdf-servidor.js:204:      fs.writeFileSync(arquivoLocal, buffer);
+./lib/servidor-storage-persistente.js:317:    fs.writeFileSync(localPath, buffer);
+./lib/dados-supabase-cejas.js:251:      fs.writeFileSync(destino, buffer);
+./lib/cejas-fase2.js:531:      fs.writeFileSync(arquivoPath, buffer);
+./lib/persistencia-total-supabase.js:239:    fs.writeFileSync(destino, buffer);
+./lib/persistencia-total-supabase.js:280:    fs.writeFileSync(destino, buffer);
+./lib/dashboard-permissoes-orcamento.js:273:      fs.writeFileSync(arquivoLocal, buffer);
+./lib/dashboard-permissoes-orcamento.backup-painel-dia-20260617-104544.js:273:      fs.writeFileSync(arquivoLocal, buffer);
+./lib/orcamento-pdf-servidor.backup-mes-existente-20260616-232714.js:164:      fs.writeFileSync(arquivoLocal, buffer);
+./lib/chat-cejas-api.backup-imagem-20260617-111012.js:18:      fs.writeFileSync(CHAT_FILE, JSON.stringify([], null, 2));
+./lib/chat-cejas-api.backup-imagem-20260617-111012.js:29:  fs.writeFileSync(CHAT_FILE, JSON.stringify(lista, null, 2));
+./lib/financeiro-cejas.js:16:    fs.writeFileSync(
+./lib/financeiro-cejas.js:39:  fs.writeFileSync(FINANCEIRO_FILE, JSON.stringify(db, null, 2), "utf8");
+./lib/configuracoes-cejas.js:326:      fs.writeFileSync(localPath, req.file.buffer);
+./lib/orcamento-pdf-servidor.backup-sem-json-20260616-233754.js:203:      fs.writeFileSync(arquivoLocal, buffer);
+./lib/dashboard-permissoes-orcamento.backup-remove-card-painel-dia-20260617-104913.js:274:      fs.writeFileSync(arquivoLocal, buffer);
+./lib/chat-cejas-api.js:24:      fs.writeFileSync(CHAT_FILE, JSON.stringify([], null, 2));
+./lib/chat-cejas-api.js:35:  fs.writeFileSync(CHAT_FILE, JSON.stringify(lista, null, 2));
+./lib/chat-cejas-api.js:438:      fs.writeFileSync(localPath, req.file.buffer);
+./lib/agenda-local-fallback.js:19:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./lib/financeiro-cejas.backup-auto-sync-20260617-180921.js:16:    fs.writeFileSync(
+./lib/financeiro-cejas.backup-auto-sync-20260617-180921.js:39:  fs.writeFileSync(FINANCEIRO_FILE, JSON.stringify(db, null, 2), "utf8");
+./server.backup-limpeza-login-definitiva-20260617-155655.js:346:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-limpeza-login-definitiva-20260617-155655.js:363:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-limpeza-login-definitiva-20260617-155655.js:1173:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-limpeza-login-definitiva-20260617-155655.js:1205:    fs.writeFileSync(
+./server.backup-limpeza-login-definitiva-20260617-155655.js:1222:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-limpeza-login-definitiva-20260617-155655.js:1293:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-limpeza-login-definitiva-20260617-155655.js:1309:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-limpeza-login-definitiva-20260617-155655.js:1649:      fs.writeFileSync(target, file.buffer);
+./consertar-servidor-storage-e-orcamento-pdf.sh:171:  fs.writeFileSync(local, buffer);
+./consertar-servidor-storage-e-orcamento-pdf.sh:676:      fs.writeFileSync(local, buffer);
+./consertar-servidor-storage-e-orcamento-pdf.sh:1502:  fs.writeFileSync(`.cejas-local-backups/check-orcamento-a4-completo/script-${index + 1}.js`, code);
+./server.backup-corrige-syntax-financeiro-20260617-180301.js:325:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-corrige-syntax-financeiro-20260617-180301.js:342:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-corrige-syntax-financeiro-20260617-180301.js:1214:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-corrige-syntax-financeiro-20260617-180301.js:1249:    fs.writeFileSync(
+./server.backup-corrige-syntax-financeiro-20260617-180301.js:1266:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-corrige-syntax-financeiro-20260617-180301.js:1342:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-corrige-syntax-financeiro-20260617-180301.js:1358:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-corrige-syntax-financeiro-20260617-180301.js:1699:      fs.writeFileSync(target, file.buffer);
+./server.backup-antes-login-novo-total-20260617-150905.js:346:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-antes-login-novo-total-20260617-150905.js:363:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-antes-login-novo-total-20260617-150905.js:1173:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-antes-login-novo-total-20260617-150905.js:1205:    fs.writeFileSync(
+./server.backup-antes-login-novo-total-20260617-150905.js:1222:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-antes-login-novo-total-20260617-150905.js:1293:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-antes-login-novo-total-20260617-150905.js:1309:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-antes-login-novo-total-20260617-150905.js:1649:      fs.writeFileSync(target, file.buffer);
+./server.backup-servidor-ano-mes-20260615-133132.js:56:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-servidor-ano-mes-20260615-133132.js:73:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-servidor-ano-mes-20260615-133132.js:861:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-servidor-ano-mes-20260615-133132.js:893:    fs.writeFileSync(
+./server.backup-servidor-ano-mes-20260615-133132.js:910:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-servidor-ano-mes-20260615-133132.js:981:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-servidor-ano-mes-20260615-133132.js:997:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-servidor-ano-mes-20260615-133132.js:1332:      fs.writeFileSync(target, file.buffer);
+./server.backup-auto-sync-supabase-20260616-205835.js:56:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-auto-sync-supabase-20260616-205835.js:73:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-auto-sync-supabase-20260616-205835.js:861:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-auto-sync-supabase-20260616-205835.js:893:    fs.writeFileSync(
+./server.backup-auto-sync-supabase-20260616-205835.js:910:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-auto-sync-supabase-20260616-205835.js:981:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-auto-sync-supabase-20260616-205835.js:997:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-auto-sync-supabase-20260616-205835.js:1337:      fs.writeFileSync(target, file.buffer);
+./corrigir-gratuidades-menu-manual-deploy.sh:135:    fs.writeFileSync(GRATUIDADES_FILE, "[]", "utf8");
+./corrigir-gratuidades-menu-manual-deploy.sh:152:  fs.writeFileSync(GRATUIDADES_FILE, JSON.stringify(lista || [], null, 2), "utf8");
+./corrigir-gratuidades-menu-manual-deploy.sh:574:    fs.writeFileSync(`.cejas-local-backups/check-menu-gratuidades/${html}-${index + 1}.js`, code);
+./server.backup-fix-upload-rota-20260615-123411.js:22:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-fix-upload-rota-20260615-123411.js:39:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-pdfparse-final-20260615-123654.js:29:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-pdfparse-final-20260615-123654.js:46:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-pdfparse-final-20260615-123654.js:515:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-pdfparse-final-20260615-123654.js:558:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-financeiro-auto-sync-20260617-180921.js:325:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-financeiro-auto-sync-20260617-180921.js:342:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-financeiro-auto-sync-20260617-180921.js:1214:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-financeiro-auto-sync-20260617-180921.js:1249:    fs.writeFileSync(
+./server.backup-financeiro-auto-sync-20260617-180921.js:1266:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-financeiro-auto-sync-20260617-180921.js:1342:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-financeiro-auto-sync-20260617-180921.js:1358:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-financeiro-auto-sync-20260617-180921.js:1699:      fs.writeFileSync(target, file.buffer);
+./server.backup-render-20260618-135615.js:332:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-render-20260618-135615.js:349:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-render-20260618-135615.js:1224:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-render-20260618-135615.js:1259:    fs.writeFileSync(
+./server.backup-render-20260618-135615.js:1276:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-render-20260618-135615.js:1352:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-render-20260618-135615.js:1368:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-render-20260618-135615.js:1709:      fs.writeFileSync(target, file.buffer);
+./server.backup-libera-js-financeiro-20260617-181220.js:325:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-libera-js-financeiro-20260617-181220.js:342:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-libera-js-financeiro-20260617-181220.js:1217:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-libera-js-financeiro-20260617-181220.js:1252:    fs.writeFileSync(
+./server.backup-libera-js-financeiro-20260617-181220.js:1269:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-libera-js-financeiro-20260617-181220.js:1345:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-libera-js-financeiro-20260617-181220.js:1361:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-libera-js-financeiro-20260617-181220.js:1702:      fs.writeFileSync(target, file.buffer);
+./server.backup-parser-supera-v2-20260615-124003.js:56:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-parser-supera-v2-20260615-124003.js:73:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-parser-supera-v2-20260615-124003.js:542:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-parser-supera-v2-20260615-124003.js:585:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-login-admin-override-20260617-144404.js:346:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-login-admin-override-20260617-144404.js:363:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-login-admin-override-20260617-144404.js:1173:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-login-admin-override-20260617-144404.js:1205:    fs.writeFileSync(
+./server.backup-login-admin-override-20260617-144404.js:1222:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-login-admin-override-20260617-144404.js:1293:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-login-admin-override-20260617-144404.js:1309:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-login-admin-override-20260617-144404.js:1649:      fs.writeFileSync(target, file.buffer);
+./server.backup-menu-financeiro-20260617-180448.js:325:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-menu-financeiro-20260617-180448.js:342:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-menu-financeiro-20260617-180448.js:1214:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-menu-financeiro-20260617-180448.js:1249:    fs.writeFileSync(
+./server.backup-menu-financeiro-20260617-180448.js:1266:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-menu-financeiro-20260617-180448.js:1342:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-menu-financeiro-20260617-180448.js:1358:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-menu-financeiro-20260617-180448.js:1699:      fs.writeFileSync(target, file.buffer);
+./server.backup-login-admin-override-20260617-144415.js:346:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-login-admin-override-20260617-144415.js:363:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-login-admin-override-20260617-144415.js:1173:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-login-admin-override-20260617-144415.js:1205:    fs.writeFileSync(
+./server.backup-login-admin-override-20260617-144415.js:1222:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-login-admin-override-20260617-144415.js:1293:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-login-admin-override-20260617-144415.js:1309:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-login-admin-override-20260617-144415.js:1649:      fs.writeFileSync(target, file.buffer);
+./server.backup-login-cejas-20260617-124832.js:305:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-login-cejas-20260617-124832.js:322:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-login-cejas-20260617-124832.js:1111:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-login-cejas-20260617-124832.js:1143:    fs.writeFileSync(
+./server.backup-login-cejas-20260617-124832.js:1160:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-login-cejas-20260617-124832.js:1231:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-login-cejas-20260617-124832.js:1247:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-login-cejas-20260617-124832.js:1587:      fs.writeFileSync(target, file.buffer);
+./server.backup-fix-pdfparse-20260615-123518.js:24:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-fix-pdfparse-20260615-123518.js:41:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-fix-pdfparse-20260615-123518.js:510:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-fix-pdfparse-20260615-123518.js:553:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-forca-configuracoes-v2-20260617-000733.js:152:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-forca-configuracoes-v2-20260617-000733.js:169:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-forca-configuracoes-v2-20260617-000733.js:958:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-forca-configuracoes-v2-20260617-000733.js:990:    fs.writeFileSync(
+./server.backup-forca-configuracoes-v2-20260617-000733.js:1007:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-forca-configuracoes-v2-20260617-000733.js:1078:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-forca-configuracoes-v2-20260617-000733.js:1094:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-forca-configuracoes-v2-20260617-000733.js:1434:      fs.writeFileSync(target, file.buffer);
+./corrigir-servidor-listagem-e-dashboard-persistente.sh:369:      fs.writeFileSync(destino, buffer);
+./corrigir-servidor-listagem-e-dashboard-persistente.sh:640:  fs.writeFileSync(`.cejas-local-backups/check-dashboard-persistente/script-${i + 1}.js`, code);
+./server.backup-agenda-plus-20260616-213245.js:58:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-agenda-plus-20260616-213245.js:75:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-agenda-plus-20260616-213245.js:863:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-agenda-plus-20260616-213245.js:895:    fs.writeFileSync(
+./server.backup-agenda-plus-20260616-213245.js:912:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-agenda-plus-20260616-213245.js:983:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-agenda-plus-20260616-213245.js:999:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-agenda-plus-20260616-213245.js:1339:      fs.writeFileSync(target, file.buffer);
+./corrigir-servidor-estabilidade-apagar-tudo-cejas.sh:402:  fs.writeFileSync(`.cejas-local-backups/check-servidor-estavel/script-${i + 1}.js`, code);
+./corrigir-storage-rest-supabase-cejas.sh:229:  fs.writeFileSync(local, buffer);
+./server.backup-corrige-login-401-20260617-125621.js:308:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-corrige-login-401-20260617-125621.js:325:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-corrige-login-401-20260617-125621.js:1114:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-corrige-login-401-20260617-125621.js:1146:    fs.writeFileSync(
+./server.backup-corrige-login-401-20260617-125621.js:1163:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-corrige-login-401-20260617-125621.js:1234:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-corrige-login-401-20260617-125621.js:1250:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-corrige-login-401-20260617-125621.js:1590:      fs.writeFileSync(target, file.buffer);
+./server.backup-agenda-dia-livre-20260616-215809.js:77:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-agenda-dia-livre-20260616-215809.js:94:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-agenda-dia-livre-20260616-215809.js:883:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-agenda-dia-livre-20260616-215809.js:915:    fs.writeFileSync(
+./server.backup-agenda-dia-livre-20260616-215809.js:932:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-agenda-dia-livre-20260616-215809.js:1003:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-agenda-dia-livre-20260616-215809.js:1019:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-agenda-dia-livre-20260616-215809.js:1359:      fs.writeFileSync(target, file.buffer);
+./corrigir-servidor-stack-e-upload-lotes-cejas.sh:398:  fs.writeFileSync(`.cejas-local-backups/check-servidor-upload-lotes/script-${i + 1}.js`, code);
+./corrigir-servidor-modelo-final-cejas.sh:858:  fs.writeFileSync(`.cejas-local-backups/check-servidor-modelo-final/script-${i + 1}.js`, code);
+./server.backup-apagar-supabase-relatorio-20260616-210243.js:57:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-apagar-supabase-relatorio-20260616-210243.js:74:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-apagar-supabase-relatorio-20260616-210243.js:862:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-apagar-supabase-relatorio-20260616-210243.js:894:    fs.writeFileSync(
+./server.backup-apagar-supabase-relatorio-20260616-210243.js:911:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-apagar-supabase-relatorio-20260616-210243.js:982:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-apagar-supabase-relatorio-20260616-210243.js:998:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-apagar-supabase-relatorio-20260616-210243.js:1338:      fs.writeFileSync(target, file.buffer);
+./server.backup-menu-permissoes-fixo-20260617-112715.js:298:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-menu-permissoes-fixo-20260617-112715.js:315:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-menu-permissoes-fixo-20260617-112715.js:1104:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-menu-permissoes-fixo-20260617-112715.js:1136:    fs.writeFileSync(
+./server.backup-menu-permissoes-fixo-20260617-112715.js:1153:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-menu-permissoes-fixo-20260617-112715.js:1224:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-menu-permissoes-fixo-20260617-112715.js:1240:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-menu-permissoes-fixo-20260617-112715.js:1580:      fs.writeFileSync(target, file.buffer);
+./server.backup-libera-login-publico-20260617-130106.js:308:    fs.writeFileSync(ITEMS_FILE, "[]", "utf8");
+./server.backup-libera-login-publico-20260617-130106.js:325:  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+./server.backup-libera-login-publico-20260617-130106.js:1114:      fs.writeFileSync(RELATORIO_FILE, JSON.stringify(emptySuperaReport(), null, 2));
+./server.backup-libera-login-publico-20260617-130106.js:1146:    fs.writeFileSync(
+./server.backup-libera-login-publico-20260617-130106.js:1163:    fs.writeFileSync(RELATORIO_FILE, JSON.stringify(report, null, 2), "utf8");
+./server.backup-libera-login-publico-20260617-130106.js:1234:    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-libera-login-publico-20260617-130106.js:1250:  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+./server.backup-libera-login-publico-20260617-130106.js:1590:      fs.writeFileSync(target, file.buffer);
+
+=== data/ ===
+./server.backup-corrige-menu-permissoes-20260617-113433.js:1162:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-corrige-menu-permissoes-20260617-113433.js:1984:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-login-master-ultra-20260617-151951.js:1227:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-login-master-ultra-20260617-151951.js:2049:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-corrige-admin-menu-20260617-164758.js:1233:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-corrige-admin-menu-20260617-164758.js:2055:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-chat-imagem-menu-fixo-20260617-111012.js:1152:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-chat-imagem-menu-fixo-20260617-111012.js:1974:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-login-admin-fix-20260617-143054.js:1200:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-login-admin-fix-20260617-143054.js:2022:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+Binary file ./diagnostico-login-cejas.zip matches
+./blindagem-total-deploy-cejas.sh:683:data/usuarios.json
+./blindagem-total-deploy-cejas.sh:684:data/redefinicoes-senha-local.json
+./blindagem-total-deploy-cejas.sh:685:data/chat-mensagens-local.json
+./blindagem-total-deploy-cejas.sh:686:data/relatorio-supera.json
+./blindagem-total-deploy-cejas.sh:687:data/relatorio-atual.json
+./blindagem-total-deploy-cejas.sh:688:data/ultimo-relatorio-texto-extraido.txt
+./blindagem-total-deploy-cejas.sh:689:data/agenda-manual-local.json
+./blindagem-total-deploy-cejas.sh:690:data/gratuidades-manuais.json
+./blindagem-total-deploy-cejas.sh:691:data/gratuidades-ocultas.json
+./blindagem-total-deploy-cejas.sh:692:data/historico-relatorios/
+./diagnosticar-salvamento-local-cejas.sh:34:echo "=== data/ ===" >> "$OUT"
+./diagnosticar-salvamento-local-cejas.sh:35:grep -R "data/" -n . \
+./server.backup-corrige-js-agenda-plus-20260616-213957.js:920:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-corrige-js-agenda-plus-20260616-213957.js:1742:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-parser-supera-real-20260615-125033.js:783:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-login-mestre-final-20260617-151256.js:1227:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-login-mestre-final-20260617-151256.js:2049:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-forca-api-agenda-dia-20260616-215025.js:935:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-forca-api-agenda-dia-20260616-215025.js:1757:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-corrige-admin-menu-20260617-114353.js:1165:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-corrige-admin-menu-20260617-114353.js:1987:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-login-publico-final-20260617-132552.js:1194:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-login-publico-final-20260617-132552.js:2016:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-usuarios-permissoes-20260615-132614.js:876:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-pdf-viewer-servidor-20260616-233423.js:943:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-pdf-viewer-servidor-20260616-233423.js:1765:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-login-bypass-final-20260617-152208.js:1227:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-login-bypass-final-20260617-152208.js:2049:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-fase2-seguranca-agenda-20260616-212353.js:916:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-fase2-seguranca-agenda-20260616-212353.js:1738:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.js:291:            console.warn("⚠️ Sync data/ pós alteração falhou:", error.message);
+./server.js:1747:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.js:3148:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-login-form-direto-20260617-150559.js:1227:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-login-form-direto-20260617-150559.js:2049:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-remove-trava-agenda-dia-20260616-215452.js:938:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-remove-trava-agenda-dia-20260616-215452.js:1760:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-corrige-api-agenda-dia-20260616-214705.js:934:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-corrige-api-agenda-dia-20260616-214705.js:1756:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-corrige-admin-menu-20260617-114348.js:1165:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-corrige-admin-menu-20260617-114348.js:1987:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-ajuste-login-ordem-20260617-125330.js:1168:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-ajuste-login-ordem-20260617-125330.js:1990:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-refaz-login-limpo-20260617-145226.js:1227:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-refaz-login-limpo-20260617-145226.js:2049:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-corrige-syntax-financeiro-20260617-180236.js:1271:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-corrige-syntax-financeiro-20260617-180236.js:2099:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-destrava-login-sessao-20260617-143718.js:1200:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-destrava-login-sessao-20260617-143718.js:2022:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-orcamento-pdf-servidor-20260616-230757.js:942:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-orcamento-pdf-servidor-20260616-230757.js:1764:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-apagar-relatorio-definitivo-20260617-105458.js:1025:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-apagar-relatorio-definitivo-20260617-105458.js:1847:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+Binary file ./uploads/servidor/05 MAIO/CDL 19.05/CDL 19.05.pdf matches
+Binary file ./uploads/servidor/05 MAIO/DIA EMPREENDIMENTOS 19.05/DIA EMPREENDIMENTOS 19.05.pdf matches
+Binary file ./uploads/servidor/05 MAIO/KWB 19.05/KWB 19.05.pdf matches
+Binary file ./uploads/servidor/05 MAIO/SAVE 08.05/SAVE 08.05.pdf matches
+Binary file ./uploads/servidor/05 MAIO/CDL TRILHAS DE DESENVILVIMENTO E 14.05/CDL TRILHAS DE DESENVILVIMENTO 14.05, 17.06, 15.07 E 19.08.pdf matches
+Binary file ./uploads/servidor/05 MAIO/CSM 18 E 19.05/CSM 18 E 19.05.pdf matches
+Binary file ./uploads/servidor/05 MAIO/CSM IA 18 E 19.05/CSM IA 18 E 19.05.pdf matches
+Binary file ./uploads/servidor/05 MAIO/RODADA DE NEGOCIOS ACIJS 06.05/RODADA DE NEGOCIOS ACIJS 06.05.pdf matches
+Binary file ./uploads/servidor/05 MAIO/BORGES GROUP 11.05/BORGES GROUP 11.05.pdf matches
+Binary file ./uploads/servidor/05 MAIO/SAVE 15.05/SAVE 15.05.pdf matches
+Binary file ./uploads/servidor/05 MAIO/CLINICORP 20.05/CLINICORP 20.05.pdf matches
+Binary file ./uploads/servidor/VERIFICAR/SEM MES/FEMUSC 2027.pdf matches
+Binary file ./uploads/servidor/VERIFICAR/SEM MES/NUCLEO .pdf matches
+Binary file ./uploads/servidor/10 OUTUBRO/OBMEP 08.10/OBMEP 08.10.pdf matches
+Binary file ./uploads/servidor/04 ABRIL/ESTACIO 15.04/ESTACIO 15.04.pdf matches
+Binary file ./uploads/servidor/04 ABRIL/POSSE APEVI 16.04/POSSE APEVI 16.04.pdf matches
+Binary file ./uploads/servidor/04 ABRIL/GDO CURSOS 10.04/GDO CURSOS 10.04.pdf matches
+Binary file ./uploads/servidor/04 ABRIL/VIACREDI 22.04/VIACREDI 22.04.pdf matches
+Binary file ./uploads/servidor/04 ABRIL/LEVMED 08.04/LEVMED 08.04.pdf matches
+Binary file ./uploads/servidor/02 FEVEREIRO/SENAI 19.02/SENAI 19.02.pdf matches
+Binary file ./uploads/servidor/02 FEVEREIRO/SENAI 12.02/SENAI 12.02.pdf matches
+Binary file ./uploads/servidor/07 JULHO/PM 20 E 21.07/PM 20 e 21.07.pdf matches
+Binary file ./uploads/servidor/07 JULHO/IFSC 10.07/IFSC 10.07.pdf matches
+Binary file ./uploads/servidor/07 JULHO/NUCLEO 31.07/NUCLEO 31.07.pdf matches
+Binary file ./uploads/servidor/06 JUNHO/DSEVEN 08.06/DSEVEN 08.06.pdf matches
+Binary file ./uploads/servidor/09 SETEMBRO/ESCOLA JL 21.09/CONTRATO ESCOLA JL 21.09.pdf matches
+Binary file ./uploads/servidor/08 AGOSTO/UNISENAI 07.08/UNISENAI 07.08.pdf matches
+Binary file ./uploads/servidor/08 AGOSTO/KWB 19.08/kwb 19.08.pdf matches
+./server.backup-permissao-upload-supera-20260617-165714.js:1256:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-permissao-upload-supera-20260617-165714.js:2078:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-financeiro-clicavel-20260617-180601.js:1271:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-financeiro-clicavel-20260617-180601.js:2099:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-upload-inteligente-20260615-143023.js:915:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./proteger-dados-servidor-cejas.sh:80:console.log(`Arquivos em data/: ${arquivosData.length}`);
+./server.backup-servidor-drag-drop-20260615-135041.js:915:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-servidor-20260615-132754.js:915:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./README.md:97:└── data/                          # Dados locais
+./server.backup-financeiro-20260617-175917.js:1267:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-financeiro-20260617-175917.js:2089:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-pdf-sem-json-20260616-233754.js:944:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-pdf-sem-json-20260616-233754.js:1766:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-financeiro-20260617-175937.js:1267:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-financeiro-20260617-175937.js:2089:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./.gitignore:29:data/usuarios.json
+./.gitignore:30:data/redefinicoes-senha-local.json
+./.gitignore:31:data/chat-mensagens-local.json
+./.gitignore:32:data/relatorio-supera.json
+./.gitignore:33:data/relatorio-atual.json
+./.gitignore:34:data/ultimo-relatorio-texto-extraido.txt
+./.gitignore:35:data/agenda-manual-local.json
+./.gitignore:36:data/gratuidades-manuais.json
+./.gitignore:37:data/gratuidades-ocultas.json
+./.gitignore:38:data/historico-relatorios/
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214507.js:934:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214507.js:1756:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./scripts/auditoria-dados-cejas.js:37:console.log(`Arquivos em data/: ${arquivosData.length}`);
+./scripts/data-restore-cejas.js:8:  console.error("❌ Erro ao restaurar data/:", error.message);
+./scripts/data-sync-cejas.js:8:  console.error("❌ Erro ao sincronizar data/:", error.message);
+./scripts/start-seguro-cejas.js:10:    console.log("📊 Status data/Supabase:", statusDadosSupabase());
+./scripts/start-seguro-cejas.js:13:    console.log("✅ data/ restaurado do Supabase:", restore);
+./scripts/start-seguro-cejas.js:15:    console.warn("⚠️ Restore de data/ ignorado:", error.message);
+./server.backup-dashboard-permissoes-orcamento-servidor-20260616-224721.js:941:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-dashboard-permissoes-orcamento-servidor-20260616-224721.js:1763:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-libera-entrar-login-20260617-151513.js:1227:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-libera-entrar-login-20260617-151513.js:2049:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-configuracoes-2-20260617-000310.js:1011:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-configuracoes-2-20260617-000310.js:1833:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-botao-pdf-exclusao-superadmin-20260616-234307.js:944:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-botao-pdf-exclusao-superadmin-20260616-234307.js:1766:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-render-index-20260618-141014.js:1281:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-render-index-20260618-141014.js:2109:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214513.js:934:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214513.js:1756:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./lib/dados-supabase-cejas.js:51:    throw new Error("Supabase não configurado para persistência de data/: " + JSON.stringify(status));
+./lib/dados-supabase-cejas.js:227:      console.warn("⚠️ Falha ao sincronizar data/" + item.rel + ":", error.message);
+./lib/chat-cejas-api.backup-sem-travar-20260617-104544.js:132:    console.log("⚠️ Chat: não consegui ler data/usuarios.json:", error.message);
+./server.backup-limpeza-login-definitiva-20260617-155655.js:1227:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-limpeza-login-definitiva-20260617-155655.js:2049:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-corrige-syntax-financeiro-20260617-180301.js:1271:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-corrige-syntax-financeiro-20260617-180301.js:2099:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./subir-github-cejas.sh:42:data/usuarios.json
+./subir-github-cejas.sh:43:data/redefinicoes-senha-local.json
+./subir-github-cejas.sh:44:data/chat-mensagens-local.json
+./subir-github-cejas.sh:45:data/relatorio-supera.json
+./subir-github-cejas.sh:46:data/relatorio-atual.json
+./subir-github-cejas.sh:47:data/ultimo-relatorio-texto-extraido.txt
+./subir-github-cejas.sh:48:data/agenda-manual-local.json
+./subir-github-cejas.sh:49:data/gratuidades-manuais.json
+./subir-github-cejas.sh:75:git rm -r --cached .env .env.* uploads .cejas-local-backups data/usuarios.json data/redefinicoes-senha-local.json data/chat-mensagens-local.json data/relatorio-supera.json data/relatorio-atual.json data/ultimo-relatorio-texto-extraido.txt data/agenda-manual-local.json data/gratuidades-manuais.json 2>/dev/null || true
+./server.backup-antes-login-novo-total-20260617-150905.js:1227:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-antes-login-novo-total-20260617-150905.js:2049:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-servidor-ano-mes-20260615-133132.js:915:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-auto-sync-supabase-20260616-205835.js:915:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./corrigir-gratuidades-menu-manual-deploy.sh:25:cat > data/gratuidades-manuais.json <<'EOF'
+./corrigir-gratuidades-menu-manual-deploy.sh:29:cat > data/gratuidades-ocultas.json <<'EOF'
+./server.backup-financeiro-auto-sync-20260617-180921.js:1271:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-financeiro-auto-sync-20260617-180921.js:2099:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-render-20260618-135615.js:1281:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-render-20260618-135615.js:2109:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-libera-js-financeiro-20260617-181220.js:1274:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-libera-js-financeiro-20260617-181220.js:2102:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-login-admin-override-20260617-144404.js:1227:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-login-admin-override-20260617-144404.js:2049:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-menu-financeiro-20260617-180448.js:1271:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-menu-financeiro-20260617-180448.js:2099:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-login-admin-override-20260617-144415.js:1227:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-login-admin-override-20260617-144415.js:2049:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./DEPLOY_STATUS.txt:116:├── data/                        ← Local data (financeiro.json, etc)
+./server.backup-login-cejas-20260617-124832.js:1165:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-login-cejas-20260617-124832.js:1987:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-forca-configuracoes-v2-20260617-000733.js:1012:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-forca-configuracoes-v2-20260617-000733.js:1834:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./corrigir-servidor-listagem-e-dashboard-persistente.sh:169:    throw new Error("Supabase não configurado para persistência de data/: " + JSON.stringify(status));
+./corrigir-servidor-listagem-e-dashboard-persistente.sh:345:      console.warn("⚠️ Falha ao sincronizar data/" + item.rel + ":", error.message);
+./corrigir-servidor-listagem-e-dashboard-persistente.sh:398:  console.error("❌ Erro ao sincronizar data/:", error.message);
+./corrigir-servidor-listagem-e-dashboard-persistente.sh:411:  console.error("❌ Erro ao restaurar data/:", error.message);
+./corrigir-servidor-listagem-e-dashboard-persistente.sh:440:    console.log("📊 Status data/Supabase:", statusDadosSupabase());
+./corrigir-servidor-listagem-e-dashboard-persistente.sh:443:    console.log("✅ data/ restaurado do Supabase:", restore);
+./corrigir-servidor-listagem-e-dashboard-persistente.sh:445:    console.warn("⚠️ Restore de data/ ignorado:", error.message);
+./corrigir-servidor-listagem-e-dashboard-persistente.sh:492:            console.warn("⚠️ Sync data/ pós alteração falhou:", error.message);
+./server.backup-agenda-plus-20260616-213245.js:917:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-agenda-plus-20260616-213245.js:1739:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-corrige-login-401-20260617-125621.js:1168:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-corrige-login-401-20260617-125621.js:1990:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-agenda-dia-livre-20260616-215809.js:937:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-agenda-dia-livre-20260616-215809.js:1759:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-apagar-supabase-relatorio-20260616-210243.js:916:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-apagar-supabase-relatorio-20260616-210243.js:1738:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-menu-permissoes-fixo-20260617-112715.js:1158:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-menu-permissoes-fixo-20260617-112715.js:1980:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+./server.backup-libera-login-publico-20260617-130106.js:1168:    console.log("📝 Texto salvo em data/ultimo-relatorio-texto-extraido.txt");
+./server.backup-libera-login-publico-20260617-130106.js:1990:// Sempre que data/relatorio-supera.json for atualizado, o sistema envia o resumo e os eventos para o banco.
+
+=== uploads/ ===
+./server.backup-corrige-menu-permissoes-20260617-113433.js:59:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-corrige-menu-permissoes-20260617-113433.js:118:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-corrige-menu-permissoes-20260617-113433.js:119:    path.join(__dirname, "uploads", "supera"),
+./server.backup-corrige-menu-permissoes-20260617-113433.js:120:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-corrige-menu-permissoes-20260617-113433.js:637:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-corrige-menu-permissoes-20260617-113433.js:1477:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-corrige-menu-permissoes-20260617-113433.js:1717:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-login-master-ultra-20260617-151951.js:103:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-login-master-ultra-20260617-151951.js:162:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-login-master-ultra-20260617-151951.js:163:    path.join(__dirname, "uploads", "supera"),
+./server.backup-login-master-ultra-20260617-151951.js:164:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-login-master-ultra-20260617-151951.js:702:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-login-master-ultra-20260617-151951.js:1542:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-login-master-ultra-20260617-151951.js:1782:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-corrige-admin-menu-20260617-164758.js:76:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-corrige-admin-menu-20260617-164758.js:135:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-corrige-admin-menu-20260617-164758.js:136:    path.join(__dirname, "uploads", "supera"),
+./server.backup-corrige-admin-menu-20260617-164758.js:137:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-corrige-admin-menu-20260617-164758.js:708:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-corrige-admin-menu-20260617-164758.js:1548:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-corrige-admin-menu-20260617-164758.js:1788:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./financeiro.backup-remove-todos-css-globais-20260618-160518.html:882:        : "Nenhum arquivo financeiro encontrado ainda. Clique em Sincronizar servidor ou confira se existem PDFs dentro de uploads.";
+./financeiro.backup-remove-corte-20260618-160256.html:882:        : "Nenhum arquivo financeiro encontrado ainda. Clique em Sincronizar servidor ou confira se existem PDFs dentro de uploads.";
+./server.backup-chat-imagem-menu-fixo-20260617-111012.js:108:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-chat-imagem-menu-fixo-20260617-111012.js:109:    path.join(__dirname, "uploads", "supera"),
+./server.backup-chat-imagem-menu-fixo-20260617-111012.js:110:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-chat-imagem-menu-fixo-20260617-111012.js:627:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-chat-imagem-menu-fixo-20260617-111012.js:1467:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-chat-imagem-menu-fixo-20260617-111012.js:1707:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./financeiro.backup-zoom-final-20260618-145642.html:880:        : "Nenhum arquivo financeiro encontrado ainda. Clique em Sincronizar servidor ou confira se existem PDFs dentro de uploads.";
+./server.backup-login-admin-fix-20260617-143054.js:84:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-login-admin-fix-20260617-143054.js:143:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-login-admin-fix-20260617-143054.js:144:    path.join(__dirname, "uploads", "supera"),
+./server.backup-login-admin-fix-20260617-143054.js:145:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-login-admin-fix-20260617-143054.js:675:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-login-admin-fix-20260617-143054.js:1515:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-login-admin-fix-20260617-143054.js:1755:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./blindagem-total-deploy-cejas.sh:15:[ -d uploads ] && cp -R uploads "$BACKUP_DIR/uploads" 2>/dev/null || true
+./blindagem-total-deploy-cejas.sh:266:  const root = path.join(process.cwd(), "uploads", "servidor");
+./blindagem-total-deploy-cejas.sh:282:  const root = path.join(process.cwd(), "uploads", "servidor");
+./blindagem-total-deploy-cejas.sh:415:  const localServidor = listarArquivosLocais(path.join(process.cwd(), "uploads", "servidor"));
+./blindagem-total-deploy-cejas.sh:674:uploads/
+./diagnosticar-salvamento-local-cejas.sh:42:echo "=== uploads/ ===" >> "$OUT"
+./diagnosticar-salvamento-local-cejas.sh:43:grep -R "uploads" -n . \
+./server.backup-corrige-js-agenda-plus-20260616-213957.js:395:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-corrige-js-agenda-plus-20260616-213957.js:1235:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-corrige-js-agenda-plus-20260616-213957.js:1475:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./render.yaml:11:      name: cejas-uploads
+./render.yaml:12:      mountPath: /opt/render/project/src/uploads
+./render.yaml:20:        value: /opt/render/project/src/uploads/.data
+./reset-servidor-100-supabase-cejas.sh:26:const TMP_ROOT = path.join(process.cwd(), "uploads", "tmp-servidor-supabase");
+./server.backup-parser-supera-real-20260615-125033.js:351:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-login-mestre-final-20260617-151256.js:103:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-login-mestre-final-20260617-151256.js:162:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-login-mestre-final-20260617-151256.js:163:    path.join(__dirname, "uploads", "supera"),
+./server.backup-login-mestre-final-20260617-151256.js:164:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-login-mestre-final-20260617-151256.js:702:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-login-mestre-final-20260617-151256.js:1542:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-login-mestre-final-20260617-151256.js:1782:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-forca-api-agenda-dia-20260616-215025.js:410:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-forca-api-agenda-dia-20260616-215025.js:1250:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-forca-api-agenda-dia-20260616-215025.js:1490:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-corrige-admin-menu-20260617-114353.js:62:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-corrige-admin-menu-20260617-114353.js:121:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-corrige-admin-menu-20260617-114353.js:122:    path.join(__dirname, "uploads", "supera"),
+./server.backup-corrige-admin-menu-20260617-114353.js:123:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-corrige-admin-menu-20260617-114353.js:640:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-corrige-admin-menu-20260617-114353.js:1480:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-corrige-admin-menu-20260617-114353.js:1720:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-login-publico-final-20260617-132552.js:83:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-login-publico-final-20260617-132552.js:142:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-login-publico-final-20260617-132552.js:143:    path.join(__dirname, "uploads", "supera"),
+./server.backup-login-publico-final-20260617-132552.js:144:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-login-publico-final-20260617-132552.js:669:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-login-publico-final-20260617-132552.js:1509:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-login-publico-final-20260617-132552.js:1749:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-usuarios-permissoes-20260615-132614.js:351:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-pdf-viewer-servidor-20260616-233423.js:418:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-pdf-viewer-servidor-20260616-233423.js:1258:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-pdf-viewer-servidor-20260616-233423.js:1498:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./financeiro.backup-fonte-padrao-20260618-154716.html:882:        : "Nenhum arquivo financeiro encontrado ainda. Clique em Sincronizar servidor ou confira se existem PDFs dentro de uploads.";
+./server.backup-login-bypass-final-20260617-152208.js:103:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-login-bypass-final-20260617-152208.js:162:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-login-bypass-final-20260617-152208.js:163:    path.join(__dirname, "uploads", "supera"),
+./server.backup-login-bypass-final-20260617-152208.js:164:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-login-bypass-final-20260617-152208.js:702:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-login-bypass-final-20260617-152208.js:1542:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-login-bypass-final-20260617-152208.js:1782:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./preparar-pasta-ti-cejas.sh:27:  --exclude "uploads/tmp-servidor-supabase" \
+./preparar-pasta-ti-cejas.sh:28:  --exclude "uploads/tmp" \
+./server.backup-fase2-seguranca-agenda-20260616-212353.js:391:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-fase2-seguranca-agenda-20260616-212353.js:1231:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-fase2-seguranca-agenda-20260616-212353.js:1471:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.js:420:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.js:445:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.js:479:    path.join(__dirname, "uploads", "relatorios"),
+./server.js:480:    path.join(__dirname, "uploads", "supera"),
+./server.js:481:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.js:532:    fs.mkdirSync(path.join(__dirname, "uploads", "relatorios"), { recursive: true });
+./server.js:1086:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.js:2479:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.js:2717:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-login-form-direto-20260617-150559.js:103:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-login-form-direto-20260617-150559.js:162:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-login-form-direto-20260617-150559.js:163:    path.join(__dirname, "uploads", "supera"),
+./server.backup-login-form-direto-20260617-150559.js:164:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-login-form-direto-20260617-150559.js:702:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-login-form-direto-20260617-150559.js:1542:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-login-form-direto-20260617-150559.js:1782:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-remove-trava-agenda-dia-20260616-215452.js:413:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-remove-trava-agenda-dia-20260616-215452.js:1253:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-remove-trava-agenda-dia-20260616-215452.js:1493:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./servidor-upload-final-cejas.sh:22:block_start = 'const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");'
+./servidor-upload-final-cejas.sh:32:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./blindar-dados-supabase-cejas.sh:341:  const root = path.join(process.cwd(), "uploads", "servidor");
+./blindar-dados-supabase-cejas.sh:359:  const root = path.join(process.cwd(), "uploads", "servidor");
+./server.backup-corrige-api-agenda-dia-20260616-214705.js:409:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-corrige-api-agenda-dia-20260616-214705.js:1249:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-corrige-api-agenda-dia-20260616-214705.js:1489:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-corrige-admin-menu-20260617-114348.js:62:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-corrige-admin-menu-20260617-114348.js:121:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-corrige-admin-menu-20260617-114348.js:122:    path.join(__dirname, "uploads", "supera"),
+./server.backup-corrige-admin-menu-20260617-114348.js:123:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-corrige-admin-menu-20260617-114348.js:640:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-corrige-admin-menu-20260617-114348.js:1480:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-corrige-admin-menu-20260617-114348.js:1720:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-ajuste-login-ordem-20260617-125330.js:65:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-ajuste-login-ordem-20260617-125330.js:124:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-ajuste-login-ordem-20260617-125330.js:125:    path.join(__dirname, "uploads", "supera"),
+./server.backup-ajuste-login-ordem-20260617-125330.js:126:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-ajuste-login-ordem-20260617-125330.js:643:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-ajuste-login-ordem-20260617-125330.js:1483:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-ajuste-login-ordem-20260617-125330.js:1723:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./aplicar-servidor-inteligente-cejas.sh:23:start_marker = 'const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");'
+./aplicar-servidor-inteligente-cejas.sh:33:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-refaz-login-limpo-20260617-145226.js:103:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-refaz-login-limpo-20260617-145226.js:162:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-refaz-login-limpo-20260617-145226.js:163:    path.join(__dirname, "uploads", "supera"),
+./server.backup-refaz-login-limpo-20260617-145226.js:164:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-refaz-login-limpo-20260617-145226.js:702:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-refaz-login-limpo-20260617-145226.js:1542:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-refaz-login-limpo-20260617-145226.js:1782:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-corrige-syntax-financeiro-20260617-180236.js:77:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-corrige-syntax-financeiro-20260617-180236.js:136:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-corrige-syntax-financeiro-20260617-180236.js:137:    path.join(__dirname, "uploads", "supera"),
+./server.backup-corrige-syntax-financeiro-20260617-180236.js:138:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-corrige-syntax-financeiro-20260617-180236.js:189:    fs.mkdirSync(path.join(__dirname, "uploads", "relatorios"), { recursive: true });
+./server.backup-corrige-syntax-financeiro-20260617-180236.js:740:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-corrige-syntax-financeiro-20260617-180236.js:1592:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-corrige-syntax-financeiro-20260617-180236.js:1832:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./financeiro.backup-recupera-layout-20260618-154246.html:882:        : "Nenhum arquivo financeiro encontrado ainda. Clique em Sincronizar servidor ou confira se existem PDFs dentro de uploads.";
+./server.backup-destrava-login-sessao-20260617-143718.js:84:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-destrava-login-sessao-20260617-143718.js:143:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-destrava-login-sessao-20260617-143718.js:144:    path.join(__dirname, "uploads", "supera"),
+./server.backup-destrava-login-sessao-20260617-143718.js:145:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-destrava-login-sessao-20260617-143718.js:675:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-destrava-login-sessao-20260617-143718.js:1515:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-destrava-login-sessao-20260617-143718.js:1755:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./aplicar-servidor-v2-mobile-relatorio.sh:32:block_start = 'const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");'
+./aplicar-servidor-v2-mobile-relatorio.sh:43:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./financeiro.backup-padrao-unico-20260618-152710.html:1025:        : "Nenhum arquivo financeiro encontrado ainda. Clique em Sincronizar servidor ou confira se existem PDFs dentro de uploads.";
+./server.backup-orcamento-pdf-servidor-20260616-230757.js:417:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-orcamento-pdf-servidor-20260616-230757.js:1257:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-orcamento-pdf-servidor-20260616-230757.js:1497:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-apagar-relatorio-definitivo-20260617-105458.js:500:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-apagar-relatorio-definitivo-20260617-105458.js:1340:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-apagar-relatorio-definitivo-20260617-105458.js:1580:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./uploads/servidor/_SISTEMA/data/financeiro.json:14:          "caminho": "uploads/servidor/2026/Fevereiro/ZANOTTI 10.02/ORCAMENTO - ZANOTTI 10.02.pdf",
+./server.backup-permissao-upload-supera-20260617-165714.js:76:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-permissao-upload-supera-20260617-165714.js:135:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-permissao-upload-supera-20260617-165714.js:136:    path.join(__dirname, "uploads", "supera"),
+./server.backup-permissao-upload-supera-20260617-165714.js:137:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-permissao-upload-supera-20260617-165714.js:731:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-permissao-upload-supera-20260617-165714.js:1571:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-permissao-upload-supera-20260617-165714.js:1811:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-financeiro-clicavel-20260617-180601.js:77:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-financeiro-clicavel-20260617-180601.js:136:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-financeiro-clicavel-20260617-180601.js:137:    path.join(__dirname, "uploads", "supera"),
+./server.backup-financeiro-clicavel-20260617-180601.js:138:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-financeiro-clicavel-20260617-180601.js:189:    fs.mkdirSync(path.join(__dirname, "uploads", "relatorios"), { recursive: true });
+./server.backup-financeiro-clicavel-20260617-180601.js:740:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-financeiro-clicavel-20260617-180601.js:1592:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-financeiro-clicavel-20260617-180601.js:1832:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-upload-inteligente-20260615-143023.js:390:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-upload-inteligente-20260615-143023.js:1230:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./proteger-dados-servidor-cejas.sh:30:  --exclude='uploads/tmp-servidor' \
+./proteger-dados-servidor-cejas.sh:31:  --exclude='uploads/servidor/tmp-servidor' \
+./proteger-dados-servidor-cejas.sh:35:  uploads data 2>/dev/null || true
+./proteger-dados-servidor-cejas.sh:72:const arquivosServidor = walk(path.join(root, "uploads", "servidor"));
+./server.backup-servidor-drag-drop-20260615-135041.js:390:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-servidor-drag-drop-20260615-135041.js:1230:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./financeiro.backup-corrige-escala-20260618-153018.html:883:        : "Nenhum arquivo financeiro encontrado ainda. Clique em Sincronizar servidor ou confira se existem PDFs dentro de uploads.";
+./server.backup-servidor-20260615-132754.js:390:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./README.md:13:- ✓ **Servidor**: Gerenciamento de uploads
+./README.md:45:Este projeto é um backend Node.js/Express que usa `app.listen`, sessões, uploads de arquivos e lógica de servidor persistente. O Vercel funciona melhor com funções serverless, e não com um servidor Express completo.
+./README.md:55:O `render.yaml` também ativa `CEJAS_PERSISTENT_DATA_DIR=/opt/render/project/src/uploads/.data`, para que relatórios importados, usuários locais, financeiro e agenda manual local sobrevivam aos redeploys.
+./README.md:115:- Verifique permissões em `uploads/`
+./DEPLOY.md:75:CEJAS_PERSISTENT_DATA_DIR=/opt/render/project/src/uploads/.data
+./DEPLOY.md:82:O `CEJAS_PERSISTENT_DATA_DIR` usa o disco persistente montado em `uploads/` para manter os JSONs dinamicos entre redeploys.
+./DEPLOY.md:244:└── uploads/                  ← Uploads de usuários (local)
+./server.backup-financeiro-20260617-175917.js:76:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-financeiro-20260617-175917.js:135:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-financeiro-20260617-175917.js:136:    path.join(__dirname, "uploads", "supera"),
+./server.backup-financeiro-20260617-175917.js:137:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-financeiro-20260617-175917.js:188:    fs.mkdirSync(path.join(__dirname, "uploads", "relatorios"), { recursive: true });
+./server.backup-financeiro-20260617-175917.js:736:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-financeiro-20260617-175917.js:1582:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-financeiro-20260617-175917.js:1822:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-pdf-sem-json-20260616-233754.js:419:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-pdf-sem-json-20260616-233754.js:1259:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-pdf-sem-json-20260616-233754.js:1499:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-financeiro-20260617-175937.js:76:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-financeiro-20260617-175937.js:135:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-financeiro-20260617-175937.js:136:    path.join(__dirname, "uploads", "supera"),
+./server.backup-financeiro-20260617-175937.js:137:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-financeiro-20260617-175937.js:188:    fs.mkdirSync(path.join(__dirname, "uploads", "relatorios"), { recursive: true });
+./server.backup-financeiro-20260617-175937.js:736:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-financeiro-20260617-175937.js:1582:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-financeiro-20260617-175937.js:1822:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./.gitignore:20:uploads/
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214507.js:409:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214507.js:1249:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214507.js:1489:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./scripts/auditoria-dados-cejas.js:29:const arquivosServidor = walk(path.join(root, "uploads", "servidor"));
+./scripts/backup-dados-cejas.sh:12:  --exclude='uploads/tmp-servidor' \
+./scripts/backup-dados-cejas.sh:13:  --exclude='uploads/servidor/tmp-servidor' \
+./scripts/backup-dados-cejas.sh:17:  uploads data 2>/dev/null || true
+./scripts/limpar-json-e-meses-duplicados.js:4:const base = path.join(__dirname, "..", "uploads", "servidor");
+./scripts/sync-servidor-supabase.js:8:  const root = path.join(process.cwd(), "uploads", "servidor");
+./scripts/restaurar-servidor-supabase.js:8:  const root = path.join(process.cwd(), "uploads", "servidor");
+./server.backup-dashboard-permissoes-orcamento-servidor-20260616-224721.js:416:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-dashboard-permissoes-orcamento-servidor-20260616-224721.js:1256:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-dashboard-permissoes-orcamento-servidor-20260616-224721.js:1496:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-libera-entrar-login-20260617-151513.js:103:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-libera-entrar-login-20260617-151513.js:162:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-libera-entrar-login-20260617-151513.js:163:    path.join(__dirname, "uploads", "supera"),
+./server.backup-libera-entrar-login-20260617-151513.js:164:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-libera-entrar-login-20260617-151513.js:702:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-libera-entrar-login-20260617-151513.js:1542:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-libera-entrar-login-20260617-151513.js:1782:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-configuracoes-2-20260617-000310.js:486:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-configuracoes-2-20260617-000310.js:1326:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-configuracoes-2-20260617-000310.js:1566:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-botao-pdf-exclusao-superadmin-20260616-234307.js:419:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-botao-pdf-exclusao-superadmin-20260616-234307.js:1259:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-botao-pdf-exclusao-superadmin-20260616-234307.js:1499:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./financeiro.backup-remove-global-bug-20260618-151630.html:881:        : "Nenhum arquivo financeiro encontrado ainda. Clique em Sincronizar servidor ou confira se existem PDFs dentro de uploads.";
+./server.backup-render-index-20260618-141014.js:59:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-render-index-20260618-141014.js:84:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-render-index-20260618-141014.js:143:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-render-index-20260618-141014.js:144:    path.join(__dirname, "uploads", "supera"),
+./server.backup-render-index-20260618-141014.js:145:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-render-index-20260618-141014.js:196:    fs.mkdirSync(path.join(__dirname, "uploads", "relatorios"), { recursive: true });
+./server.backup-render-index-20260618-141014.js:750:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-render-index-20260618-141014.js:1602:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-render-index-20260618-141014.js:1842:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214513.js:409:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214513.js:1249:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-ajuste-agenda-plus-topo-api-20260616-214513.js:1489:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./lib/orcamento-pdf-servidor.js:82:  const pastaAnoLocal = path.join(__dirname, "..", "uploads", "servidor", ano);
+./lib/orcamento-pdf-servidor.js:200:      const dirLocal = path.join(__dirname, "..", "uploads", "servidor", pasta.caminhoLocalRelativo);
+./lib/servidor-pdf-viewer.js:15:      const base = path.resolve(__dirname, "..", "uploads", "servidor");
+./lib/cejas-fase2.js:513:      const baseDir = path.join(__dirname, "..", "uploads", "servidor", pasta.caminhoRelativo);
+./lib/persistencia-total-supabase.js:247:  const root = path.join(process.cwd(), "uploads", "servidor");
+./lib/persistencia-total-supabase.js:263:  const root = path.join(process.cwd(), "uploads", "servidor");
+./lib/persistencia-total-supabase.js:396:  const localServidor = listarArquivosLocais(path.join(process.cwd(), "uploads", "servidor"));
+./lib/dashboard-permissoes-orcamento.js:246:      const dirLocal = path.join(__dirname, "..", "uploads", "servidor", pasta.relativo);
+./lib/dashboard-permissoes-orcamento.backup-painel-dia-20260617-104544.js:246:      const dirLocal = path.join(__dirname, "..", "uploads", "servidor", pasta.relativo);
+./lib/render-persistent-data.js:53:    (process.env.RENDER ? path.join(rootDir, "uploads", ".data") : "");
+./lib/servidor-supabase-definitivo.js:8:const TMP_ROOT = path.join(process.cwd(), "uploads", "tmp-servidor-supabase");
+./lib/orcamento-pdf-servidor.backup-mes-existente-20260616-232714.js:160:      const dirLocal = path.join(__dirname, "..", "uploads", "servidor", pasta.caminhoLocalRelativo);
+./lib/financeiro-cejas.js:6:const UPLOADS_DIR = path.join(__dirname, "..", "uploads");
+./lib/financeiro-cejas.js:187:  if (relLower.includes("uploads/relatorios/")) return true;
+./lib/configuracoes-cejas.js:321:      const localDir = path.join(__dirname, "..", "uploads", "configuracoes");
+./lib/configuracoes-cejas.js:330:        url: `/uploads/configuracoes/${localName}`
+./lib/orcamento-pdf-servidor.backup-sem-json-20260616-233754.js:82:  const pastaAnoLocal = path.join(__dirname, "..", "uploads", "servidor", ano);
+./lib/orcamento-pdf-servidor.backup-sem-json-20260616-233754.js:199:      const dirLocal = path.join(__dirname, "..", "uploads", "servidor", pasta.caminhoLocalRelativo);
+./lib/dashboard-permissoes-orcamento.backup-remove-card-painel-dia-20260617-104913.js:247:      const dirLocal = path.join(__dirname, "..", "uploads", "servidor", pasta.relativo);
+./lib/chat-cejas-api.js:434:      const localDir = path.join(__dirname, "..", "uploads", "chat");
+./lib/chat-cejas-api.js:442:        arquivo_url: `/uploads/chat/${nomeArquivo}`,
+./lib/chat-cejas-api.js:443:        arquivo_path: `local:uploads/chat/${nomeArquivo}`,
+./lib/financeiro-cejas.backup-auto-sync-20260617-180921.js:6:const UPLOADS_DIR = path.join(__dirname, "..", "uploads");
+./server.backup-limpeza-login-definitiva-20260617-155655.js:103:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-limpeza-login-definitiva-20260617-155655.js:162:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-limpeza-login-definitiva-20260617-155655.js:163:    path.join(__dirname, "uploads", "supera"),
+./server.backup-limpeza-login-definitiva-20260617-155655.js:164:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-limpeza-login-definitiva-20260617-155655.js:702:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-limpeza-login-definitiva-20260617-155655.js:1542:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-limpeza-login-definitiva-20260617-155655.js:1782:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./consertar-servidor-storage-e-orcamento-pdf.sh:14:[ -d uploads ] && cp -R uploads "$BACKUP_DIR/uploads" 2>/dev/null || true
+./consertar-servidor-storage-e-orcamento-pdf.sh:31:const LOCAL_ROOT = path.join(process.cwd(), "uploads", "servidor");
+./consertar-servidor-storage-e-orcamento-pdf.sh:32:const TMP_ROOT = path.join(process.cwd(), "uploads", "tmp-servidor-supabase");
+./server.backup-corrige-syntax-financeiro-20260617-180301.js:77:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-corrige-syntax-financeiro-20260617-180301.js:136:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-corrige-syntax-financeiro-20260617-180301.js:137:    path.join(__dirname, "uploads", "supera"),
+./server.backup-corrige-syntax-financeiro-20260617-180301.js:138:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-corrige-syntax-financeiro-20260617-180301.js:189:    fs.mkdirSync(path.join(__dirname, "uploads", "relatorios"), { recursive: true });
+./server.backup-corrige-syntax-financeiro-20260617-180301.js:740:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-corrige-syntax-financeiro-20260617-180301.js:1592:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-corrige-syntax-financeiro-20260617-180301.js:1832:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./subir-github-cejas.sh:34:uploads/
+./subir-github-cejas.sh:75:git rm -r --cached .env .env.* uploads .cejas-local-backups data/usuarios.json data/redefinicoes-senha-local.json data/chat-mensagens-local.json data/relatorio-supera.json data/relatorio-atual.json data/ultimo-relatorio-texto-extraido.txt data/agenda-manual-local.json data/gratuidades-manuais.json 2>/dev/null || true
+./financeiro.backup-global-compacto-20260618-145926.html:931:        : "Nenhum arquivo financeiro encontrado ainda. Clique em Sincronizar servidor ou confira se existem PDFs dentro de uploads.";
+./server.backup-antes-login-novo-total-20260617-150905.js:103:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-antes-login-novo-total-20260617-150905.js:162:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-antes-login-novo-total-20260617-150905.js:163:    path.join(__dirname, "uploads", "supera"),
+./server.backup-antes-login-novo-total-20260617-150905.js:164:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-antes-login-novo-total-20260617-150905.js:702:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-antes-login-novo-total-20260617-150905.js:1542:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-antes-login-novo-total-20260617-150905.js:1782:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./financeiro.html:906:        : "Nenhum arquivo financeiro encontrado ainda. Clique em Sincronizar servidor ou confira se existem PDFs dentro de uploads.";
+./server.backup-servidor-ano-mes-20260615-133132.js:390:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-servidor-ano-mes-20260615-133132.js:1230:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-auto-sync-supabase-20260616-205835.js:390:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-auto-sync-supabase-20260616-205835.js:1230:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-auto-sync-supabase-20260616-205835.js:1470:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-pdfparse-final-20260615-123654.js:324:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-financeiro-auto-sync-20260617-180921.js:77:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-financeiro-auto-sync-20260617-180921.js:136:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-financeiro-auto-sync-20260617-180921.js:137:    path.join(__dirname, "uploads", "supera"),
+./server.backup-financeiro-auto-sync-20260617-180921.js:138:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-financeiro-auto-sync-20260617-180921.js:189:    fs.mkdirSync(path.join(__dirname, "uploads", "relatorios"), { recursive: true });
+./server.backup-financeiro-auto-sync-20260617-180921.js:740:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-financeiro-auto-sync-20260617-180921.js:1592:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-financeiro-auto-sync-20260617-180921.js:1832:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-render-20260618-135615.js:59:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-render-20260618-135615.js:84:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-render-20260618-135615.js:143:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-render-20260618-135615.js:144:    path.join(__dirname, "uploads", "supera"),
+./server.backup-render-20260618-135615.js:145:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-render-20260618-135615.js:196:    fs.mkdirSync(path.join(__dirname, "uploads", "relatorios"), { recursive: true });
+./server.backup-render-20260618-135615.js:750:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-render-20260618-135615.js:1602:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-render-20260618-135615.js:1842:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-libera-js-financeiro-20260617-181220.js:77:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-libera-js-financeiro-20260617-181220.js:136:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-libera-js-financeiro-20260617-181220.js:137:    path.join(__dirname, "uploads", "supera"),
+./server.backup-libera-js-financeiro-20260617-181220.js:138:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-libera-js-financeiro-20260617-181220.js:189:    fs.mkdirSync(path.join(__dirname, "uploads", "relatorios"), { recursive: true });
+./server.backup-libera-js-financeiro-20260617-181220.js:743:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-libera-js-financeiro-20260617-181220.js:1595:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-libera-js-financeiro-20260617-181220.js:1835:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./.env.example:25:# CEJAS_PERSISTENT_DATA_DIR=/opt/render/project/src/uploads/.data
+./financeiro.backup-sidebar-padrao-20260618-152021.html:1153:        : "Nenhum arquivo financeiro encontrado ainda. Clique em Sincronizar servidor ou confira se existem PDFs dentro de uploads.";
+./financeiro.backup-padrao-demais-abas-20260618-151819.html:880:        : "Nenhum arquivo financeiro encontrado ainda. Clique em Sincronizar servidor ou confira se existem PDFs dentro de uploads.";
+./corrigir-start-sem-restore-servidor-cejas.sh:22:  console.log("⚠️ Não será feita restauração de uploads locais no start.");
+./server.backup-parser-supera-v2-20260615-124003.js:351:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./financeiro.backup-visual-final-20260618-160034.html:882:        : "Nenhum arquivo financeiro encontrado ainda. Clique em Sincronizar servidor ou confira se existem PDFs dentro de uploads.";
+./server.backup-login-admin-override-20260617-144404.js:103:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-login-admin-override-20260617-144404.js:162:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-login-admin-override-20260617-144404.js:163:    path.join(__dirname, "uploads", "supera"),
+./server.backup-login-admin-override-20260617-144404.js:164:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-login-admin-override-20260617-144404.js:702:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-login-admin-override-20260617-144404.js:1542:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-login-admin-override-20260617-144404.js:1782:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-menu-financeiro-20260617-180448.js:77:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-menu-financeiro-20260617-180448.js:136:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-menu-financeiro-20260617-180448.js:137:    path.join(__dirname, "uploads", "supera"),
+./server.backup-menu-financeiro-20260617-180448.js:138:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-menu-financeiro-20260617-180448.js:189:    fs.mkdirSync(path.join(__dirname, "uploads", "relatorios"), { recursive: true });
+./server.backup-menu-financeiro-20260617-180448.js:740:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-menu-financeiro-20260617-180448.js:1592:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-menu-financeiro-20260617-180448.js:1832:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./data/financeiro.json:14:          "caminho": "uploads/servidor/2026/Fevereiro/ZANOTTI 10.02/ORCAMENTO - ZANOTTI 10.02.pdf",
+./server.backup-login-admin-override-20260617-144415.js:103:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-login-admin-override-20260617-144415.js:162:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-login-admin-override-20260617-144415.js:163:    path.join(__dirname, "uploads", "supera"),
+./server.backup-login-admin-override-20260617-144415.js:164:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-login-admin-override-20260617-144415.js:702:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-login-admin-override-20260617-144415.js:1542:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-login-admin-override-20260617-144415.js:1782:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./DEPLOY_STATUS.txt:117:└── uploads/                     ← User uploads
+./DEPLOY_STATUS.txt:135:                      ├─ File uploads
+./DEPLOY_STATUS.txt:154:A: Backend needs /uploads folder (auto-created). Check Render file system permissions.
+./server.backup-login-cejas-20260617-124832.js:62:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-login-cejas-20260617-124832.js:121:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-login-cejas-20260617-124832.js:122:    path.join(__dirname, "uploads", "supera"),
+./server.backup-login-cejas-20260617-124832.js:123:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-login-cejas-20260617-124832.js:640:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-login-cejas-20260617-124832.js:1480:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-login-cejas-20260617-124832.js:1720:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-fix-pdfparse-20260615-123518.js:319:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-forca-configuracoes-v2-20260617-000733.js:487:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-forca-configuracoes-v2-20260617-000733.js:1327:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-forca-configuracoes-v2-20260617-000733.js:1567:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-agenda-plus-20260616-213245.js:392:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-agenda-plus-20260616-213245.js:1232:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-agenda-plus-20260616-213245.js:1472:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./financeiro.backup-layout-compacto-20260618-143311.html:669:        : "Nenhum arquivo financeiro encontrado ainda. Clique em Sincronizar servidor ou confira se existem PDFs dentro de uploads.";
+./corrigir-storage-rest-supabase-cejas.sh:24:const LOCAL_ROOT = path.join(process.cwd(), "uploads", "servidor");
+./corrigir-storage-rest-supabase-cejas.sh:25:const TMP_ROOT = path.join(process.cwd(), "uploads", "tmp-servidor-supabase");
+./server.backup-corrige-login-401-20260617-125621.js:65:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-corrige-login-401-20260617-125621.js:124:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-corrige-login-401-20260617-125621.js:125:    path.join(__dirname, "uploads", "supera"),
+./server.backup-corrige-login-401-20260617-125621.js:126:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-corrige-login-401-20260617-125621.js:643:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-corrige-login-401-20260617-125621.js:1483:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-corrige-login-401-20260617-125621.js:1723:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-agenda-dia-livre-20260616-215809.js:412:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-agenda-dia-livre-20260616-215809.js:1252:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-agenda-dia-livre-20260616-215809.js:1492:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./corrigir-servidor-modelo-final-cejas.sh:22:block_start = 'const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");'
+./corrigir-servidor-modelo-final-cejas.sh:32:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-apagar-supabase-relatorio-20260616-210243.js:391:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-apagar-supabase-relatorio-20260616-210243.js:1231:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-apagar-supabase-relatorio-20260616-210243.js:1471:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-menu-permissoes-fixo-20260617-112715.js:55:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-menu-permissoes-fixo-20260617-112715.js:114:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-menu-permissoes-fixo-20260617-112715.js:115:    path.join(__dirname, "uploads", "supera"),
+./server.backup-menu-permissoes-fixo-20260617-112715.js:116:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-menu-permissoes-fixo-20260617-112715.js:633:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-menu-permissoes-fixo-20260617-112715.js:1473:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-menu-permissoes-fixo-20260617-112715.js:1713:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+./server.backup-libera-login-publico-20260617-130106.js:65:app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
+./server.backup-libera-login-publico-20260617-130106.js:124:    path.join(__dirname, "uploads", "relatorios"),
+./server.backup-libera-login-publico-20260617-130106.js:125:    path.join(__dirname, "uploads", "supera"),
+./server.backup-libera-login-publico-20260617-130106.js:126:    path.join(__dirname, "uploads", "importar-relatorio")
+./server.backup-libera-login-publico-20260617-130106.js:643:const RELATORIO_UPLOAD_DIR = path.join(__dirname, "uploads", "relatorios");
+./server.backup-libera-login-publico-20260617-130106.js:1483:const SERVIDOR_DIR = path.join(__dirname, "uploads", "servidor");
+./server.backup-libera-login-publico-20260617-130106.js:1723:const SERVIDOR_TMP_DIR = path.join(__dirname, "uploads", "tmp-servidor");
+
