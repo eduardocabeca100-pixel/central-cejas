@@ -2289,5 +2289,149 @@ async function criarBackupSegurancaServidorCejas() {
 // CEJAS_SERVIDOR_ESTAVEL_APAGAR_TUDO_END
 </script>
 
+
+<script>
+// CEJAS_UPLOAD_ZIP_SERVIDOR_START
+(function () {
+  if (window.__CEJAS_UPLOAD_ZIP_SERVIDOR__) return;
+  window.__CEJAS_UPLOAD_ZIP_SERVIDOR__ = true;
+
+  function criarBotaoZip() {
+    if (document.getElementById("cejasZipServidorInput")) return;
+
+    const area =
+      document.querySelector(".actions") ||
+      document.querySelector(".topbar") ||
+      document.querySelector("main") ||
+      document.body;
+
+    const wrap = document.createElement("div");
+    wrap.id = "cejasZipServidorWrap";
+    wrap.style.cssText = "display:inline-flex;align-items:center;gap:8px;margin-left:8px;flex-wrap:wrap;";
+
+    const input = document.createElement("input");
+    input.id = "cejasZipServidorInput";
+    input.type = "file";
+    input.accept = ".zip,application/zip,application/x-zip-compressed";
+    input.style.display = "none";
+
+    const btn = document.createElement("button");
+    btn.id = "cejasZipServidorBtn";
+    btn.type = "button";
+    btn.textContent = "Enviar ZIP";
+    btn.style.cssText = `
+      border:1px solid rgba(168,85,247,.42);
+      background:linear-gradient(135deg,rgba(168,85,247,.95),rgba(217,70,239,.90));
+      color:white;
+      border-radius:12px;
+      padding:11px 14px;
+      font-weight:950;
+      cursor:pointer;
+      box-shadow:0 12px 32px rgba(168,85,247,.22);
+    `;
+
+    const status = document.createElement("span");
+    status.id = "cejasZipServidorStatus";
+    status.style.cssText = "font-size:12px;color:rgba(255,255,255,.70);font-weight:800;";
+
+    btn.addEventListener("click", () => input.click());
+
+    input.addEventListener("change", async () => {
+      const file = input.files && input.files[0];
+
+      if (!file) return;
+
+      if (!file.name.toLowerCase().endsWith(".zip")) {
+        alert("Selecione um arquivo .zip.");
+        input.value = "";
+        return;
+      }
+
+      const ok = confirm(
+        `Enviar o ZIP "${file.name}" para o Servidor?\n\nO sistema vai abrir o ZIP, manter as pastas e enviar os arquivos para o Supabase Storage.`
+      );
+
+      if (!ok) {
+        input.value = "";
+        return;
+      }
+
+      await enviarZip(file, btn, status);
+      input.value = "";
+    });
+
+    wrap.appendChild(input);
+    wrap.appendChild(btn);
+    wrap.appendChild(status);
+    area.appendChild(wrap);
+  }
+
+  async function respostaJsonSegura(response) {
+    const text = await response.text();
+
+    try {
+      return JSON.parse(text);
+    } catch {
+      throw new Error(text.slice(0, 500) || `Resposta inválida HTTP ${response.status}`);
+    }
+  }
+
+  async function enviarZip(file, btn, status) {
+    const form = new FormData();
+    form.append("zip", file);
+
+    btn.disabled = true;
+    btn.textContent = "Enviando ZIP...";
+    status.textContent = "Processando arquivo. Não feche a página.";
+
+    try {
+      const response = await fetch(`/api/servidor/upload-zip?_ts=${Date.now()}`, {
+        method: "POST",
+        cache: "no-store",
+        body: form
+      });
+
+      const data = await respostaJsonSegura(response);
+
+      if (!response.ok || data.ok === false) {
+        throw new Error(data.message || "Erro ao enviar ZIP.");
+      }
+
+      let msg = data.message || "ZIP enviado com sucesso.";
+
+      if (data.falhas && data.falhas.length) {
+        msg += `\n\nFalhas: ${data.falhas.length}`;
+      }
+
+      alert(msg);
+
+      status.textContent = `${data.enviados || 0} arquivo(s) enviados.`;
+
+      setTimeout(() => {
+        if (typeof window.carregarServidor === "function") {
+          window.carregarServidor();
+        } else {
+          location.reload();
+        }
+      }, 800);
+    } catch (error) {
+      console.error(error);
+      alert("Erro ao enviar ZIP: " + error.message);
+      status.textContent = "Erro no envio do ZIP.";
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Enviar ZIP";
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    criarBotaoZip();
+    setTimeout(criarBotaoZip, 1000);
+    setTimeout(criarBotaoZip, 2500);
+  });
+})();
+// CEJAS_UPLOAD_ZIP_SERVIDOR_END
+</script>
+
 </body>
 </html>
